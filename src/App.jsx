@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 /* =========================
@@ -20,46 +20,38 @@ function buildDeck() {
 }
 
 /* =========================
-   RULES (MAX DEGEN)
+   RULES
 ========================= */
 function getRuleText(rank) {
   switch (rank) {
     case "A": return "Waterfall. Weaklings die first.";
     case "2": return "You. Choose a victim.";
     case "3": return "Me. Suffer.";
-    case "4": return "Whores. Everyone drinks. Yes, you too.";
-    case "5": return "Guys drink. Cry about it.";
+    case "4": return "Whores. Everyone drinks.";
+    case "5": return "Guys drink.";
     case "6": return "Dicks. Everyone drinks again.";
-    case "7": return "Heaven. Last hand up gets humiliated.";
-    case "8": return "Mate. Pick a lifelong burden.";
+    case "7": return "Heaven. Last hand up drinks.";
+    case "8": return "Mate. Pick your curse.";
     case "9": return "Rhyme. Brain lag = chug.";
-    case "10": return "Categories. Think fast, idiot.";
-    case "J": return "Thumb Master. Miss it, sip shame.";
-    case "Q": return "Question Master. Answer = drink.";
+    case "10": return "Categories. Think fast.";
+    case "J": return "Thumb Master.";
+    case "Q": return "Question Master.";
     case "K": return "Make a rule. Abuse it.";
     default: return "";
   }
 }
 
 /* =========================
-   MEDAL SYSTEM (TIERED)
+   MEDAL LOGIC
 ========================= */
-function calculateMedals(players) {
-  return players.map(p => {
-    const medals = [];
-
-    if (p.drinks >= 5) medals.push({ tier: "bronze", name: "Warm-Up Wreck" });
-    if (p.drinks >= 10) medals.push({ tier: "silver", name: "Certified Liability" });
-    if (p.drinks >= 15) medals.push({ tier: "gold", name: "Menace to Sobriety" });
-    if (p.drinks >= 20) medals.push({ tier: "mythic", name: "Walking Poor Decision" });
-    if (p.drinks >= 25) medals.push({ tier: "forbidden", name: "Public Health Emergency" });
-
-    if (p.drinks === Math.max(...players.map(x => x.drinks))) {
-      medals.push({ tier: "legendary", name: "Final Boss of Bad Choices" });
-    }
-
-    return { ...p, medals };
-  });
+function getNewMedals(player) {
+  const medals = [];
+  if (player.drinks === 5) medals.push("Warm-Up Wreck");
+  if (player.drinks === 10) medals.push("Certified Liability");
+  if (player.drinks === 15) medals.push("Menace to Sobriety");
+  if (player.drinks === 20) medals.push("Walking Poor Decision");
+  if (player.drinks === 25) medals.push("Public Health Emergency");
+  return medals;
 }
 
 /* =========================
@@ -77,12 +69,14 @@ export default function App() {
   const [thumbMaster, setThumbMaster] = useState(null);
   const [questionMaster, setQuestionMaster] = useState(null);
 
+  const [popup, setPopup] = useState(null);
+
   /* =========================
      SETUP
   ========================= */
   function addPlayer() {
     if (!nameInput.trim()) return;
-    setPlayers([...players, { name: nameInput, drinks: 0 }]);
+    setPlayers([...players, { name: nameInput, drinks: 0, medals: [] }]);
     setNameInput("");
   }
 
@@ -98,7 +92,7 @@ export default function App() {
   }
 
   /* =========================
-     DRAW
+     DRAW CARD
   ========================= */
   function drawCard() {
     if (deck.length === 0) return;
@@ -107,11 +101,21 @@ export default function App() {
     const card = nextDeck.pop();
 
     const updatedPlayers = [...players];
-    updatedPlayers[turn].drinks += 1;
+    const current = updatedPlayers[turn];
+    current.drinks += 1;
 
-    if (card.rank === "7") setHeaven(players[turn].name);
-    if (card.rank === "J") setThumbMaster(players[turn].name);
-    if (card.rank === "Q") setQuestionMaster(players[turn].name);
+    const newMedals = getNewMedals(current);
+    if (newMedals.length > 0) {
+      current.medals.push(...newMedals);
+      setPopup({
+        player: current.name,
+        medal: newMedals[0]
+      });
+    }
+
+    if (card.rank === "7") setHeaven(current.name);
+    if (card.rank === "J") setThumbMaster(current.name);
+    if (card.rank === "Q") setQuestionMaster(current.name);
 
     setPlayers(updatedPlayers);
     setDeck(nextDeck);
@@ -124,8 +128,14 @@ export default function App() {
     }
   }
 
+  useEffect(() => {
+    if (popup) {
+      const timer = setTimeout(() => setPopup(null), 2800);
+      return () => clearTimeout(timer);
+    }
+  }, [popup]);
+
   const currentCard = discard[discard.length - 1];
-  const finalPlayers = gameOver ? calculateMedals(players) : players;
 
   /* =========================
      RENDER
@@ -133,6 +143,14 @@ export default function App() {
   return (
     <div className="app">
       <h1>KAD Kings</h1>
+
+      {popup && (
+        <div className="medal-popup">
+          <h2>{popup.player}</h2>
+          <p>UNLOCKED</p>
+          <span>{popup.medal}</span>
+        </div>
+      )}
 
       {/* SETUP */}
       {deck.length === 0 && !gameOver && (
@@ -168,7 +186,7 @@ export default function App() {
           </div>
 
           <button className="draw" onClick={drawCard}>Draw Card</button>
-          <p className="count">Cards left: {deck.length}</p>
+          <p>Cards left: {deck.length}</p>
 
           {currentCard && (
             <div className="card">
@@ -193,18 +211,16 @@ export default function App() {
       {gameOver && (
         <div className="game-over">
           <h2>Deck Empty</h2>
-          <p>No winners. Just survivors.</p>
+          <p>No winners. Just consequences.</p>
 
-          {finalPlayers
+          {players
             .sort((a, b) => b.drinks - a.drinks)
             .map((p, i) => (
               <div key={i} className="medal-card">
-                <h3>{p.name} — {p.drinks} drinks</h3>
+                <h3>{p.name} — {p.drinks}</h3>
                 <div className="medals">
                   {p.medals.map((m, j) => (
-                    <span key={j} className={`medal ${m.tier}`}>
-                      {m.name}
-                    </span>
+                    <span key={j} className="medal">{m}</span>
                   ))}
                 </div>
               </div>
