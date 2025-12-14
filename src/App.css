@@ -26,47 +26,53 @@ button {
 }
 
 /* =========================
-   CARD FLIP SYSTEM
+   CARD SYSTEM (FIXED)
 ========================= */
 .card-container {
   position: relative;
   width: 240px;
   height: 340px;
-  margin: 20px auto;
-  perspective: 1200px;
+  margin: 24px auto;
+  perspective: 1000px;
 }
 
+/* lock transforms */
 .card-back,
 .card-face {
   position: absolute;
   inset: 0;
   border-radius: 18px;
   backface-visibility: hidden;
+  transform-style: preserve-3d;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* CARD BACK */
 .card-back {
   background: linear-gradient(135deg, #222, #000);
   color: white;
   font-size: 48px;
   font-weight: 900;
   letter-spacing: 4px;
+  transform: rotateY(0deg);
 }
 
+/* CARD FRONT */
 .card-face {
   background: white;
   transform: rotateY(180deg);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.6);
 }
 
+/* FLIP */
 .card-container.flip .card-back {
   transform: rotateY(180deg);
 }
 
 .card-container.flip .card-face {
-  transform: rotateY(0deg);
+  transform: rotateY(360deg);
 }
 
 .red { color: #dc2626; }
@@ -102,53 +108,54 @@ button {
   top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 100px;
+  font-size: 96px;
   opacity: 0.15;
 }
 
+/* RULE STAYS INSIDE CARD */
 .rule-box {
   position: absolute;
-  bottom: 14px;
-  left: 14px;
-  right: 14px;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
   padding: 10px;
-  background: rgba(255,255,255,0.95);
+  background: #f9fafb;
   border-radius: 12px;
-  color: black;
+  color: #111;
   font-weight: 600;
   font-size: 14px;
+  text-align: center;
 }
 
 /* =========================
-   SPECIAL CARD EFFECTS
+   SPECIAL EFFECTS (SAFE)
 ========================= */
-.special-7 { animation: pulse 1s infinite; }
-.special-J { animation: shake 0.4s; }
-.special-Q { animation: glow 1.2s infinite; }
-.special-K { animation: slam 0.4s; }
+.special-7 {
+  box-shadow: 0 0 24px rgba(34,197,94,.6);
+}
 
-@keyframes pulse {
-  0% { box-shadow: 0 0 0px rgba(34,197,94,.4); }
-  50% { box-shadow: 0 0 30px rgba(34,197,94,.8); }
-  100% { box-shadow: 0 0 0px rgba(34,197,94,.4); }
+.special-J {
+  animation: shake 0.3s;
+}
+
+.special-Q {
+  box-shadow: 0 0 24px violet;
+}
+
+.special-K {
+  animation: slam 0.25s;
 }
 
 @keyframes shake {
   0% { transform: translateX(0); }
-  25% { transform: translateX(-6px); }
-  50% { transform: translateX(6px); }
-  75% { transform: translateX(-6px); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
   100% { transform: translateX(0); }
 }
 
-@keyframes glow {
-  0% { box-shadow: 0 0 10px purple; }
-  50% { box-shadow: 0 0 30px violet; }
-  100% { box-shadow: 0 0 10px purple; }
-}
-
 @keyframes slam {
-  0% { transform: scale(1.1); }
+  0% { transform: scale(1.08); }
   100% { transform: scale(1); }
 }
 
