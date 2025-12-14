@@ -24,15 +24,15 @@ function buildDeck() {
 ========================= */
 function getRuleText(rank) {
   switch (rank) {
-    case "A": return "Waterfall. Weaklings die first.";
+    case "A": return "Waterfall. Everyone drinks.";
     case "2": return "You. Choose a victim.";
-    case "3": return "Me. Suffer.";
+    case "3": return "Me. You drink.";
     case "4": return "Whores. Everyone drinks.";
     case "5": return "Guys drink.";
     case "6": return "Dicks. Everyone drinks again.";
     case "7": return "Heaven. Last hand up drinks.";
-    case "8": return "Mate. Pick your curse.";
-    case "9": return "Rhyme. Brain lag = chug.";
+    case "8": return "Mate. Pick a drinking buddy.";
+    case "9": return "Rhyme. Brain lag = drink.";
     case "10": return "Categories. Think fast.";
     case "J": return "Thumb Master.";
     case "Q": return "Question Master.";
@@ -42,15 +42,15 @@ function getRuleText(rank) {
 }
 
 /* =========================
-   MEDAL LOGIC
+   MEDALS
 ========================= */
 function getNewMedals(player) {
   const medals = [];
-  if (player.drinks === 5) medals.push("Warm-Up Wreck");
-  if (player.drinks === 10) medals.push("Certified Liability");
-  if (player.drinks === 15) medals.push("Menace to Sobriety");
-  if (player.drinks === 20) medals.push("Walking Poor Decision");
-  if (player.drinks === 25) medals.push("Public Health Emergency");
+  if (player.beers === 5) medals.push("Warm-Up Wreck");
+  if (player.beers === 10) medals.push("Certified Liability");
+  if (player.beers === 15) medals.push("Menace to Sobriety");
+  if (player.beers === 20) medals.push("Walking Bad Decision");
+  if (player.beers === 25) medals.push("Public Health Emergency");
   return medals;
 }
 
@@ -76,7 +76,10 @@ export default function App() {
   ========================= */
   function addPlayer() {
     if (!nameInput.trim()) return;
-    setPlayers([...players, { name: nameInput, drinks: 0, medals: [] }]);
+    setPlayers([
+      ...players,
+      { name: nameInput, beers: 0, medals: [] }
+    ]);
     setNameInput("");
   }
 
@@ -92,27 +95,17 @@ export default function App() {
   }
 
   /* =========================
-     DRAW CARD
+     GAMEPLAY
   ========================= */
   function drawCard() {
     if (deck.length === 0) return;
 
     const nextDeck = [...deck];
     const card = nextDeck.pop();
-
     const updatedPlayers = [...players];
     const current = updatedPlayers[turn];
-    current.drinks += 1;
 
-    const newMedals = getNewMedals(current);
-    if (newMedals.length > 0) {
-      current.medals.push(...newMedals);
-      setPopup({
-        player: current.name,
-        medal: newMedals[0]
-      });
-    }
-
+    // Roles
     if (card.rank === "7") setHeaven(current.name);
     if (card.rank === "J") setThumbMaster(current.name);
     if (card.rank === "Q") setQuestionMaster(current.name);
@@ -128,10 +121,23 @@ export default function App() {
     }
   }
 
+  function addBeer(index) {
+    const updated = [...players];
+    updated[index].beers += 1;
+
+    const newMedals = getNewMedals(updated[index]);
+    if (newMedals.length) {
+      updated[index].medals.push(...newMedals);
+      setPopup({ player: updated[index].name, medal: newMedals[0] });
+    }
+
+    setPlayers(updated);
+  }
+
   useEffect(() => {
     if (popup) {
-      const timer = setTimeout(() => setPopup(null), 2800);
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => setPopup(null), 2500);
+      return () => clearTimeout(t);
     }
   }, [popup]);
 
@@ -147,12 +153,10 @@ export default function App() {
       {popup && (
         <div className="medal-popup">
           <h2>{popup.player}</h2>
-          <p>UNLOCKED</p>
           <span>{popup.medal}</span>
         </div>
       )}
 
-      {/* SETUP */}
       {deck.length === 0 && !gameOver && (
         <div className="setup">
           <input
@@ -172,7 +176,6 @@ export default function App() {
         </div>
       )}
 
-      {/* GAME */}
       {deck.length > 0 && !gameOver && (
         <>
           <h2>
@@ -185,39 +188,46 @@ export default function App() {
             <p>❓ Questions: {questionMaster || "—"}</p>
           </div>
 
-          <button className="draw" onClick={drawCard}>Draw Card</button>
+          <button className="draw" onClick={drawCard}>
+            Draw Card
+          </button>
+
           <p>Cards left: {deck.length}</p>
 
           {currentCard && (
-            <div className="card">
-              <div className="corner top">{currentCard.rank}{currentCard.suit}</div>
+            <div className="card active-card">
+              <div className="corner top">
+                {currentCard.rank}{currentCard.suit}
+              </div>
               <div className="center">{currentCard.suit}</div>
-              <div className="corner bottom">{currentCard.rank}{currentCard.suit}</div>
-              <div className="rule">{getRuleText(currentCard.rank)}</div>
+              <div className="corner bottom">
+                {currentCard.rank}{currentCard.suit}
+              </div>
+              <div className="rule">
+                {getRuleText(currentCard.rank)}
+              </div>
             </div>
           )}
 
           <ul className="scores">
             {players.map((p, i) => (
               <li key={i} className={i === turn ? "active" : ""}>
-                {p.name}: {p.drinks}
+                {p.name} — 🍺 {p.beers}
+                <button onClick={() => addBeer(i)}>+1</button>
               </li>
             ))}
           </ul>
         </>
       )}
 
-      {/* GAME OVER */}
       {gameOver && (
         <div className="game-over">
           <h2>Deck Empty</h2>
-          <p>No winners. Just consequences.</p>
-
           {players
-            .sort((a, b) => b.drinks - a.drinks)
+            .sort((a, b) => b.beers - a.beers)
             .map((p, i) => (
               <div key={i} className="medal-card">
-                <h3>{p.name} — {p.drinks}</h3>
+                <h3>{p.name} — 🍺 {p.beers}</h3>
                 <div className="medals">
                   {p.medals.map((m, j) => (
                     <span key={j} className="medal">{m}</span>
