@@ -1,101 +1,116 @@
-/* GLOBAL */
 body {
   margin: 0;
-  background: #0f0f0f;
-  color: #eee;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0f172a;
+  color: #fff;
+  font-family: system-ui;
 }
 
 .app {
-  max-width: 480px;
-  margin: 0 auto;
+  max-width: 420px;
+  margin: auto;
   padding: 16px;
   text-align: center;
 }
 
-/* HEADERS */
-h1 {
-  margin-bottom: 10px;
-}
-
-h2, h3 {
-  margin: 8px 0;
-}
-
-/* SETUP */
-.setup input {
-  padding: 8px;
-  margin-right: 6px;
-}
-
-.setup button {
-  padding: 8px 12px;
-  margin-top: 8px;
-}
-
-/* BUTTONS */
 button {
-  background: #1e1e1e;
-  color: white;
-  border: 1px solid #333;
-  border-radius: 6px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  background: #22c55e;
+  font-weight: bold;
   cursor: pointer;
 }
 
-button:hover {
-  background: #333;
-}
-
-button.draw {
-  font-size: 18px;
-  padding: 12px 20px;
-  margin: 12px 0;
-}
-
-button.start {
-  margin-top: 12px;
-}
-
-/* ACTIVE TURN */
 .active {
-  color: #4caf50;
-  font-weight: bold;
-}
-
-/* ROLES */
-.roles {
-  display: flex;
-  justify-content: space-around;
-  margin: 10px 0;
-  font-size: 14px;
+  color: #22c55e;
 }
 
 /* CARD */
 .card {
-  margin: 16px auto;
-  padding: 20px;
-  width: 160px;
+  position: relative;
+  width: 260px;
+  height: 360px;
+  margin: 20px auto;
   background: white;
-  color: black;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  border-radius: 18px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  animation: flipIn 0.6s ease;
 }
 
-.rank {
-  font-size: 36px;
+.card.red { color: #dc2626; }
+.card.black { color: #111827; }
+
+.corner {
+  position: absolute;
   font-weight: bold;
 }
 
-.suit {
-  font-size: 28px;
+.corner.top { top: 12px; left: 12px; }
+.corner.bottom {
+  bottom: 12px;
+  right: 12px;
+  transform: rotate(180deg);
+}
+
+.center-suit {
+  font-size: 96px;
+  opacity: 0.15;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .rule {
-  margin-top: 8px;
-  font-size: 14px;
+  position: absolute;
+  bottom: 20px;
+  left: 12px;
+  right: 12px;
+  background: rgba(255,255,255,0.9);
+  padding: 10px;
+  border-radius: 12px;
+  color: black;
+  font-weight: bold;
 }
 
-/* GAME OVER */
-.game-over {
-  margin-top: 20px;
+/* DECK */
+.deck {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.deck-card {
+  width: 50px;
+  height: 70px;
+  background: #1e293b;
+  border-radius: 6px;
+  margin-left: -30px;
+}
+
+/* MEDALS */
+.medal {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 20px;
+  border-radius: 14px;
+  background: gold;
+  color: black;
+  animation: pop 0.4s ease;
+}
+
+.medal.legendary {
+  background: linear-gradient(90deg, #facc15, #fb7185);
+}
+
+@keyframes flipIn {
+  from { transform: rotateY(90deg); opacity: 0; }
+  to { transform: rotateY(0); opacity: 1; }
+}
+
+@keyframes pop {
+  from { transform: translateX(-50%) scale(0.5); }
+  to { transform: translateX(-50%) scale(1); }
 }
