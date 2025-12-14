@@ -1,0 +1,101 @@
+/* GLOBAL */
+body {
+  margin: 0;
+  background: #0f0f0f;
+  color: #eee;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  text-align: center;
+}
+
+/* HEADERS */
+h1 {
+  margin-bottom: 10px;
+}
+
+h2, h3 {
+  margin: 8px 0;
+}
+
+/* SETUP */
+.setup input {
+  padding: 8px;
+  margin-right: 6px;
+}
+
+.setup button {
+  padding: 8px 12px;
+  margin-top: 8px;
+}
+
+/* BUTTONS */
+button {
+  background: #1e1e1e;
+  color: white;
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #333;
+}
+
+button.draw {
+  font-size: 18px;
+  padding: 12px 20px;
+  margin: 12px 0;
+}
+
+button.start {
+  margin-top: 12px;
+}
+
+/* ACTIVE TURN */
+.active {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* ROLES */
+.roles {
+  display: flex;
+  justify-content: space-around;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+/* CARD */
+.card {
+  margin: 16px auto;
+  padding: 20px;
+  width: 160px;
+  background: white;
+  color: black;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.rank {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.suit {
+  font-size: 28px;
+}
+
+.rule {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+/* GAME OVER */
+.game-over {
+  margin-top: 20px;
+}
