@@ -1,4 +1,4 @@
-body {
+ body {
   margin: 0;
   background: radial-gradient(circle at top, #111, #000);
   font-family: system-ui, sans-serif;
@@ -11,8 +11,9 @@ body {
 }
 
 button {
-  padding: 10px 16px;
-  border-radius: 8px;
+  margin-left: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
   border: none;
   background: #333;
   color: white;
@@ -31,22 +32,33 @@ button:hover {
   font-weight: bold;
 }
 
+/* ===== CARD ===== */
 .card {
-  margin: 20px auto;
-  width: 260px;
-  height: 360px;
+  margin: 18px auto;
+  width: 200px;
+  height: 280px;
   background: white;
   color: black;
-  border-radius: 16px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 10px;
   position: relative;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-  animation: deal 0.4s ease;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.6);
+  animation: deal 0.35s ease;
+}
+
+.active-card {
+  box-shadow: 0 0 18px rgba(76, 175, 80, 0.8);
 }
 
 @keyframes deal {
-  from { transform: translateY(-40px) scale(0.95); opacity: 0; }
-  to { transform: none; opacity: 1; }
+  from {
+    transform: translateY(-30px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
 }
 
 .corner {
@@ -54,22 +66,46 @@ button:hover {
   font-weight: bold;
 }
 
-.corner.top { top: 10px; left: 12px; }
-.corner.bottom { bottom: 10px; right: 12px; transform: rotate(180deg); }
+.corner.top {
+  top: 8px;
+  left: 10px;
+}
+
+.corner.bottom {
+  bottom: 8px;
+  right: 10px;
+  transform: rotate(180deg);
+}
 
 .center {
-  font-size: 5rem;
+  font-size: 4rem;
   margin-top: 40px;
 }
 
 .rule {
   position: absolute;
-  bottom: 24px;
-  left: 16px;
-  right: 16px;
+  bottom: 16px;
+  left: 10px;
+  right: 10px;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
+/* ===== SCORES ===== */
+.scores {
+  list-style: none;
+  padding: 0;
+}
+
+.scores li {
+  margin: 8px 0;
+}
+
+.roles p {
+  margin: 4px 0;
+}
+
+/* ===== MEDALS ===== */
 .medal-popup {
   position: fixed;
   top: 20%;
@@ -77,40 +113,27 @@ button:hover {
   transform: translateX(-50%);
   background: black;
   border: 2px solid red;
-  padding: 20px 30px;
+  padding: 18px 26px;
   border-radius: 14px;
-  animation: pop 0.6s ease;
+  animation: pop 0.5s ease;
   z-index: 999;
 }
 
 @keyframes pop {
-  0% { transform: translate(-50%, 40px) scale(0.8); opacity: 0; }
-  100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
-}
-
-.medal-popup span {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
-  color: red;
-}
-
-.medal-card {
-  background: #111;
-  margin: 16px 0;
-  padding: 12px;
-  border-radius: 10px;
-}
-
-.medals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
+  from {
+    transform: translate(-50%, 30px) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
 }
 
 .medal {
-  padding: 6px 10px;
-  border-radius: 12px;
   background: darkred;
+  padding: 6px 10px;
+  border-radius: 10px;
+  margin: 4px;
+  display: inline-block;
 }
