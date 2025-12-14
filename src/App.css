@@ -1,1 +1,131 @@
+* { box-sizing: border-box; }
 
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #1b1b1b, #000);
+  font-family: system-ui, sans-serif;
+  color: #eee;
+}
+
+.app {
+  max-width: 420px;
+  margin: auto;
+  padding: 16px;
+}
+
+h1, h2 {
+  text-align: center;
+  margin: 8px 0;
+}
+
+/* SETUP */
+.setup input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #333;
+  color: #fff;
+}
+
+.start {
+  background: darkred;
+  margin-top: 8px;
+}
+
+.lobby-player {
+  background: #111;
+  padding: 8px;
+  border-radius: 8px;
+  margin: 4px 0;
+}
+
+/* TOP */
+.top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.active {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* CARD */
+.card {
+  margin: 14px auto;
+  width: 150px;
+  height: 220px;
+  background: white;
+  color: black;
+  border-radius: 14px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.corner {
+  position: absolute;
+  font-size: 0.9rem;
+}
+
+.tl { top: 6px; left: 8px; }
+.br { bottom: 6px; right: 8px; transform: rotate(180deg); }
+
+.suit {
+  font-size: 3rem;
+}
+
+.rule {
+  position: absolute;
+  bottom: 10px;
+  text-align: center;
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+/* PLAYERS */
+.players {
+  margin-top: 10px;
+}
+
+.player {
+  background: #111;
+  padding: 10px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+}
+
+.player.active {
+  border: 2px solid #4caf50;
+}
+
+.controls button {
+  width: 48%;
+  margin-top: 4px;
+}
+
+/* ENDGAME */
+.end-player {
+  background: #111;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.roast {
+  opacity: 0.85;
+  font-size: 0.85rem;
+}
