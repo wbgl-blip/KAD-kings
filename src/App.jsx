@@ -7,40 +7,59 @@ import "./App.css";
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 
-function buildDeck() {
-  const deck = [];
-  SUITS.forEach(suit => {
-    RANKS.forEach(rank => {
-      deck.push({ suit, rank });
-    });
-  });
-  return shuffle(deck);
-}
-
 function shuffle(arr) {
   return [...arr].sort(() => Math.random() - 0.5);
 }
 
+function buildDeck() {
+  const deck = [];
+  SUITS.forEach(suit =>
+    RANKS.forEach(rank => deck.push({ suit, rank }))
+  );
+  return shuffle(deck);
+}
+
 /* =========================
-   RULES (TOXIC EDITION)
+   RULES (MAX DEGEN)
 ========================= */
 function getRuleText(rank) {
   switch (rank) {
-    case "A": return "Waterfall. Nobody stops until the weak fold.";
-    case "2": return "You. Point at a victim. They drink.";
-    case "3": return "Me. Suffer alone.";
-    case "4": return "Whores. Everyone drinks. No excuses.";
-    case "5": return "Guys drink. Sorry lads.";
+    case "A": return "Waterfall. Weaklings die first.";
+    case "2": return "You. Choose a victim.";
+    case "3": return "Me. Suffer.";
+    case "4": return "Whores. Everyone drinks. Yes, you too.";
+    case "5": return "Guys drink. Cry about it.";
     case "6": return "Dicks. Everyone drinks again.";
-    case "7": return "Heaven. Last hand up gets punished.";
-    case "8": return "Mate. Pick a ride-or-die drink slave.";
-    case "9": return "Rhyme. Hesitate = hydrate (booze).";
-    case "10": return "Categories. Brain lag = drink.";
-    case "J": return "Thumb Master. Miss it? Drink.";
-    case "Q": return "Question Master. Answer? Drink.";
-    case "K": return "Make a rule. Abuse this power.";
+    case "7": return "Heaven. Last hand up gets humiliated.";
+    case "8": return "Mate. Pick a lifelong burden.";
+    case "9": return "Rhyme. Brain lag = chug.";
+    case "10": return "Categories. Think fast, idiot.";
+    case "J": return "Thumb Master. Miss it, sip shame.";
+    case "Q": return "Question Master. Answer = drink.";
+    case "K": return "Make a rule. Abuse it.";
     default: return "";
   }
+}
+
+/* =========================
+   MEDAL SYSTEM (TIERED)
+========================= */
+function calculateMedals(players) {
+  return players.map(p => {
+    const medals = [];
+
+    if (p.drinks >= 5) medals.push({ tier: "bronze", name: "Warm-Up Wreck" });
+    if (p.drinks >= 10) medals.push({ tier: "silver", name: "Certified Liability" });
+    if (p.drinks >= 15) medals.push({ tier: "gold", name: "Menace to Sobriety" });
+    if (p.drinks >= 20) medals.push({ tier: "mythic", name: "Walking Poor Decision" });
+    if (p.drinks >= 25) medals.push({ tier: "forbidden", name: "Public Health Emergency" });
+
+    if (p.drinks === Math.max(...players.map(x => x.drinks))) {
+      medals.push({ tier: "legendary", name: "Final Boss of Bad Choices" });
+    }
+
+    return { ...p, medals };
+  });
 }
 
 /* =========================
@@ -106,6 +125,7 @@ export default function App() {
   }
 
   const currentCard = discard[discard.length - 1];
+  const finalPlayers = gameOver ? calculateMedals(players) : players;
 
   /* =========================
      RENDER
@@ -125,13 +145,11 @@ export default function App() {
           <button onClick={addPlayer}>Add</button>
 
           <ul>
-            {players.map((p, i) => (
-              <li key={i}>{p.name}</li>
-            ))}
+            {players.map((p, i) => <li key={i}>{p.name}</li>)}
           </ul>
 
           <button className="start" onClick={startGame}>
-            Start the Chaos
+            Start the Disaster
           </button>
         </div>
       )}
@@ -145,38 +163,22 @@ export default function App() {
 
           <div className="roles">
             <p>👼 Heaven: {heaven || "—"}</p>
-            <p>👍 Thumb Master: {thumbMaster || "—"}</p>
-            <p>❓ Question Master: {questionMaster || "—"}</p>
+            <p>👍 Thumb: {thumbMaster || "—"}</p>
+            <p>❓ Questions: {questionMaster || "—"}</p>
           </div>
 
-          <button className="draw" onClick={drawCard}>
-            Draw Card
-          </button>
-
+          <button className="draw" onClick={drawCard}>Draw Card</button>
           <p className="count">Cards left: {deck.length}</p>
 
           {currentCard && (
-            <div className="card flip">
-              <div className="card-inner">
-                <div className="card-front">
-                  <div className="corner top">
-                    {currentCard.rank}{currentCard.suit}
-                  </div>
-                  <div className="center">
-                    {currentCard.suit}
-                  </div>
-                  <div className="corner bottom">
-                    {currentCard.rank}{currentCard.suit}
-                  </div>
-                  <div className="rule">
-                    {getRuleText(currentCard.rank)}
-                  </div>
-                </div>
-              </div>
+            <div className="card">
+              <div className="corner top">{currentCard.rank}{currentCard.suit}</div>
+              <div className="center">{currentCard.suit}</div>
+              <div className="corner bottom">{currentCard.rank}{currentCard.suit}</div>
+              <div className="rule">{getRuleText(currentCard.rank)}</div>
             </div>
           )}
 
-          <h3>Drinks Taken</h3>
           <ul className="scores">
             {players.map((p, i) => (
               <li key={i} className={i === turn ? "active" : ""}>
@@ -191,17 +193,22 @@ export default function App() {
       {gameOver && (
         <div className="game-over">
           <h2>Deck Empty</h2>
-          <p>You animals actually survived.</p>
+          <p>No winners. Just survivors.</p>
 
-          <ol>
-            {[...players]
-              .sort((a, b) => b.drinks - a.drinks)
-              .map((p, i) => (
-                <li key={i}>
-                  {p.name} — {p.drinks} drinks
-                </li>
-              ))}
-          </ol>
+          {finalPlayers
+            .sort((a, b) => b.drinks - a.drinks)
+            .map((p, i) => (
+              <div key={i} className="medal-card">
+                <h3>{p.name} — {p.drinks} drinks</h3>
+                <div className="medals">
+                  {p.medals.map((m, j) => (
+                    <span key={j} className={`medal ${m.tier}`}>
+                      {m.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
         </div>
       )}
     </div>
