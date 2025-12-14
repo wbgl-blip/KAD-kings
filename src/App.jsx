@@ -34,17 +34,23 @@ export default function App() {
   const [currentCard, setCurrentCard] = useState(null);
   const [turn, setTurn] = useState(0);
   const [kings, setKings] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
 
   const players = ["Player 1", "Player 2", "Player 3", "Player 4"];
 
   function drawCard() {
-    if (deck.length === 0 || kings === 4) return;
+    if (gameOver || deck.length === 0) return;
 
     const newDeck = [...deck];
     const card = newDeck.pop();
 
+    let newKings = kings;
     if (card.value === "K") {
-      setKings(kings + 1);
+      newKings += 1;
+      setKings(newKings);
+      if (newKings === 4) {
+        setGameOver(true);
+      }
     }
 
     setDeck(newDeck);
@@ -57,8 +63,11 @@ export default function App() {
       <h1>KAD Kings</h1>
 
       <h2>Kings: {kings} / 4</h2>
-      {kings === 4 && (
-        <h2 style={{ color: "red" }}>👑 GAME OVER — DRINK THE CUP 👑</h2>
+
+      {gameOver && (
+        <h2 style={{ color: "red" }}>
+          👑 GAME OVER — DRINK THE CUP 👑
+        </h2>
       )}
 
       <h3>Turn</h3>
@@ -78,11 +87,14 @@ export default function App() {
 
       <button
         onClick={drawCard}
-        disabled={kings === 4}
+        disabled={gameOver}
         style={{
           padding: "10px 20px",
           fontSize: 16,
           marginTop: 10,
+          backgroundColor: gameOver ? "#aaa" : "#000",
+          color: "#fff",
+          cursor: gameOver ? "not-allowed" : "pointer",
         }}
       >
         Draw Card
