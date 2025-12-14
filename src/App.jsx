@@ -1,74 +1,23 @@
-import { useReducer } from "react";
+import { useReducer, useEffect, useState } from "react";
 import "./App.css";
 
-/* ---------- CARD DECK ---------- */
+/* ---------- DECK ---------- */
 const SUITS = ["♠", "♥", "♦", "♣"];
 const VALUES = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 function buildDeck() {
   const deck = [];
-  for (let v of VALUES) {
-    for (let s of SUITS) {
-      deck.push({ value: v, suit: s });
-    }
-  }
+  for (let v of VALUES) for (let s of SUITS) deck.push({ value: v, suit: s });
   return deck.sort(() => Math.random() - 0.5);
 }
 
 function ruleForCard(card) {
   switch (card.value) {
-    case "7":
-      return "Heaven. Last one up drinks.";
-    case "J":
-      return "Thumb Master. Last thumb down drinks.";
-    case "Q":
-      return "Questions. Answer = drink.";
-    case "4":
-      return "Whores. Everyone drinks.";
-    case "K":
-      return "King. You’re closer to death.";
-    default:
-      return "Drink.";
+    case "7": return "Heaven. Last one up drinks.";
+    case "J": return "Thumb. Last down drinks.";
+    case "Q": return "Questions. Answer = drink.";
+    default: return "Drink.";
   }
-}
-
-/* ---------- MEDALS ---------- */
-function generateMedals(players) {
-  const sorted = [...players].sort((a, b) => b.beers - a.beers);
-  const top = sorted[0];
-  const bottom = sorted[sorted.length - 1];
-
-  const medals = [];
-
-  medals.push({
-    title: "🍺 Alcoholic of the Night",
-    player: top.name,
-    text: "Absolutely unhinged. Society has concerns.",
-  });
-
-  if (top.beers >= 6) {
-    medals.push({
-      title: "☠️ Menace to Sobriety",
-      player: top.name,
-      text: "Single-handedly ruined tomorrow.",
-    });
-  }
-
-  if (bottom.beers <= 1) {
-    medals.push({
-      title: "🥛 Designated Liability",
-      player: bottom.name,
-      text: "Why were you even here?",
-    });
-  }
-
-  medals.push({
-    title: "🤡 Peer Pressure Failure",
-    player: bottom.name,
-    text: "Watched everyone drink and did nothing.",
-  });
-
-  return medals;
 }
 
 /* ---------- STATE ---------- */
@@ -87,32 +36,26 @@ const initialState = {
   gameOver: false,
 };
 
-/* ---------- REDUCER ---------- */
 function reducer(state, action) {
   switch (action.type) {
     case "DRAW": {
-      if (state.deck.length === 0) return state;
-
+      if (!state.deck.length) return state;
       const [card, ...rest] = state.deck;
-
-      const updates = {
+      return {
+        ...state,
         currentCard: card,
         deck: rest,
+        heaven: card.value === "7" ? action.player : state.heaven,
+        thumb: card.value === "J" ? action.player : state.thumb,
+        questions: card.value === "Q" ? action.player : state.questions,
+        gameOver: rest.length === 0,
       };
-
-      if (card.value === "7") updates.heaven = action.player;
-      if (card.value === "J") updates.thumb = action.player;
-      if (card.value === "Q") updates.questions = action.player;
-
-      if (rest.length === 0) updates.gameOver = true;
-
-      return { ...state, ...updates };
     }
 
     case "BEER":
       return {
         ...state,
-        players: state.players.map((p) =>
+        players: state.players.map(p =>
           p.id === action.id
             ? { ...p, beers: Math.max(0, p.beers + action.delta) }
             : p
@@ -128,36 +71,58 @@ function reducer(state, action) {
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const medals = state.gameOver ? generateMedals(state.players) : [];
+  // Horseshoe positions (mobile tuned)
+  const positions = [
+    { top: "18%", left: "50%", transform: "translateX(-50%)" },
+    { top: "38%", left: "8%" },
+    { top: "38%", right: "8%" },
+    { top: "60%", left: "50%", transform: "translateX(-50%)" },
+  ];
 
   return (
-    <div className="app">
+    <div className="app" style={{ position: "relative", minHeight: "100vh" }}>
       <h1 className="title">KAD Kings</h1>
 
-      {/* PLAYERS */}
-      <div className="table">
+      {/* TABLE */}
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "60vh",
+          marginTop: "20px",
+        }}
+      >
         {state.players.map((p, i) => (
-          <div key={p.id} className={`player seat-${i}`}>
-            <div className="player-name">{p.name}</div>
+          <div
+            key={p.id}
+            style={{
+              position: "absolute",
+              ...positions[i],
+              background: "#111",
+              padding: "14px 18px",
+              borderRadius: "16px",
+              boxShadow: "0 0 18px rgba(255,255,255,0.08)",
+              minWidth: "220px",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: "18px", marginBottom: "6px" }}>
+              {p.name}
+            </div>
 
-            <div className="beer-controls">
-              <button
-                className="beer-btn"
-                onClick={() =>
-                  dispatch({ type: "BEER", id: p.id, delta: -1 })
-                }
-              >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "14px",
+              }}
+            >
+              <button onClick={() => dispatch({ type: "BEER", id: p.id, delta: -1 })}>
                 −
               </button>
-
-              <span className="beer-count">🍺 {p.beers}</span>
-
-              <button
-                className="beer-btn"
-                onClick={() =>
-                  dispatch({ type: "BEER", id: p.id, delta: 1 })
-                }
-              >
+              <span>🍺 {p.beers}</span>
+              <button onClick={() => dispatch({ type: "BEER", id: p.id, delta: 1 })}>
                 +
               </button>
             </div>
@@ -165,78 +130,37 @@ export default function App() {
         ))}
       </div>
 
-      {/* CARD */}
-      {state.currentCard && (
-        <div className="card">
-          <div className="card-corner">
-            {state.currentCard.value}
-            {state.currentCard.suit}
-          </div>
-
-          <div className="card-center">
-            {state.currentCard.suit}
+      {/* CENTER */}
+      <div style={{ textAlign: "center", marginTop: "10px" }}>
+        {state.currentCard && (
+          <div className="card">
+            <div>
+              {state.currentCard.value}
+              {state.currentCard.suit}
+            </div>
             <div className="card-rule">
               {ruleForCard(state.currentCard)}
             </div>
           </div>
+        )}
 
-          <div className="card-corner bottom">
-            {state.currentCard.value}
-            {state.currentCard.suit}
-          </div>
-        </div>
-      )}
-
-      {/* CONTROLS */}
-      <div className="center-controls">
         <button
           className="draw-button"
           onClick={() =>
-            dispatch({
-              type: "DRAW",
-              player: state.players[0].name,
-            })
+            dispatch({ type: "DRAW", player: state.players[0].name })
           }
         >
           Draw Card
         </button>
 
-        <div className="deck-count">
-          Cards left: {state.deck.length}
-        </div>
+        <div>Cards left: {state.deck.length}</div>
 
-        <div className="powers">
-          😇 Heaven: {state.heaven || "—"} <br />
-          👍 Thumb: {state.thumb || "—"} <br />
-          ❓ Questions: {state.questions || "—"}
+        <div style={{ marginTop: "6px" }}>
+          😇 {state.heaven || "—"} &nbsp;|&nbsp;
+          👍 {state.thumb || "—"} &nbsp;|&nbsp;
+          ❓ {state.questions || "—"}
         </div>
       </div>
-
-      {/* END GAME */}
-      {state.gameOver && (
-        <div className="endgame">
-          <h2>Final Damage Report</h2>
-
-          <ul>
-            {[...state.players]
-              .sort((a, b) => b.beers - a.beers)
-              .map((p) => (
-                <li key={p.id}>
-                  {p.name}: 🍺 {p.beers}
-                </li>
-              ))}
-          </ul>
-
-          <h3>Medals</h3>
-          {medals.map((m, i) => (
-            <div key={i} className="medal">
-              <strong>{m.title}</strong>
-              <div>{m.player}</div>
-              <small>{m.text}</small>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
