@@ -49,9 +49,12 @@ function getRuleText(rank) {
 export default function App() {
   const [players, setPlayers] = useState([]);
   const [nameInput, setNameInput] = useState("");
+
   const [deck, setDeck] = useState([]);
   const [discard, setDiscard] = useState([]);
   const [turn, setTurn] = useState(0);
+
+  const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
 
   // Persistent roles
@@ -70,13 +73,17 @@ export default function App() {
 
   function startGame() {
     if (players.length < 2) return;
+
     setDeck(buildDeck());
     setDiscard([]);
     setTurn(0);
-    setGameOver(false);
+
     setHeaven(null);
     setThumbMaster(null);
     setQuestionMaster(null);
+
+    setGameOver(false);
+    setGameStarted(true);
   }
 
   /* =========================
@@ -88,12 +95,11 @@ export default function App() {
     const nextDeck = [...deck];
     const card = nextDeck.pop();
 
-    // Handle role cards
+    // Role transfer
     if (card.rank === "7") setHeaven(players[turn].name);
     if (card.rank === "J") setThumbMaster(players[turn].name);
     if (card.rank === "Q") setQuestionMaster(players[turn].name);
 
-    // +1 drink for drawer (simple counter)
     const updatedPlayers = [...players];
     updatedPlayers[turn].drinks += 1;
 
@@ -103,6 +109,7 @@ export default function App() {
 
     if (nextDeck.length === 0) {
       setGameOver(true);
+      setGameStarted(false);
     } else {
       setTurn((turn + 1) % players.length);
     }
@@ -118,7 +125,7 @@ export default function App() {
       <h1>KAD Kings</h1>
 
       {/* SETUP */}
-      {deck.length === 0 && !gameOver && (
+      {!gameStarted && !gameOver && (
         <div className="setup">
           <input
             value={nameInput}
@@ -140,7 +147,7 @@ export default function App() {
       )}
 
       {/* GAME */}
-      {deck.length > 0 && !gameOver && (
+      {gameStarted && !gameOver && (
         <>
           <h2>
             Turn: <span className="active">{players[turn].name}</span>
@@ -162,9 +169,7 @@ export default function App() {
             <div className="card">
               <div className="rank">{currentCard.rank}</div>
               <div className="suit">{currentCard.suit}</div>
-              <div className="rule">
-                {getRuleText(currentCard.rank)}
-              </div>
+              <div className="rule">{getRuleText(currentCard.rank)}</div>
             </div>
           )}
 
