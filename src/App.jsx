@@ -1,115 +1,198 @@
 import { useState } from "react";
+import "./App.css";
 
+/* =========================
+   CARD SETUP
+========================= */
 const SUITS = ["♠", "♥", "♦", "♣"];
-const VALUES = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 
-const CARD_RULES = {
-  A: "Waterfall — everyone starts drinking",
-  2: "You — choose someone to drink",
-  3: "Me — you drink",
-  4: "Whores — everyone drinks",
-  5: "Thumb Master — last to put thumb down drinks",
-  6: "Dicks — all guys drink",
-  7: "Heaven — last to point up drinks",
-  8: "Mate — pick a drinking buddy",
-  9: "Rhyme — first to mess up drinks",
-  10: "Categories — first to fail drinks",
-  J: "Make a rule",
-  Q: "Questions — first to answer drinks",
-  K: "King — pour into the cup",
-};
-
-function createDeck() {
+function buildDeck() {
   const deck = [];
-  for (let suit of SUITS) {
-    for (let value of VALUES) {
-      deck.push({ suit, value });
-    }
-  }
-  return deck.sort(() => Math.random() - 0.5);
+  SUITS.forEach(suit => {
+    RANKS.forEach(rank => {
+      deck.push({ suit, rank });
+    });
+  });
+  return shuffle(deck);
 }
 
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+/* =========================
+   RULE TEXT
+========================= */
+function getRuleText(rank) {
+  switch (rank) {
+    case "A": return "Waterfall – everyone drinks";
+    case "2": return "You – pick someone to drink";
+    case "3": return "Me – you drink";
+    case "4": return "Whores – we all drink";
+    case "5": return "Guys drink";
+    case "6": return "Dicks – we all drink";
+    case "7": return "Heaven – last hand up drinks";
+    case "8": return "Mate – pick a drinking buddy";
+    case "9": return "Rhyme – loser drinks";
+    case "10": return "Categories – loser drinks";
+    case "J": return "Thumb Master";
+    case "Q": return "Question Master";
+    case "K": return "Make a rule";
+    default: return "";
+  }
+}
+
+/* =========================
+   APP
+========================= */
 export default function App() {
-  const [deck, setDeck] = useState(createDeck());
-  const [currentCard, setCurrentCard] = useState(null);
+  const [players, setPlayers] = useState([]);
+  const [nameInput, setNameInput] = useState("");
+  const [deck, setDeck] = useState([]);
+  const [discard, setDiscard] = useState([]);
   const [turn, setTurn] = useState(0);
-  const [kings, setKings] = useState(0);
   const [gameOver, setGameOver] = useState(false);
 
-  const players = ["Player 1", "Player 2", "Player 3", "Player 4"];
+  // Persistent roles
+  const [heaven, setHeaven] = useState(null);
+  const [thumbMaster, setThumbMaster] = useState(null);
+  const [questionMaster, setQuestionMaster] = useState(null);
 
-  function drawCard() {
-    if (gameOver || deck.length === 0) return;
-
-    const newDeck = [...deck];
-    const card = newDeck.pop();
-
-    let newKings = kings;
-    if (card.value === "K") {
-      newKings += 1;
-      setKings(newKings);
-      if (newKings === 4) {
-        setGameOver(true);
-      }
-    }
-
-    setDeck(newDeck);
-    setCurrentCard(card);
-    setTurn((turn + 1) % players.length);
+  /* =========================
+     PLAYER SETUP
+  ========================= */
+  function addPlayer() {
+    if (!nameInput.trim()) return;
+    setPlayers([...players, { name: nameInput, drinks: 0 }]);
+    setNameInput("");
   }
 
+  function startGame() {
+    if (players.length < 2) return;
+    setDeck(buildDeck());
+    setDiscard([]);
+    setTurn(0);
+    setGameOver(false);
+    setHeaven(null);
+    setThumbMaster(null);
+    setQuestionMaster(null);
+  }
+
+  /* =========================
+     DRAW CARD
+  ========================= */
+  function drawCard() {
+    if (deck.length === 0) return;
+
+    const nextDeck = [...deck];
+    const card = nextDeck.pop();
+
+    // Handle role cards
+    if (card.rank === "7") setHeaven(players[turn].name);
+    if (card.rank === "J") setThumbMaster(players[turn].name);
+    if (card.rank === "Q") setQuestionMaster(players[turn].name);
+
+    // +1 drink for drawer (simple counter)
+    const updatedPlayers = [...players];
+    updatedPlayers[turn].drinks += 1;
+
+    setPlayers(updatedPlayers);
+    setDeck(nextDeck);
+    setDiscard([...discard, card]);
+
+    if (nextDeck.length === 0) {
+      setGameOver(true);
+    } else {
+      setTurn((turn + 1) % players.length);
+    }
+  }
+
+  const currentCard = discard[discard.length - 1];
+
+  /* =========================
+     RENDER
+  ========================= */
   return (
-    <div style={{ padding: 20, fontFamily: "sans-serif" }}>
+    <div className="app">
       <h1>KAD Kings</h1>
 
-      <h2>Kings: {kings} / 4</h2>
+      {/* SETUP */}
+      {deck.length === 0 && !gameOver && (
+        <div className="setup">
+          <input
+            value={nameInput}
+            placeholder="Player name"
+            onChange={e => setNameInput(e.target.value)}
+          />
+          <button onClick={addPlayer}>Add Player</button>
 
-      {gameOver && (
-        <h2 style={{ color: "red" }}>
-          👑 GAME OVER — DRINK THE CUP 👑
-        </h2>
+          <ul>
+            {players.map((p, i) => (
+              <li key={i}>{p.name}</li>
+            ))}
+          </ul>
+
+          <button className="start" onClick={startGame}>
+            Start Game
+          </button>
+        </div>
       )}
 
-      <h3>Turn</h3>
-      <ul>
-        {players.map((p, i) => (
-          <li
-            key={p}
-            style={{
-              fontWeight: i === turn ? "bold" : "normal",
-              color: i === turn ? "red" : "black",
-            }}
-          >
-            {p} {i === turn ? "← YOUR TURN" : ""}
-          </li>
-        ))}
-      </ul>
-
-      <button
-        onClick={drawCard}
-        disabled={gameOver}
-        style={{
-          padding: "10px 20px",
-          fontSize: 16,
-          marginTop: 10,
-          backgroundColor: gameOver ? "#aaa" : "#000",
-          color: "#fff",
-          cursor: gameOver ? "not-allowed" : "pointer",
-        }}
-      >
-        Draw Card
-      </button>
-
-      <p>Cards left: {deck.length}</p>
-
-      {currentCard && (
-        <div style={{ marginTop: 20 }}>
+      {/* GAME */}
+      {deck.length > 0 && !gameOver && (
+        <>
           <h2>
-            {currentCard.value} {currentCard.suit}
+            Turn: <span className="active">{players[turn].name}</span>
           </h2>
-          <p style={{ fontSize: 18 }}>
-            {CARD_RULES[currentCard.value]}
-          </p>
+
+          <div className="roles">
+            <p>👼 Heaven: {heaven || "—"}</p>
+            <p>👍 Thumb Master: {thumbMaster || "—"}</p>
+            <p>❓ Question Master: {questionMaster || "—"}</p>
+          </div>
+
+          <button className="draw" onClick={drawCard}>
+            Draw Card
+          </button>
+
+          <p>Cards left: {deck.length}</p>
+
+          {currentCard && (
+            <div className="card">
+              <div className="rank">{currentCard.rank}</div>
+              <div className="suit">{currentCard.suit}</div>
+              <div className="rule">
+                {getRuleText(currentCard.rank)}
+              </div>
+            </div>
+          )}
+
+          <h3>Drinks</h3>
+          <ul>
+            {players.map((p, i) => (
+              <li key={i} className={i === turn ? "active" : ""}>
+                {p.name}: {p.drinks}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {/* GAME OVER */}
+      {gameOver && (
+        <div className="game-over">
+          <h2>Game Over</h2>
+          <h3>Leaderboard</h3>
+          <ol>
+            {[...players]
+              .sort((a, b) => b.drinks - a.drinks)
+              .map((p, i) => (
+                <li key={i}>
+                  {p.name} — {p.drinks} drinks
+                </li>
+              ))}
+          </ol>
         </div>
       )}
     </div>
