@@ -1,116 +1,191 @@
-body {
-  margin: 0;
-  background: #0f172a;
-  color: #fff;
-  font-family: system-ui;
+import { useState } from "react";
+import "./App.css";
+
+/* =========================
+   CARD SETUP
+========================= */
+const SUITS = ["♠", "♥", "♦", "♣"];
+const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+
+function buildDeck() {
+  const deck = [];
+  SUITS.forEach(suit => {
+    RANKS.forEach(rank => {
+      deck.push({ suit, rank });
+    });
+  });
+  return shuffle(deck);
 }
 
-.app {
-  max-width: 420px;
-  margin: auto;
-  padding: 16px;
-  text-align: center;
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
 }
 
-button {
-  padding: 12px 18px;
-  border-radius: 10px;
-  border: none;
-  background: #22c55e;
-  font-weight: bold;
-  cursor: pointer;
+/* =========================
+   RULE TEXT
+========================= */
+function getRuleText(rank) {
+  switch (rank) {
+    case "A": return "Waterfall – everyone drinks";
+    case "2": return "You – pick someone to drink";
+    case "3": return "Me – you drink";
+    case "4": return "Whores – we all drink";
+    case "5": return "Guys drink";
+    case "6": return "Dicks – we all drink";
+    case "7": return "Heaven – last hand up drinks";
+    case "8": return "Mate – pick a drinking buddy";
+    case "9": return "Rhyme – loser drinks";
+    case "10": return "Categories – loser drinks";
+    case "J": return "Thumb Master";
+    case "Q": return "Question Master";
+    case "K": return "Make a rule";
+    default: return "";
+  }
 }
 
-.active {
-  color: #22c55e;
-}
+/* =========================
+   APP
+========================= */
+export default function App() {
+  const [players, setPlayers] = useState([]);
+  const [nameInput, setNameInput] = useState("");
+  const [deck, setDeck] = useState([]);
+  const [discard, setDiscard] = useState([]);
+  const [turn, setTurn] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
 
-/* CARD */
-.card {
-  position: relative;
-  width: 260px;
-  height: 360px;
-  margin: 20px auto;
-  background: white;
-  border-radius: 18px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  animation: flipIn 0.6s ease;
-}
+  const [heaven, setHeaven] = useState(null);
+  const [thumbMaster, setThumbMaster] = useState(null);
+  const [questionMaster, setQuestionMaster] = useState(null);
 
-.card.red { color: #dc2626; }
-.card.black { color: #111827; }
+  function addPlayer() {
+    if (!nameInput.trim()) return;
+    setPlayers([...players, { name: nameInput, drinks: 0 }]);
+    setNameInput("");
+  }
 
-.corner {
-  position: absolute;
-  font-weight: bold;
-}
+  function startGame() {
+    if (players.length < 2) return;
+    setDeck(buildDeck());
+    setDiscard([]);
+    setTurn(0);
+    setGameOver(false);
+    setHeaven(null);
+    setThumbMaster(null);
+    setQuestionMaster(null);
+  }
 
-.corner.top { top: 12px; left: 12px; }
-.corner.bottom {
-  bottom: 12px;
-  right: 12px;
-  transform: rotate(180deg);
-}
+  function drawCard() {
+    if (deck.length === 0) return;
 
-.center-suit {
-  font-size: 96px;
-  opacity: 0.15;
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
+    const nextDeck = [...deck];
+    const card = nextDeck.pop();
 
-.rule {
-  position: absolute;
-  bottom: 20px;
-  left: 12px;
-  right: 12px;
-  background: rgba(255,255,255,0.9);
-  padding: 10px;
-  border-radius: 12px;
-  color: black;
-  font-weight: bold;
-}
+    const updatedPlayers = [...players];
+    updatedPlayers[turn].drinks += 1;
 
-/* DECK */
-.deck {
-  display: flex;
-  justify-content: center;
-  margin: 12px 0;
-}
+    if (card.rank === "7") setHeaven(updatedPlayers[turn].name);
+    if (card.rank === "J") setThumbMaster(updatedPlayers[turn].name);
+    if (card.rank === "Q") setQuestionMaster(updatedPlayers[turn].name);
 
-.deck-card {
-  width: 50px;
-  height: 70px;
-  background: #1e293b;
-  border-radius: 6px;
-  margin-left: -30px;
-}
+    setPlayers(updatedPlayers);
+    setDeck(nextDeck);
+    setDiscard([...discard, card]);
 
-/* MEDALS */
-.medal {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 14px 20px;
-  border-radius: 14px;
-  background: gold;
-  color: black;
-  animation: pop 0.4s ease;
-}
+    if (nextDeck.length === 0) {
+      setGameOver(true);
+    } else {
+      setTurn((turn + 1) % players.length);
+    }
+  }
 
-.medal.legendary {
-  background: linear-gradient(90deg, #facc15, #fb7185);
-}
+  const currentCard = discard[discard.length - 1];
+  const isRed =
+    currentCard &&
+    (currentCard.suit === "♥" || currentCard.suit === "♦");
 
-@keyframes flipIn {
-  from { transform: rotateY(90deg); opacity: 0; }
-  to { transform: rotateY(0); opacity: 1; }
-}
+  return (
+    <div className="app">
+      <h1>KAD Kings</h1>
 
-@keyframes pop {
-  from { transform: translateX(-50%) scale(0.5); }
-  to { transform: translateX(-50%) scale(1); }
-}
+      {deck.length === 0 && !gameOver && (
+        <div className="setup">
+          <input
+            value={nameInput}
+            placeholder="Player name"
+            onChange={e => setNameInput(e.target.value)}
+          />
+          <button onClick={addPlayer}>Add Player</button>
+
+          <ul>
+            {players.map((p, i) => (
+              <li key={i}>{p.name}</li>
+            ))}
+          </ul>
+
+          <button onClick={startGame}>Start Game</button>
+        </div>
+      )}
+
+      {deck.length > 0 && !gameOver && (
+        <>
+          <h2>
+            Turn: <span className="active">{players[turn].name}</span>
+          </h2>
+
+          <div className="roles">
+            <p>👼 Heaven: {heaven || "—"}</p>
+            <p>👍 Thumb Master: {thumbMaster || "—"}</p>
+            <p>❓ Question Master: {questionMaster || "—"}</p>
+          </div>
+
+          <button className="draw" onClick={drawCard}>
+            Draw Card
+          </button>
+
+          <p>Cards left: {deck.length}</p>
+
+          {currentCard && (
+            <div
+              key={discard.length}
+              className={`card ${isRed ? "red" : "black"}`}
+            >
+              <div className="corner top">
+                {currentCard.rank}
+                <span>{currentCard.suit}</span>
+              </div>
+
+              <div className="corner bottom">
+                {currentCard.rank}
+                <span>{currentCard.suit}</span>
+              </div>
+
+              <div className="center-suit">
+                {currentCard.suit}
+              </div>
+
+              <div className="rule-box">
+                {getRuleText(currentCard.rank)}
+              </div>
+            </div>
+          )}
+
+          <h3>Drinks</h3>
+          <ul>
+            {players.map((p, i) => (
+              <li key={i} className={i === turn ? "active" : ""}>
+                {p.name}: {p.drinks}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {gameOver && (
+        <div className="game-over">
+          <h2>Game Over</h2>
+        </div>
+      )}
+    </div>
+  );
+    }
