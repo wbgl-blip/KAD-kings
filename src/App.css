@@ -10,10 +10,6 @@ body {
   text-align: center;
 }
 
-h1 {
-  font-size: 2.4rem;
-}
-
 button {
   padding: 10px 16px;
   border-radius: 8px;
@@ -27,16 +23,12 @@ button:hover {
 }
 
 .start {
-  background: #b71c1c;
+  background: darkred;
 }
 
 .active {
   color: #4caf50;
   font-weight: bold;
-}
-
-.roles {
-  opacity: 0.85;
 }
 
 .card {
@@ -49,6 +41,12 @@ button:hover {
   padding: 14px;
   position: relative;
   box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  animation: deal 0.4s ease;
+}
+
+@keyframes deal {
+  from { transform: translateY(-40px) scale(0.95); opacity: 0; }
+  to { transform: none; opacity: 1; }
 }
 
 .corner {
@@ -56,16 +54,8 @@ button:hover {
   font-weight: bold;
 }
 
-.corner.top {
-  top: 10px;
-  left: 12px;
-}
-
-.corner.bottom {
-  bottom: 10px;
-  right: 12px;
-  transform: rotate(180deg);
-}
+.corner.top { top: 10px; left: 12px; }
+.corner.bottom { bottom: 10px; right: 12px; transform: rotate(180deg); }
 
 .center {
   font-size: 5rem;
@@ -78,6 +68,31 @@ button:hover {
   left: 16px;
   right: 16px;
   font-weight: 600;
+}
+
+.medal-popup {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: black;
+  border: 2px solid red;
+  padding: 20px 30px;
+  border-radius: 14px;
+  animation: pop 0.6s ease;
+  z-index: 999;
+}
+
+@keyframes pop {
+  0% { transform: translate(-50%, 40px) scale(0.8); opacity: 0; }
+  100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+}
+
+.medal-popup span {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+  color: red;
 }
 
 .medal-card {
@@ -97,12 +112,5 @@ button:hover {
 .medal {
   padding: 6px 10px;
   border-radius: 12px;
-  font-size: 0.8rem;
+  background: darkred;
 }
-
-.bronze { background: #8d6e63; }
-.silver { background: #9e9e9e; }
-.gold { background: #fbc02d; color: black; }
-.legendary { background: linear-gradient(45deg, purple, red); }
-.mythic { background: black; border: 1px solid red; }
-.forbidden { background: red; color: black; font-weight: bold; }
