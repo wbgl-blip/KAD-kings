@@ -44,33 +44,11 @@ function getRuleText(rank) {
 }
 
 /* =========================
-   MEDALS
-========================= */
-const MEDALS = {
-  MENACE_TO_SOBRIETY: {
-    name: "Menace to Sobriety",
-    tier: "Epic",
-    description: "Reached 10 drinks"
-  },
-  BLACKOUT_ARTIST: {
-    name: "Blackout Artist",
-    tier: "Legendary",
-    description: "Reached 20 drinks"
-  },
-  RULE_TYRANT: {
-    name: "Rule Tyrant",
-    tier: "Rare",
-    description: "Created 3 rules (Kings)"
-  }
-};
-
-/* =========================
    APP
 ========================= */
 export default function App() {
   const [players, setPlayers] = useState([]);
   const [nameInput, setNameInput] = useState("");
-
   const [deck, setDeck] = useState([]);
   const [discard, setDiscard] = useState([]);
   const [turn, setTurn] = useState(0);
@@ -80,19 +58,9 @@ export default function App() {
   const [thumbMaster, setThumbMaster] = useState(null);
   const [questionMaster, setQuestionMaster] = useState(null);
 
-  const [medalPopup, setMedalPopup] = useState(null);
-
-  /* =========================
-     SETUP
-  ========================= */
   function addPlayer() {
     if (!nameInput.trim()) return;
-    setPlayers([...players, {
-      name: nameInput,
-      drinks: 0,
-      kings: 0,
-      medals: []
-    }]);
+    setPlayers([...players, { name: nameInput, drinks: 0 }]);
     setNameInput("");
   }
 
@@ -107,44 +75,18 @@ export default function App() {
     setQuestionMaster(null);
   }
 
-  /* =========================
-     MEDAL CHECKS
-  ========================= */
-  function awardMedal(playerIndex, medalKey) {
-    const updated = [...players];
-    if (updated[playerIndex].medals.includes(medalKey)) return;
-
-    updated[playerIndex].medals.push(medalKey);
-    setPlayers(updated);
-    setMedalPopup(MEDALS[medalKey]);
-
-    setTimeout(() => setMedalPopup(null), 3000);
-  }
-
-  /* =========================
-     DRAW CARD
-  ========================= */
   function drawCard() {
-    if (deck.length === 0 || gameOver) return;
+    if (deck.length === 0) return;
 
     const nextDeck = [...deck];
     const card = nextDeck.pop();
 
     const updatedPlayers = [...players];
-    const player = updatedPlayers[turn];
+    updatedPlayers[turn].drinks += 1;
 
-    player.drinks += 1;
-
-    if (player.drinks === 10) awardMedal(turn, "MENACE_TO_SOBRIETY");
-    if (player.drinks === 20) awardMedal(turn, "BLACKOUT_ARTIST");
-
-    if (card.rank === "7") setHeaven(player.name);
-    if (card.rank === "J") setThumbMaster(player.name);
-    if (card.rank === "Q") setQuestionMaster(player.name);
-    if (card.rank === "K") {
-      player.kings += 1;
-      if (player.kings === 3) awardMedal(turn, "RULE_TYRANT");
-    }
+    if (card.rank === "7") setHeaven(updatedPlayers[turn].name);
+    if (card.rank === "J") setThumbMaster(updatedPlayers[turn].name);
+    if (card.rank === "Q") setQuestionMaster(updatedPlayers[turn].name);
 
     setPlayers(updatedPlayers);
     setDeck(nextDeck);
@@ -162,22 +104,10 @@ export default function App() {
     currentCard &&
     (currentCard.suit === "♥" || currentCard.suit === "♦");
 
-  /* =========================
-     RENDER
-  ========================= */
   return (
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* MEDAL POPUP */}
-      {medalPopup && (
-        <div className={`medal ${medalPopup.tier.toLowerCase()}`}>
-          🏅 {medalPopup.name}
-          <div className="desc">{medalPopup.description}</div>
-        </div>
-      )}
-
-      {/* SETUP */}
       {deck.length === 0 && !gameOver && (
         <div className="setup">
           <input
@@ -197,7 +127,6 @@ export default function App() {
         </div>
       )}
 
-      {/* GAME */}
       {deck.length > 0 && !gameOver && (
         <>
           <h2>
@@ -206,25 +135,20 @@ export default function App() {
 
           <div className="roles">
             <p>👼 Heaven: {heaven || "—"}</p>
-            <p>👍 Thumb: {thumbMaster || "—"}</p>
-            <p>❓ Question: {questionMaster || "—"}</p>
-          </div>
-
-          {/* DECK */}
-          <div className="deck">
-            {deck.slice(0, 3).map((_, i) => (
-              <div key={i} className="deck-card" />
-            ))}
+            <p>👍 Thumb Master: {thumbMaster || "—"}</p>
+            <p>❓ Question Master: {questionMaster || "—"}</p>
           </div>
 
           <button className="draw" onClick={drawCard}>
             Draw Card
           </button>
 
+          <p>Cards left: {deck.length}</p>
+
           {currentCard && (
             <div
               key={discard.length}
-              className={`card flip ${isRed ? "red" : "black"}`}
+              className={`card ${isRed ? "red" : "black"}`}
             >
               <div className="corner top">
                 {currentCard.rank}
@@ -236,31 +160,32 @@ export default function App() {
                 <span>{currentCard.suit}</span>
               </div>
 
-              <div className="center-suit">{currentCard.suit}</div>
+              <div className="center-suit">
+                {currentCard.suit}
+              </div>
 
-              <div className="rule">
+              <div className="rule-box">
                 {getRuleText(currentCard.rank)}
               </div>
             </div>
           )}
+
+          <h3>Drinks</h3>
+          <ul>
+            {players.map((p, i) => (
+              <li key={i} className={i === turn ? "active" : ""}>
+                {p.name}: {p.drinks}
+              </li>
+            ))}
+          </ul>
         </>
       )}
 
-      {/* GAME OVER */}
       {gameOver && (
         <div className="game-over">
           <h2>Game Over</h2>
-          <ol>
-            {[...players]
-              .sort((a, b) => b.drinks - a.drinks)
-              .map((p, i) => (
-                <li key={i}>
-                  {p.name} — {p.drinks} drinks
-                </li>
-              ))}
-          </ol>
         </div>
       )}
     </div>
   );
-                 }
+}
