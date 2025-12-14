@@ -43,9 +43,6 @@ function getRuleText(rank) {
   }
 }
 
-/* =========================
-   APP
-========================= */
 export default function App() {
   const [players, setPlayers] = useState([]);
   const [nameInput, setNameInput] = useState("");
@@ -53,6 +50,7 @@ export default function App() {
   const [discard, setDiscard] = useState([]);
   const [turn, setTurn] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [flipped, setFlipped] = useState(false);
 
   const [heaven, setHeaven] = useState(null);
   const [thumbMaster, setThumbMaster] = useState(null);
@@ -78,25 +76,30 @@ export default function App() {
   function drawCard() {
     if (deck.length === 0) return;
 
-    const nextDeck = [...deck];
-    const card = nextDeck.pop();
+    setFlipped(false);
 
-    const updatedPlayers = [...players];
-    updatedPlayers[turn].drinks += 1;
+    setTimeout(() => {
+      const nextDeck = [...deck];
+      const card = nextDeck.pop();
 
-    if (card.rank === "7") setHeaven(updatedPlayers[turn].name);
-    if (card.rank === "J") setThumbMaster(updatedPlayers[turn].name);
-    if (card.rank === "Q") setQuestionMaster(updatedPlayers[turn].name);
+      const updatedPlayers = [...players];
+      updatedPlayers[turn].drinks += 1;
 
-    setPlayers(updatedPlayers);
-    setDeck(nextDeck);
-    setDiscard([...discard, card]);
+      if (card.rank === "7") setHeaven(updatedPlayers[turn].name);
+      if (card.rank === "J") setThumbMaster(updatedPlayers[turn].name);
+      if (card.rank === "Q") setQuestionMaster(updatedPlayers[turn].name);
 
-    if (nextDeck.length === 0) {
-      setGameOver(true);
-    } else {
-      setTurn((turn + 1) % players.length);
-    }
+      setPlayers(updatedPlayers);
+      setDeck(nextDeck);
+      setDiscard([...discard, card]);
+      setFlipped(true);
+
+      if (nextDeck.length === 0) {
+        setGameOver(true);
+      } else {
+        setTurn((turn + 1) % players.length);
+      }
+    }, 300);
   }
 
   const currentCard = discard[discard.length - 1];
@@ -145,30 +148,31 @@ export default function App() {
 
           <p>Cards left: {deck.length}</p>
 
-          {currentCard && (
-            <div
-              key={discard.length}
-              className={`card ${isRed ? "red" : "black"}`}
-            >
-              <div className="corner top">
-                {currentCard.rank}
-                <span>{currentCard.suit}</span>
-              </div>
+          <div className={`card-container ${flipped ? "flip" : ""}`}>
+            <div className="card-back">KAD</div>
 
-              <div className="corner bottom">
-                {currentCard.rank}
-                <span>{currentCard.suit}</span>
-              </div>
+            {currentCard && (
+              <div
+                className={`card-face ${isRed ? "red" : "black"} special-${currentCard.rank}`}
+              >
+                <div className="corner top">
+                  {currentCard.rank}
+                  <span>{currentCard.suit}</span>
+                </div>
 
-              <div className="center-suit">
-                {currentCard.suit}
-              </div>
+                <div className="corner bottom">
+                  {currentCard.rank}
+                  <span>{currentCard.suit}</span>
+                </div>
 
-              <div className="rule-box">
-                {getRuleText(currentCard.rank)}
+                <div className="center-suit">{currentCard.suit}</div>
+
+                <div className="rule-box">
+                  {getRuleText(currentCard.rank)}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           <h3>Drinks</h3>
           <ul>
@@ -184,6 +188,16 @@ export default function App() {
       {gameOver && (
         <div className="game-over">
           <h2>Game Over</h2>
+          <p>🍺 Final Damage Report</p>
+          <ol>
+            {[...players]
+              .sort((a, b) => b.drinks - a.drinks)
+              .map((p, i) => (
+                <li key={i}>
+                  {p.name} — {p.drinks} drinks
+                </li>
+              ))}
+          </ol>
         </div>
       )}
     </div>
