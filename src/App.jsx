@@ -6,9 +6,9 @@ const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 
 function buildDeck() {
   const deck = [];
-  for (let suit of SUITS) {
-    for (let rank of RANKS) {
-      deck.push({ suit, rank });
+  for (let s of SUITS) {
+    for (let r of RANKS) {
+      deck.push({ suit: s, rank: r });
     }
   }
   return deck.sort(() => Math.random() - 0.5);
@@ -19,11 +19,11 @@ function ruleText(rank) {
     case "4":
       return "Whores — we all drink";
     case "7":
-      return "Heaven — last one drinks";
+      return "Heaven — last drinks";
     case "J":
       return "Thumb Master";
     case "Q":
-      return "Questions — fuck up, drink";
+      return "Questions";
     case "K":
       return "King — add to the pile";
     default:
@@ -38,18 +38,36 @@ export default function App() {
     { name: "uu", beers: 0 },
   ]);
 
-  const [turn, setTurn] = useState(0);
-  const [deck, setDeck] = useState(() => buildDeck());
+  const [deck, setDeck] = useState(buildDeck);
   const [card, setCard] = useState(null);
+  const [turn, setTurn] = useState(0);
+
+  const [powers, setPowers] = useState({
+    heaven: null,
+    thumb: null,
+    questions: null,
+  });
 
   function drawCard() {
-    setDeck((prev) => {
-      if (prev.length === 0) return prev;
-      const next = prev[0];
-      setCard(next);
-      setTurn((t) => (t + 1) % players.length);
-      return prev.slice(1);
-    });
+    if (deck.length === 0) return;
+
+    const nextCard = deck[0];
+    const currentPlayer = players[turn].name;
+
+    // assign powers
+    if (nextCard.rank === "7") {
+      setPowers((p) => ({ ...p, heaven: currentPlayer }));
+    }
+    if (nextCard.rank === "J") {
+      setPowers((p) => ({ ...p, thumb: currentPlayer }));
+    }
+    if (nextCard.rank === "Q") {
+      setPowers((p) => ({ ...p, questions: currentPlayer }));
+    }
+
+    setCard(nextCard);
+    setDeck((d) => d.slice(1));
+    setTurn((t) => (t + 1) % players.length);
   }
 
   function changeBeer(index, delta) {
@@ -88,18 +106,18 @@ export default function App() {
           {card && (
             <div className="card">
               <div className="corner top">
-                <span>{card.rank}</span>
-                <span>{card.suit}</span>
+                {card.rank}
+                {card.suit}
               </div>
 
               <div className="center">
-                <span className="suit">{card.suit}</span>
+                <div className="suit">{card.suit}</div>
                 <div className="rule">{ruleText(card.rank)}</div>
               </div>
 
               <div className="corner bottom">
-                <span>{card.rank}</span>
-                <span>{card.suit}</span>
+                {card.rank}
+                {card.suit}
               </div>
             </div>
           )}
@@ -109,6 +127,12 @@ export default function App() {
           </button>
 
           <div className="left">Cards left: {deck.length}</div>
+
+          <div className="powers">
+            😇 Heaven: {powers.heaven ?? "—"}<br />
+            👍 Thumb: {powers.thumb ?? "—"}<br />
+            ❓ Questions: {powers.questions ?? "—"}
+          </div>
         </div>
       </div>
     </div>
