@@ -7,8 +7,8 @@ import "./App.css";
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 
-function shuffle(array) {
-  return [...array].sort(() => Math.random() - 0.5);
+function shuffle(deck) {
+  return [...deck].sort(() => Math.random() - 0.5);
 }
 
 function buildDeck() {
@@ -26,16 +26,16 @@ function buildDeck() {
 ========================= */
 function getRuleText(rank) {
   switch (rank) {
-    case "A": return "Waterfall – everyone drinks";
-    case "2": return "You – pick someone to drink";
-    case "3": return "Me – you drink";
-    case "4": return "Whores – we all drink";
+    case "A": return "Waterfall — everyone drinks";
+    case "2": return "You — pick someone to drink";
+    case "3": return "Me — you drink";
+    case "4": return "Whores — we all drink";
     case "5": return "Guys drink";
-    case "6": return "Dicks – we all drink";
-    case "7": return "Heaven – last hand up drinks";
-    case "8": return "Mate – pick a drinking buddy";
-    case "9": return "Rhyme – loser drinks";
-    case "10": return "Categories – loser drinks";
+    case "6": return "Dicks — we all drink";
+    case "7": return "Heaven — last hand up drinks";
+    case "8": return "Mate — pick a drinking buddy";
+    case "9": return "Rhyme — loser drinks";
+    case "10": return "Categories — loser drinks";
     case "J": return "Thumb Master";
     case "Q": return "Question Master";
     case "K": return "Make a rule";
@@ -43,6 +43,63 @@ function getRuleText(rank) {
   }
 }
 
+/* =========================
+   MEDAL LADDER
+========================= */
+const MEDAL_LADDER = [
+  {
+    min: 0,
+    max: 1,
+    title: "Hydration Enthusiast",
+    roast: "This was a drinking game. You opted out."
+  },
+  {
+    min: 2,
+    max: 3,
+    title: "Tourist",
+    roast: "Visited the chaos. Refused to participate."
+  },
+  {
+    min: 4,
+    max: 5,
+    title: "Socially Acceptable",
+    roast: "Bare minimum effort detected."
+  },
+  {
+    min: 6,
+    max: 7,
+    title: "Menace to Sobriety",
+    roast: "A measurable threat to the beer supply."
+  },
+  {
+    min: 8,
+    max: 9,
+    title: "Walking Poor Decision",
+    roast: "Every choice tonight was optional."
+  },
+  {
+    min: 10,
+    max: 12,
+    title: "Absolute Disasterpiece",
+    roast: "Impressive. Concerning. Memorable."
+  },
+  {
+    min: 13,
+    max: Infinity,
+    title: "The Problem™",
+    roast: "Every story tomorrow starts with you."
+  }
+];
+
+function getMedalForBeers(beers) {
+  return MEDAL_LADDER.find(
+    medal => beers >= medal.min && beers <= medal.max
+  );
+}
+
+/* =========================
+   APP
+========================= */
 export default function App() {
   const [players, setPlayers] = useState([]);
   const [nameInput, setNameInput] = useState("");
@@ -56,6 +113,9 @@ export default function App() {
   const [thumbMaster, setThumbMaster] = useState(null);
   const [questionMaster, setQuestionMaster] = useState(null);
 
+  /* =========================
+     SETUP
+  ========================= */
   function addPlayer() {
     if (!nameInput.trim()) return;
     setPlayers([...players, { name: nameInput, beers: 0 }]);
@@ -73,20 +133,20 @@ export default function App() {
     setQuestionMaster(null);
   }
 
+  /* =========================
+     GAMEPLAY
+  ========================= */
   function drawCard() {
     if (deck.length === 0) return;
 
     const nextDeck = [...deck];
     const card = nextDeck.pop();
 
-    const updatedPlayers = [...players];
-    updatedPlayers[turn].beers += 1;
-
+    // Handle persistent roles
     if (card.rank === "7") setHeaven(players[turn].name);
     if (card.rank === "J") setThumbMaster(players[turn].name);
     if (card.rank === "Q") setQuestionMaster(players[turn].name);
 
-    setPlayers(updatedPlayers);
     setDeck(nextDeck);
     setDiscard([...discard, card]);
 
@@ -97,8 +157,17 @@ export default function App() {
     }
   }
 
+  function addBeer(index) {
+    const updated = [...players];
+    updated[index].beers += 1;
+    setPlayers(updated);
+  }
+
   const currentCard = discard[discard.length - 1];
 
+  /* =========================
+     RENDER
+  ========================= */
   return (
     <div className="app">
       <h1>KAD Kings</h1>
@@ -113,13 +182,11 @@ export default function App() {
           />
           <button onClick={addPlayer}>Add Player</button>
 
-          <div className="player-grid">
+          <ul className="player-list">
             {players.map((p, i) => (
-              <div key={i} className="player-card">
-                {p.name}
-              </div>
+              <li key={i}>{p.name}</li>
             ))}
-          </div>
+          </ul>
 
           <button className="start" onClick={startGame}>
             Start Game
@@ -130,59 +197,67 @@ export default function App() {
       {/* GAME */}
       {deck.length > 0 && !gameOver && (
         <>
-          <div className="table">
-            <div className="player-grid">
-              {players.map((p, i) => (
-                <div
-                  key={i}
-                  className={`player-card ${i === turn ? "active" : ""}`}
-                >
-                  <div className="player-name">{p.name}</div>
-                  <div className="beer-count">🍺 {p.beers}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="card-area">
-              <button className="draw" onClick={drawCard}>
-                Draw Card
-              </button>
-
-              {currentCard && (
-                <div className="card">
-                  <div className="rank">{currentCard.rank}</div>
-                  <div className="suit">{currentCard.suit}</div>
-                  <div className="rule">
-                    {getRuleText(currentCard.rank)}
-                  </div>
-                </div>
-              )}
-
-              <p className="cards-left">Cards left: {deck.length}</p>
-            </div>
-          </div>
+          <h2>
+            Turn: <span className="active">{players[turn].name}</span>
+          </h2>
 
           <div className="roles">
-            <span>👼 Heaven: {heaven || "—"}</span>
-            <span>👍 Thumb: {thumbMaster || "—"}</span>
-            <span>❓ Questions: {questionMaster || "—"}</span>
+            <p>👼 Heaven: {heaven || "—"}</p>
+            <p>👍 Thumb: {thumbMaster || "—"}</p>
+            <p>❓ Question: {questionMaster || "—"}</p>
           </div>
+
+          <button className="draw" onClick={drawCard}>
+            Draw Card
+          </button>
+
+          <p>Cards left: {deck.length}</p>
+
+          {currentCard && (
+            <div className="card">
+              <div className="rank">{currentCard.rank}</div>
+              <div className="suit">{currentCard.suit}</div>
+              <div className="rule">
+                {getRuleText(currentCard.rank)}
+              </div>
+            </div>
+          )}
+
+          <h3>Beers</h3>
+          <ul className="scores">
+            {players.map((p, i) => (
+              <li key={i} className={i === turn ? "active" : ""}>
+                {p.name}: {p.beers}
+                <button onClick={() => addBeer(i)}>+1 🍺</button>
+              </li>
+            ))}
+          </ul>
         </>
       )}
 
-      {/* GAME OVER */}
+      {/* END GAME */}
       {gameOver && (
         <div className="game-over">
-          <h2>Game Over</h2>
-          <ol>
+          <h2>🍺 Final Judgment 🍺</h2>
+
+          <ol className="leaderboard">
             {[...players]
               .sort((a, b) => b.beers - a.beers)
-              .map((p, i) => (
-                <li key={i}>
-                  {p.name} — {p.beers} 🍺
-                </li>
-              ))}
+              .map((p, i) => {
+                const medal = getMedalForBeers(p.beers);
+                return (
+                  <li key={i}>
+                    <strong>{p.name}</strong> — {p.beers} beers  
+                    <div>🏅 {medal.title}</div>
+                    <div className="roast">{medal.roast}</div>
+                  </li>
+                );
+              })}
           </ol>
+
+          <p className="footer-roast">
+            No lessons were learned. Same time next week.
+          </p>
         </div>
       )}
     </div>
