@@ -1,44 +1,102 @@
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #111, #000);
+  background: radial-gradient(circle at top, #141414, #000);
   font-family: system-ui, sans-serif;
   color: #eee;
 }
 
 .app {
-  padding: 20px;
+  padding: 16px;
+  max-width: 420px;
+  margin: auto;
+}
+
+h1 {
   text-align: center;
+  margin-bottom: 10px;
+}
+
+/* SETUP */
+.add {
+  display: flex;
+  gap: 8px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
 }
 
 button {
-  padding: 10px 16px;
+  padding: 10px 14px;
   border-radius: 10px;
   border: none;
   background: #333;
-  color: white;
-  font-size: 1rem;
+  color: #fff;
 }
 
 .start {
   background: darkred;
-  margin-top: 10px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.lobby {
+  margin: 10px 0;
+}
+
+.lobby-player {
+  padding: 8px;
+  background: #111;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .turn span {
   color: #4caf50;
-  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.powers {
+  display: flex;
+  gap: 10px;
+  font-size: 0.9rem;
+  opacity: 0.9;
 }
 
 /* CARD */
+.table {
+  display: flex;
+  justify-content: center;
+  margin: 14px 0;
+}
+
 .card {
-  margin: 16px auto;
-  width: 180px;
-  height: 250px;
-  background: white;
-  color: black;
+  width: 160px;
+  height: 230px;
+  background: #fff;
+  color: #000;
   border-radius: 14px;
   position: relative;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.6);
+}
+
+.card.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
 }
 
 .corner {
@@ -46,11 +104,12 @@ button {
   font-weight: bold;
 }
 
-.corner.top { top: 8px; left: 10px; }
-.corner.bottom { bottom: 8px; right: 10px; transform: rotate(180deg); }
+.tl { top: 8px; left: 10px; }
+.br { bottom: 8px; right: 10px; transform: rotate(180deg); }
 
-.center {
-  font-size: 3.5rem;
+.suit {
+  font-size: 3.2rem;
+  text-align: center;
   margin-top: 40px;
 }
 
@@ -59,48 +118,49 @@ button {
   bottom: 16px;
   left: 10px;
   right: 10px;
-  font-size: 0.9rem;
+  text-align: center;
   font-weight: 600;
 }
 
+/* BUTTONS */
+.draw {
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.deck {
+  text-align: center;
+  opacity: 0.6;
+  margin-bottom: 10px;
+}
+
 /* PLAYERS */
-.scores {
-  list-style: none;
-  padding: 0;
-  margin-top: 20px;
+.players {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.scores li {
-  padding: 12px;
-  border-radius: 10px;
-  margin: 8px 0;
+.player {
+  padding: 10px;
+  border-radius: 12px;
   background: #111;
-  font-size: 1.1rem;
 }
 
-.scores li.active {
+.player.active {
   border: 2px solid #4caf50;
 }
 
-.name {
-  font-size: 1.3rem;
+.p-name {
+  font-size: 1.2rem;
   font-weight: bold;
 }
 
-.beer {
-  font-size: 1.1rem;
+.p-beer {
+  font-size: 1rem;
 }
 
-.medal {
-  font-size: 0.95rem;
+.p-medal {
+  font-size: 0.9rem;
   opacity: 0.85;
-}
-
-/* MISC */
-.powers p {
-  margin: 4px 0;
-}
-
-.count {
-  opacity: 0.7;
 }
