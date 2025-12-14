@@ -1,167 +1,152 @@
 body {
   margin: 0;
   background: radial-gradient(circle at top, #111, #000);
-  color: #fff;
-  font-family: system-ui;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #eee;
 }
 
 .app {
-  max-width: 420px;
-  margin: auto;
-  padding: 16px;
   text-align: center;
+  padding: 20px;
 }
 
-button {
-  padding: 12px 18px;
-  border-radius: 10px;
-  border: none;
-  background: #444;
-  color: white;
-  font-weight: bold;
+h1 {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
 }
 
 .active {
-  color: #22c55e;
-}
-
-/* =========================
-   CARD SYSTEM (FIXED)
-========================= */
-.card-container {
-  position: relative;
-  width: 240px;
-  height: 340px;
-  margin: 24px auto;
-  perspective: 1000px;
-}
-
-/* lock transforms */
-.card-back,
-.card-face {
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* CARD BACK */
-.card-back {
-  background: linear-gradient(135deg, #222, #000);
-  color: white;
-  font-size: 48px;
-  font-weight: 900;
-  letter-spacing: 4px;
-  transform: rotateY(0deg);
-}
-
-/* CARD FRONT */
-.card-face {
-  background: white;
-  transform: rotateY(180deg);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.6);
-}
-
-/* FLIP */
-.card-container.flip .card-back {
-  transform: rotateY(180deg);
-}
-
-.card-container.flip .card-face {
-  transform: rotateY(360deg);
-}
-
-.red { color: #dc2626; }
-.black { color: #111; }
-
-/* =========================
-   CARD DETAILS
-========================= */
-.corner {
-  position: absolute;
-  font-size: 20px;
+  color: #4caf50;
   font-weight: bold;
 }
 
-.corner span {
-  display: block;
-  font-size: 18px;
+.setup input {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  margin-right: 6px;
+}
+
+button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #333;
+  color: white;
+  font-size: 1rem;
+}
+
+button:hover {
+  background: #555;
+}
+
+.start {
+  margin-top: 12px;
+  background: #b71c1c;
+}
+
+.draw {
+  margin: 16px 0;
+  font-size: 1.2rem;
+}
+
+.roles {
+  margin: 12px 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.count {
+  opacity: 0.7;
+}
+
+/* =========================
+   CARD
+========================= */
+.card {
+  margin: 20px auto;
+  width: 260px;
+  height: 360px;
+  perspective: 1000px;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  animation: pop 0.35s ease;
+}
+
+.card-front {
+  background: #fff;
+  color: #000;
+  border-radius: 16px;
+  width: 100%;
+  height: 100%;
+  padding: 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  position: relative;
+}
+
+.corner {
+  position: absolute;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 .corner.top {
   top: 10px;
-  left: 10px;
+  left: 12px;
 }
 
 .corner.bottom {
   bottom: 10px;
-  right: 10px;
+  right: 12px;
   transform: rotate(180deg);
 }
 
-.center-suit {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 96px;
-  opacity: 0.15;
+.center {
+  font-size: 5rem;
+  margin-top: 40px;
 }
 
-/* RULE STAYS INSIDE CARD */
-.rule-box {
+.rule {
   position: absolute;
-  bottom: 16px;
+  bottom: 24px;
   left: 16px;
   right: 16px;
-  padding: 10px;
-  background: #f9fafb;
-  border-radius: 12px;
-  color: #111;
+  font-size: 0.95rem;
   font-weight: 600;
-  font-size: 14px;
-  text-align: center;
 }
 
 /* =========================
-   SPECIAL EFFECTS (SAFE)
+   LISTS
 ========================= */
-.special-7 {
-  box-shadow: 0 0 24px rgba(34,197,94,.6);
+.scores {
+  list-style: none;
+  padding: 0;
 }
 
-.special-J {
-  animation: shake 0.3s;
-}
-
-.special-Q {
-  box-shadow: 0 0 24px violet;
-}
-
-.special-K {
-  animation: slam 0.25s;
-}
-
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  50% { transform: translateX(4px); }
-  75% { transform: translateX(-4px); }
-  100% { transform: translateX(0); }
-}
-
-@keyframes slam {
-  0% { transform: scale(1.08); }
-  100% { transform: scale(1); }
+.scores li {
+  margin: 4px 0;
 }
 
 /* =========================
    GAME OVER
 ========================= */
 .game-over {
-  margin-top: 30px;
+  margin-top: 40px;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes pop {
+  from {
+    transform: scale(0.85) rotate(-2deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
 }
