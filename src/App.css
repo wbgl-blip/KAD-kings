@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  background: #0b0b0b;
+  background: radial-gradient(circle at top, #111, #000);
   color: #fff;
   font-family: system-ui;
 }
@@ -25,21 +25,56 @@ button {
   color: #22c55e;
 }
 
-/* CARD */
-.card {
+/* =========================
+   CARD FLIP SYSTEM
+========================= */
+.card-container {
   position: relative;
   width: 240px;
   height: 340px;
   margin: 20px auto;
-  background: white;
-  border-radius: 18px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-  animation: flipIn 0.5s ease;
+  perspective: 1200px;
 }
 
-.card.red { color: #dc2626; }
-.card.black { color: #111; }
+.card-back,
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.card-back {
+  background: linear-gradient(135deg, #222, #000);
+  color: white;
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 4px;
+}
+
+.card-face {
+  background: white;
+  transform: rotateY(180deg);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.card-container.flip .card-back {
+  transform: rotateY(180deg);
+}
+
+.card-container.flip .card-face {
+  transform: rotateY(0deg);
+}
+
+.red { color: #dc2626; }
+.black { color: #111; }
+
+/* =========================
+   CARD DETAILS
+========================= */
 .corner {
   position: absolute;
   font-size: 20px;
@@ -73,24 +108,53 @@ button {
 
 .rule-box {
   position: absolute;
-  bottom: 16px;
+  bottom: 14px;
   left: 14px;
   right: 14px;
   padding: 10px;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.95);
   border-radius: 12px;
   color: black;
   font-weight: 600;
   font-size: 14px;
 }
 
-@keyframes flipIn {
-  from {
-    transform: rotateY(90deg);
-    opacity: 0;
-  }
-  to {
-    transform: rotateY(0deg);
-    opacity: 1;
-  }
+/* =========================
+   SPECIAL CARD EFFECTS
+========================= */
+.special-7 { animation: pulse 1s infinite; }
+.special-J { animation: shake 0.4s; }
+.special-Q { animation: glow 1.2s infinite; }
+.special-K { animation: slam 0.4s; }
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0px rgba(34,197,94,.4); }
+  50% { box-shadow: 0 0 30px rgba(34,197,94,.8); }
+  100% { box-shadow: 0 0 0px rgba(34,197,94,.4); }
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 10px purple; }
+  50% { box-shadow: 0 0 30px violet; }
+  100% { box-shadow: 0 0 10px purple; }
+}
+
+@keyframes slam {
+  0% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* =========================
+   GAME OVER
+========================= */
+.game-over {
+  margin-top: 30px;
 }
