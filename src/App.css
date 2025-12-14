@@ -1,95 +1,129 @@
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   margin: 0;
   background: #0b0b0b;
-  color: white;
-  font-family: system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  color: #fff;
 }
 
 .app {
+  min-height: 100vh;
   padding: 16px;
-  max-width: 430px;
-  margin: 0 auto;
 }
 
+/* ======================
+   HEADER
+====================== */
 h1 {
   text-align: center;
-  margin-bottom: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
 }
 
+/* ======================
+   GAME LAYOUT
+====================== */
 .game {
   display: flex;
   gap: 14px;
+  align-items: flex-start;
 }
 
+/* ======================
+   PLAYERS
+====================== */
 .players {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .player {
-  background: #1a1a1a;
-  padding: 14px;
-  border-radius: 16px;
   width: 120px;
+  background: #151515;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: center;
+  transition: border 0.15s ease;
 }
 
 .player.active {
-  outline: 2px solid #ff3333;
+  border: 2px solid #e53935;
 }
 
-.name {
+.player .name {
+  font-size: 16px;
   font-weight: 700;
   margin-bottom: 6px;
 }
 
 .beer-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.beer-row span {
+  font-size: 14px;
 }
 
 .beer-row button {
-  background: #2a2a2a;
-  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   border: none;
-  border-radius: 10px;
-  padding: 6px 10px;
+  background: #262626;
+  color: #fff;
   font-size: 18px;
+  font-weight: 700;
 }
 
+/* ======================
+   CARD ZONE
+====================== */
 .card-zone {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 14px;
 }
 
+/* ======================
+   CARD
+====================== */
 .card {
-  width: 240px;
-  height: 340px;
-  background: white;
-  color: black;
+  width: 230px;
+  height: 320px;
+  background: #fff;
+  color: #000;
   border-radius: 18px;
-  padding: 14px;
   position: relative;
-  transform: translateZ(0);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  transform: rotate(-6deg);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
 }
 
 .corner {
+  position: absolute;
+  font-size: 20px;
   font-weight: 700;
-  font-size: 22px;
+}
+
+.corner.top {
+  top: 10px;
+  left: 12px;
 }
 
 .corner.bottom {
-  position: absolute;
-  bottom: 14px;
-  right: 14px;
+  bottom: 10px;
+  right: 12px;
   transform: rotate(180deg);
 }
 
@@ -99,33 +133,100 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 10px;
 }
 
-.suit {
-  font-size: 72px;
+.center .suit {
+  font-size: 64px;
 }
 
-.rule {
-  margin-top: 10px;
+.center .rule {
+  font-size: 16px;
   font-weight: 600;
-  text-align: center;
 }
 
+/* ======================
+   DRAW BUTTON
+====================== */
 .draw {
-  margin-top: 14px;
-  padding: 14px 22px;
+  width: 180px;
+  height: 44px;
   border-radius: 14px;
   border: none;
+  background: #eaeaea;
+  color: #000;
   font-weight: 700;
+  font-size: 16px;
 }
 
 .left {
-  margin-top: 6px;
   opacity: 0.7;
+  font-size: 14px;
 }
 
+/* ======================
+   POWERS
+====================== */
 .powers {
-  margin-top: 10px;
+  margin-top: 8px;
   font-size: 14px;
-  opacity: 0.9;
+  opacity: 0.85;
+  text-align: center;
+}
+
+/* ======================
+   POST GAME
+====================== */
+.scoreboard {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.score-row {
+  background: #151515;
+  padding: 14px;
+  border-radius: 14px;
+}
+
+.score-name {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.score-beer {
+  margin-top: 4px;
+  font-size: 15px;
+}
+
+.score-medal {
+  margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.shittalk {
+  margin-top: 20px;
+  text-align: center;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+/* ======================
+   MOBILE TWEAKS
+====================== */
+@media (max-width: 420px) {
+  .game {
+    gap: 10px;
+  }
+
+  .player {
+    width: 110px;
+  }
+
+  .card {
+    width: 210px;
+    height: 300px;
+  }
 }
