@@ -1,5 +1,5 @@
 /* =========================
-   GLOBAL RESET
+   RESET
 ========================= */
 
 * {
@@ -10,15 +10,15 @@
 html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
   background: radial-gradient(circle at top, #111 0%, #000 70%);
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  height: 100%;
   overflow: hidden;
 }
 
 /* =========================
-   APP WRAPPER
+   APP
 ========================= */
 
 .app {
@@ -34,15 +34,15 @@ html, body {
 ========================= */
 
 h1 {
-  margin: 14px 0 6px;
-  font-size: 2.2rem;
+  margin: 12px 0 4px;
+  font-size: 2.1rem;
   font-weight: 800;
   letter-spacing: 1px;
   text-align: center;
 }
 
 /* =========================
-   TABLE LAYOUT
+   TABLE (MAIN AREA)
 ========================= */
 
 .table {
@@ -56,51 +56,93 @@ h1 {
 }
 
 /* =========================
-   DECK / CARD
+   CENTER STACK (DECK AREA)
 ========================= */
 
-.deck {
+.center-stack {
   position: absolute;
-  bottom: 16px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -45%);
   width: 92%;
   max-width: 360px;
+  text-align: center;
+  z-index: 3;
 }
+
+/* =========================
+   CARD
+========================= */
 
 .card {
   background: #fff;
   color: #000;
-  border-radius: 16px;
-  padding: 18px;
-  font-size: 1.4rem;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  border-radius: 18px;
+  padding: 18px 16px;
+  font-size: 1.35rem;
+  box-shadow: 0 14px 35px rgba(0,0,0,0.65);
+  margin-bottom: 10px;
 }
 
 /* =========================
-   PLAYERS
+   DRAW BUTTON
+========================= */
+
+button.draw {
+  padding: 14px 28px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border-radius: 22px;
+  border: none;
+  background: #fff;
+  color: #000;
+  margin-bottom: 6px;
+}
+
+/* =========================
+   STATUS TEXT
+========================= */
+
+.status {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* =========================
+   PLAYERS CONTAINER
 ========================= */
 
 .players {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
+
+/* =========================
+   PLAYER TILE
+========================= */
 
 .player {
   position: absolute;
-  background: rgba(20,20,20,0.85);
+  background: rgba(20,20,20,0.88);
   border-radius: 18px;
   padding: 10px 14px;
-  min-width: 120px;
+  min-width: 118px;
   text-align: center;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  pointer-events: auto;
+  z-index: 2;
 }
 
 .player-name {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   margin-bottom: 6px;
 }
+
+/* =========================
+   COUNTER
+========================= */
 
 .counter {
   display: flex;
@@ -114,88 +156,52 @@ h1 {
   color: #000;
   border: none;
   border-radius: 12px;
-  width: 36px;
-  height: 36px;
-  font-size: 1.2rem;
-  font-weight: 700;
+  width: 34px;
+  height: 34px;
+  font-size: 1.1rem;
+  font-weight: 800;
 }
 
 .counter span {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
 }
 
 /* =========================
-   ACTIVE PLAYER (TURN)
+   ACTIVE PLAYER
 ========================= */
 
 .player.active {
   border: 2px solid rgba(255, 80, 80, 0.9);
   box-shadow:
     0 0 14px rgba(255, 80, 80, 0.6),
-    0 0 40px rgba(255, 0, 0, 0.45);
+    0 0 36px rgba(255, 0, 0, 0.45);
   transform: scale(1.08);
-  animation: turnPulse 1.6s infinite;
-  z-index: 5;
+  animation: pulse 1.6s infinite;
+  z-index: 4;
 }
 
-@keyframes turnPulse {
-  0% {
-    box-shadow:
-      0 0 12px rgba(255, 80, 80, 0.5),
-      0 0 28px rgba(255, 0, 0, 0.25);
-  }
-  50% {
-    box-shadow:
-      0 0 20px rgba(255, 120, 120, 0.9),
-      0 0 48px rgba(255, 0, 0, 0.6);
-  }
-  100% {
-    box-shadow:
-      0 0 12px rgba(255, 80, 80, 0.5),
-      0 0 28px rgba(255, 0, 0, 0.25);
-  }
+@keyframes pulse {
+  0% { box-shadow: 0 0 12px rgba(255,80,80,0.5); }
+  50% { box-shadow: 0 0 22px rgba(255,120,120,0.9); }
+  100% { box-shadow: 0 0 12px rgba(255,80,80,0.5); }
 }
 
 /* =========================
-   PLAYER POSITIONS (HORSESHOE)
-   Adjusted to FIT ONE SCREEN
+   PLAYER POSITIONS
+   (Guaranteed NO OVERLAP)
 ========================= */
 
-.player.p0 { top: 10%; left: 50%; transform: translateX(-50%); }
-.player.p1 { top: 28%; right: 6%; }
-.player.p2 { bottom: 36%; right: 6%; }
-.player.p3 { bottom: 36%; left: 6%; }
-.player.p4 { top: 28%; left: 6%; }
+.player.p0 { top: 12%; left: 50%; transform: translateX(-50%); }
+
+.player.p1 { top: 30%; right: 4%; }
+.player.p2 { bottom: 26%; right: 6%; }
+
+.player.p3 { bottom: 26%; left: 6%; }
+.player.p4 { top: 30%; left: 4%; }
 
 /* =========================
-   BUTTONS
-========================= */
-
-button.draw {
-  margin-top: 8px;
-  padding: 14px 26px;
-  font-size: 1.1rem;
-  font-weight: 800;
-  border-radius: 20px;
-  border: none;
-  background: #fff;
-  color: #000;
-}
-
-/* =========================
-   STATUS TEXT
-========================= */
-
-.status {
-  margin-top: 6px;
-  font-size: 0.95rem;
-  opacity: 0.85;
-  text-align: center;
-}
-
-/* =========================
-   UTIL
+   UTILS
 ========================= */
 
 .hidden {
