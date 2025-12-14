@@ -53,8 +53,6 @@ export default function App() {
   const [deck, setDeck] = useState([]);
   const [discard, setDiscard] = useState([]);
   const [turn, setTurn] = useState(0);
-
-  const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
 
   // Persistent roles
@@ -77,29 +75,28 @@ export default function App() {
     setDeck(buildDeck());
     setDiscard([]);
     setTurn(0);
+    setGameOver(false);
 
     setHeaven(null);
     setThumbMaster(null);
     setQuestionMaster(null);
-
-    setGameOver(false);
-    setGameStarted(true);
   }
 
   /* =========================
      DRAW CARD
   ========================= */
   function drawCard() {
-    if (deck.length === 0) return;
+    if (deck.length === 0 || gameOver) return;
 
     const nextDeck = [...deck];
     const card = nextDeck.pop();
 
-    // Role transfer
+    // Transfer persistent roles
     if (card.rank === "7") setHeaven(players[turn].name);
     if (card.rank === "J") setThumbMaster(players[turn].name);
     if (card.rank === "Q") setQuestionMaster(players[turn].name);
 
+    // Increment drinks (simple stat)
     const updatedPlayers = [...players];
     updatedPlayers[turn].drinks += 1;
 
@@ -109,13 +106,15 @@ export default function App() {
 
     if (nextDeck.length === 0) {
       setGameOver(true);
-      setGameStarted(false);
     } else {
       setTurn((turn + 1) % players.length);
     }
   }
 
   const currentCard = discard[discard.length - 1];
+  const isRed =
+    currentCard &&
+    (currentCard.suit === "♥" || currentCard.suit === "♦");
 
   /* =========================
      RENDER
@@ -125,7 +124,7 @@ export default function App() {
       <h1>KAD Kings</h1>
 
       {/* SETUP */}
-      {!gameStarted && !gameOver && (
+      {deck.length === 0 && !gameOver && (
         <div className="setup">
           <input
             value={nameInput}
@@ -147,7 +146,7 @@ export default function App() {
       )}
 
       {/* GAME */}
-      {gameStarted && !gameOver && (
+      {deck.length > 0 && !gameOver && (
         <>
           <h2>
             Turn: <span className="active">{players[turn].name}</span>
@@ -166,10 +165,27 @@ export default function App() {
           <p>Cards left: {deck.length}</p>
 
           {currentCard && (
-            <div className="card">
-              <div className="rank">{currentCard.rank}</div>
-              <div className="suit">{currentCard.suit}</div>
-              <div className="rule">{getRuleText(currentCard.rank)}</div>
+            <div
+              key={discard.length}
+              className={`card ${isRed ? "red" : "black"}`}
+            >
+              <div className="corner top">
+                {currentCard.rank}
+                <span>{currentCard.suit}</span>
+              </div>
+
+              <div className="corner bottom">
+                {currentCard.rank}
+                <span>{currentCard.suit}</span>
+              </div>
+
+              <div className="center-suit">
+                {currentCard.suit}
+              </div>
+
+              <div className="rule">
+                {getRuleText(currentCard.rank)}
+              </div>
             </div>
           )}
 
@@ -188,6 +204,8 @@ export default function App() {
       {gameOver && (
         <div className="game-over">
           <h2>Game Over</h2>
+          <p>All 52 cards drawn.</p>
+
           <h3>Leaderboard</h3>
           <ol>
             {[...players]
