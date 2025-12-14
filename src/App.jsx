@@ -1,173 +1,240 @@
-import { useState, useEffect, useRef } from "react";
+import { useReducer } from "react";
 import "./App.css";
 
+/* ---------- CARD DECK ---------- */
 const SUITS = ["♠", "♥", "♦", "♣"];
-const VALUES = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
-
-const RULES = {
-  A: "Waterfall. Don’t be a coward.",
-  2: "You drink. Easy.",
-  3: "Me. Suffer.",
-  4: "Whores. All drink.",
-  5: "Guys drink.",
-  6: "Chicks drink.",
-  7: "Heaven. Last one drinks.",
-  8: "Mate. Drag someone down with you.",
-  9: "Rhyme. First to choke drinks.",
-  10: "Categories. Pick your poison.",
-  J: "Thumb Master. Control the table.",
-  Q: "Questions. Answer and suffer.",
-  K: "King. Pour it in. Hope you survive."
-};
-
-const SHIT_TALK = [
-  "Barely drinking. Are you even trying?",
-  "That beer is getting warm, hero.",
-  "Everyone else is playing Kings. You’re playing chess.",
-  "Hydration king over here.",
-  "If sipping was an Olympic sport, you’d still lose."
-];
+const VALUES = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 function buildDeck() {
   const deck = [];
-  VALUES.forEach(v => {
-    SUITS.forEach(s => {
+  for (let v of VALUES) {
+    for (let s of SUITS) {
       deck.push({ value: v, suit: s });
-    });
-  });
+    }
+  }
   return deck.sort(() => Math.random() - 0.5);
 }
 
-export default function App() {
-  const [players, setPlayers] = useState([
-    { name: "dt", beers: 0 },
-    { name: "vh", beers: 0 },
-    { name: "rf", beers: 0 },
-    { name: "fff", beers: 0 }
-  ]);
+function ruleForCard(card) {
+  switch (card.value) {
+    case "7":
+      return "Heaven. Last one up drinks.";
+    case "J":
+      return "Thumb Master. Last thumb down drinks.";
+    case "Q":
+      return "Questions. Answer = drink.";
+    case "4":
+      return "Whores. Everyone drinks.";
+    case "K":
+      return "King. You’re closer to death.";
+    default:
+      return "Drink.";
+  }
+}
 
-  const [activePlayer, setActivePlayer] = useState(0);
-  const [deck, setDeck] = useState(buildDeck());
-  const [card, setCard] = useState(null);
-  const [gameOver, setGameOver] = useState(false);
+/* ---------- MEDALS ---------- */
+function generateMedals(players) {
+  const sorted = [...players].sort((a, b) => b.beers - a.beers);
+  const top = sorted[0];
+  const bottom = sorted[sorted.length - 1];
 
-  const railRef = useRef(null);
+  const medals = [];
 
-  useEffect(() => {
-    if (railRef.current) {
-      const el = railRef.current.children[activePlayer];
-      el?.scrollIntoView({ behavior: "smooth", inline: "center" });
-    }
-  }, [activePlayer]);
+  medals.push({
+    title: "🍺 Alcoholic of the Night",
+    player: top.name,
+    text: "Absolutely unhinged. Society has concerns.",
+  });
 
-  const drawCard = () => {
-    if (deck.length === 0) {
-      setGameOver(true);
-      return;
-    }
-    const next = deck[0];
-    setDeck(d => d.slice(1));
-    setCard(next);
-    setActivePlayer(i => (i + 1) % players.length);
-  };
-
-  const adjustBeer = (index, delta) => {
-    setPlayers(p =>
-      p.map((pl, i) =>
-        i === index
-          ? { ...pl, beers: Math.max(0, pl.beers + delta) }
-          : pl
-      )
-    );
-  };
-
-  const medals = [...players]
-    .sort((a, b) => b.beers - a.beers)
-    .map((p, i) => {
-      if (i === 0) return { ...p, medal: "🥇 Gold Degenerate" };
-      if (i === 1) return { ...p, medal: "🥈 Functional Alcoholic" };
-      if (i === 2) return { ...p, medal: "🥉 Social Drinker" };
-      return { ...p, medal: "🧃 Liability" };
+  if (top.beers >= 6) {
+    medals.push({
+      title: "☠️ Menace to Sobriety",
+      player: top.name,
+      text: "Single-handedly ruined tomorrow.",
     });
+  }
+
+  if (bottom.beers <= 1) {
+    medals.push({
+      title: "🥛 Designated Liability",
+      player: bottom.name,
+      text: "Why were you even here?",
+    });
+  }
+
+  medals.push({
+    title: "🤡 Peer Pressure Failure",
+    player: bottom.name,
+    text: "Watched everyone drink and did nothing.",
+  });
+
+  return medals;
+}
+
+/* ---------- STATE ---------- */
+const initialState = {
+  players: [
+    { id: "p1", name: "dt", beers: 0 },
+    { id: "p2", name: "vh", beers: 0 },
+    { id: "p3", name: "rf", beers: 0 },
+    { id: "p4", name: "fff", beers: 0 },
+  ],
+  deck: buildDeck(),
+  currentCard: null,
+  heaven: null,
+  thumb: null,
+  questions: null,
+  gameOver: false,
+};
+
+/* ---------- REDUCER ---------- */
+function reducer(state, action) {
+  switch (action.type) {
+    case "DRAW": {
+      if (state.deck.length === 0) return state;
+
+      const [card, ...rest] = state.deck;
+
+      const updates = {
+        currentCard: card,
+        deck: rest,
+      };
+
+      if (card.value === "7") updates.heaven = action.player;
+      if (card.value === "J") updates.thumb = action.player;
+      if (card.value === "Q") updates.questions = action.player;
+
+      if (rest.length === 0) updates.gameOver = true;
+
+      return { ...state, ...updates };
+    }
+
+    case "BEER":
+      return {
+        ...state,
+        players: state.players.map((p) =>
+          p.id === action.id
+            ? { ...p, beers: Math.max(0, p.beers + action.delta) }
+            : p
+        ),
+      };
+
+    default:
+      return state;
+  }
+}
+
+/* ---------- APP ---------- */
+export default function App() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const medals = state.gameOver ? generateMedals(state.players) : [];
 
   return (
     <div className="app">
-      <h1>KAD Kings</h1>
+      <h1 className="title">KAD Kings</h1>
 
-      {/* Players */}
-      <div className="player-rail" ref={railRef}>
-        {players.map((p, i) => (
-          <div
-            key={i}
-            className={`player-card ${i === activePlayer ? "active" : ""}`}
-          >
-            <div className="name">{p.name}</div>
-            <div className="controls">
-              <button onClick={() => adjustBeer(i, -1)}>-</button>
-              <span>🍺 {p.beers}</span>
-              <button onClick={() => adjustBeer(i, 1)}>+</button>
+      {/* PLAYERS */}
+      <div className="table">
+        {state.players.map((p, i) => (
+          <div key={p.id} className={`player seat-${i}`}>
+            <div className="player-name">{p.name}</div>
+
+            <div className="beer-controls">
+              <button
+                className="beer-btn"
+                onClick={() =>
+                  dispatch({ type: "BEER", id: p.id, delta: -1 })
+                }
+              >
+                −
+              </button>
+
+              <span className="beer-count">🍺 {p.beers}</span>
+
+              <button
+                className="beer-btn"
+                onClick={() =>
+                  dispatch({ type: "BEER", id: p.id, delta: 1 })
+                }
+              >
+                +
+              </button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Card */}
-      {card && (
+      {/* CARD */}
+      {state.currentCard && (
         <div className="card">
-          <div className="top">
-            {card.value} {card.suit}
+          <div className="card-corner">
+            {state.currentCard.value}
+            {state.currentCard.suit}
           </div>
-          <div className="center">{card.suit}</div>
-          <div className="rule">{RULES[card.value]}</div>
-          <div className="bottom">
-            {card.value} {card.suit}
+
+          <div className="card-center">
+            {state.currentCard.suit}
+            <div className="card-rule">
+              {ruleForCard(state.currentCard)}
+            </div>
+          </div>
+
+          <div className="card-corner bottom">
+            {state.currentCard.value}
+            {state.currentCard.suit}
           </div>
         </div>
       )}
 
-      {/* Draw */}
-      {!gameOver && (
-        <>
-          <button className="draw" onClick={drawCard}>
-            Draw Card
-          </button>
-          <div className="deck-count">Cards left: {deck.length}</div>
-        </>
-      )}
+      {/* CONTROLS */}
+      <div className="center-controls">
+        <button
+          className="draw-button"
+          onClick={() =>
+            dispatch({
+              type: "DRAW",
+              player: state.players[0].name,
+            })
+          }
+        >
+          Draw Card
+        </button>
 
-      {/* End Game */}
-      {gameOver && (
+        <div className="deck-count">
+          Cards left: {state.deck.length}
+        </div>
+
+        <div className="powers">
+          😇 Heaven: {state.heaven || "—"} <br />
+          👍 Thumb: {state.thumb || "—"} <br />
+          ❓ Questions: {state.questions || "—"}
+        </div>
+      </div>
+
+      {/* END GAME */}
+      {state.gameOver && (
         <div className="endgame">
-          <h2>Game Over</h2>
+          <h2>Final Damage Report</h2>
 
-          {medals.map((p, i) => (
-            <div key={i} className="score-row">
-              <span>{p.medal}</span>
-              <span>{p.name}</span>
-              <span>{p.beers} 🍺</span>
+          <ul>
+            {[...state.players]
+              .sort((a, b) => b.beers - a.beers)
+              .map((p) => (
+                <li key={p.id}>
+                  {p.name}: 🍺 {p.beers}
+                </li>
+              ))}
+          </ul>
+
+          <h3>Medals</h3>
+          {medals.map((m, i) => (
+            <div key={i} className="medal">
+              <strong>{m.title}</strong>
+              <div>{m.player}</div>
+              <small>{m.text}</small>
             </div>
           ))}
-
-          <div className="shit-talk">
-            {
-              SHIT_TALK[
-                Math.floor(Math.random() * SHIT_TALK.length)
-              ]
-            }
-          </div>
-
-          <button
-            className="draw"
-            onClick={() => {
-              setDeck(buildDeck());
-              setCard(null);
-              setGameOver(false);
-              setActivePlayer(0);
-              setPlayers(p => p.map(pl => ({ ...pl, beers: 0 })));
-            }}
-          >
-            Play Again
-          </button>
         </div>
       )}
     </div>
