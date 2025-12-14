@@ -7,40 +7,42 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-html, body, #root {
-  height: 100%;
+html, body {
   margin: 0;
-  overflow: hidden;
-  background: #000;
+  padding: 0;
+  background: radial-gradient(circle at top, #111 0%, #000 70%);
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* =========================
-   APP CONTAINER
+   APP WRAPPER
 ========================= */
 
 .app {
   height: 100vh;
-  width: 100%;
+  width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 /* =========================
-   HEADER
+   TITLE
 ========================= */
 
-.header {
-  padding: 16px 0 8px;
-  font-size: 28px;
+h1 {
+  margin: 14px 0 6px;
+  font-size: 2.2rem;
   font-weight: 800;
   letter-spacing: 1px;
+  text-align: center;
 }
 
 /* =========================
-   TABLE AREA
+   TABLE LAYOUT
 ========================= */
 
 .table {
@@ -48,187 +50,154 @@ html, body, #root {
   flex: 1;
   width: 100%;
   max-width: 420px;
-  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* =========================
-   CENTER DECK
+   DECK / CARD
 ========================= */
 
-.center {
+.deck {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
+  bottom: 16px;
+  width: 92%;
+  max-width: 360px;
 }
-
-/* =========================
-   CARD
-========================= */
 
 .card {
   background: #fff;
   color: #000;
-  border-radius: 18px;
-  padding: 14px;
-  width: 180px;
-  font-size: 18px;
-  font-weight: 700;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-}
-
-.card .rule {
-  margin-top: 6px;
-  font-size: 15px;
-  font-weight: 600;
+  border-radius: 16px;
+  padding: 18px;
+  font-size: 1.4rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
 /* =========================
-   DRAW BUTTON
+   PLAYERS
 ========================= */
 
-.draw-btn {
-  margin-top: 10px;
-  padding: 12px 20px;
-  border-radius: 999px;
-  border: none;
-  background: #fff;
-  color: #000;
-  font-weight: 800;
-  font-size: 16px;
-  cursor: pointer;
+.players {
+  position: absolute;
+  inset: 0;
 }
-
-.draw-btn:active {
-  transform: scale(0.96);
-}
-
-/* =========================
-   CARD COUNT / MARKERS
-========================= */
-
-.status {
-  margin-top: 6px;
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-/* =========================
-   PLAYER CARDS
-========================= */
 
 .player {
   position: absolute;
-  width: 130px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(20,20,20,0.85);
   border-radius: 18px;
-  padding: 10px;
+  padding: 10px 14px;
+  min-width: 120px;
   text-align: center;
-  backdrop-filter: blur(10px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .player-name {
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 700;
   margin-bottom: 6px;
 }
 
-.player-controls {
+.counter {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
 
+.counter button {
+  background: #eee;
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.counter span {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
 /* =========================
-   DRINK BUTTONS
+   ACTIVE PLAYER (TURN)
 ========================= */
 
-.drink-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+.player.active {
+  border: 2px solid rgba(255, 80, 80, 0.9);
+  box-shadow:
+    0 0 14px rgba(255, 80, 80, 0.6),
+    0 0 40px rgba(255, 0, 0, 0.45);
+  transform: scale(1.08);
+  animation: turnPulse 1.6s infinite;
+  z-index: 5;
+}
+
+@keyframes turnPulse {
+  0% {
+    box-shadow:
+      0 0 12px rgba(255, 80, 80, 0.5),
+      0 0 28px rgba(255, 0, 0, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(255, 120, 120, 0.9),
+      0 0 48px rgba(255, 0, 0, 0.6);
+  }
+  100% {
+    box-shadow:
+      0 0 12px rgba(255, 80, 80, 0.5),
+      0 0 28px rgba(255, 0, 0, 0.25);
+  }
+}
+
+/* =========================
+   PLAYER POSITIONS (HORSESHOE)
+   Adjusted to FIT ONE SCREEN
+========================= */
+
+.player.p0 { top: 10%; left: 50%; transform: translateX(-50%); }
+.player.p1 { top: 28%; right: 6%; }
+.player.p2 { bottom: 36%; right: 6%; }
+.player.p3 { bottom: 36%; left: 6%; }
+.player.p4 { top: 28%; left: 6%; }
+
+/* =========================
+   BUTTONS
+========================= */
+
+button.draw {
+  margin-top: 8px;
+  padding: 14px 26px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border-radius: 20px;
   border: none;
   background: #fff;
   color: #000;
-  font-size: 18px;
-  font-weight: 900;
-}
-
-.drink-btn:active {
-  transform: scale(0.9);
-}
-
-.drink-count {
-  font-size: 16px;
-  font-weight: 800;
 }
 
 /* =========================
-   PLAYER POSITIONS
+   STATUS TEXT
 ========================= */
 
-/* Top */
-.player.p0 {
-  top: 6%;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* Top Right */
-.player.p1 {
-  top: 22%;
-  right: 4%;
-}
-
-/* Bottom Right */
-.player.p2 {
-  bottom: 22%;
-  right: 4%;
-}
-
-/* Bottom */
-.player.p3 {
-  bottom: 6%;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* Bottom Left */
-.player.p4 {
-  bottom: 22%;
-  left: 4%;
-}
-
-/* Top Left */
-.player.p5 {
-  top: 22%;
-  left: 4%;
+.status {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  opacity: 0.85;
+  text-align: center;
 }
 
 /* =========================
-   MOBILE TIGHT FIT
+   UTIL
 ========================= */
 
-@media (max-height: 750px) {
-  .player {
-    width: 115px;
-    padding: 8px;
-  }
-
-  .card {
-    width: 165px;
-    font-size: 16px;
-  }
-
-  .header {
-    font-size: 24px;
-  }
-}
-
-@media (max-height: 700px) {
-  .card {
-    width: 155px;
-  }
+.hidden {
+  display: none;
 }
