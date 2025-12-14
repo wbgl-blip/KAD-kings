@@ -17,7 +17,7 @@ function buildDeck() {
 function ruleText(rank) {
   switch (rank) {
     case "4":
-      return "Whores — everyone drinks";
+      return "Whores — we all drink";
     case "7":
       return "Heaven — last one drinks";
     case "J":
@@ -39,15 +39,27 @@ export default function App() {
   ]);
 
   const [turn, setTurn] = useState(0);
-  const [deck, setDeck] = useState(buildDeck());
+  const [deck, setDeck] = useState(() => buildDeck());
   const [card, setCard] = useState(null);
 
   function drawCard() {
-    if (deck.length === 0) return;
-    const next = deck[0];
-    setDeck(deck.slice(1));
-    setCard(next);
-    setTurn((turn + 1) % players.length);
+    setDeck((prev) => {
+      if (prev.length === 0) return prev;
+      const next = prev[0];
+      setCard(next);
+      setTurn((t) => (t + 1) % players.length);
+      return prev.slice(1);
+    });
+  }
+
+  function changeBeer(index, delta) {
+    setPlayers((prev) =>
+      prev.map((p, i) =>
+        i === index
+          ? { ...p, beers: Math.max(0, p.beers + delta) }
+          : p
+      )
+    );
   }
 
   return (
@@ -62,7 +74,12 @@ export default function App() {
               className={`player ${i === turn ? "active" : ""}`}
             >
               <div className="name">{p.name}</div>
-              <div className="beer">🍺 {p.beers}</div>
+
+              <div className="beer-row">
+                <button onClick={() => changeBeer(i, -1)}>−</button>
+                <span>🍺 {p.beers}</span>
+                <button onClick={() => changeBeer(i, 1)}>+</button>
+              </div>
             </div>
           ))}
         </div>
