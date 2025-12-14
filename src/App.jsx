@@ -1,9 +1,6 @@
 import { useState } from "react";
 import "./App.css";
 
-/* =========================
-   DECK
-========================= */
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 const shuffle = a => [...a].sort(() => Math.random() - 0.5);
@@ -14,26 +11,20 @@ const buildDeck = () => {
   return shuffle(d);
 };
 
-/* =========================
-   RULES
-========================= */
-function getRuleText(rank) {
+function getRule(rank) {
   switch (rank) {
-    case "A": return "Waterfall. Everyone drinks.";
-    case "4": return "Whores. Everyone drinks.";
-    case "6": return "Dicks. Everyone drinks again.";
-    case "7": return "Heaven. Last hand up drinks.";
-    case "9": return "Rhyme. Loser drinks.";
-    case "J": return "Thumb Master.";
-    case "Q": return "Question Master.";
-    case "K": return "Make a rule.";
-    default: return "Drink.";
+    case "A": return "Waterfall";
+    case "4": return "Whores";
+    case "6": return "Dicks";
+    case "7": return "Heaven";
+    case "9": return "Rhyme";
+    case "J": return "Thumb Master";
+    case "Q": return "Question Master";
+    case "K": return "Make a rule";
+    default: return "Drink";
   }
 }
 
-/* =========================
-   MEDALS
-========================= */
 function getMedal(beers) {
   if (beers >= 15) return "👑 King of Degeneracy";
   if (beers >= 12) return "💀 Liquor Liability";
@@ -43,126 +34,114 @@ function getMedal(beers) {
   return "";
 }
 
-/* =========================
-   APP
-========================= */
 export default function App() {
   const [players, setPlayers] = useState([]);
-  const [nameInput, setNameInput] = useState("");
+  const [name, setName] = useState("");
   const [deck, setDeck] = useState([]);
   const [discard, setDiscard] = useState([]);
   const [turn, setTurn] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
+  const [powers, setPowers] = useState({ heaven:null, thumb:null, question:null });
 
-  const [powers, setPowers] = useState({
-    heaven: null,
-    thumb: null,
-    question: null
-  });
+  const currentCard = discard.at(-1);
 
-  function addPlayer() {
-    if (!nameInput.trim()) return;
-    setPlayers([...players, { name: nameInput, beers: 0 }]);
-    setNameInput("");
-  }
+  const addPlayer = () => {
+    if (!name.trim()) return;
+    setPlayers([...players, { name, beers: 0 }]);
+    setName("");
+  };
 
-  function startGame() {
-    if (players.length < 2) return;
+  const start = () => {
     setDeck(buildDeck());
     setDiscard([]);
     setTurn(0);
-    setGameOver(false);
-    setPowers({ heaven: null, thumb: null, question: null });
-  }
+    setPowers({ heaven:null, thumb:null, question:null });
+  };
 
-  function drawCard() {
-    if (!deck.length) return;
+  const draw = () => {
+    const next = [...deck];
+    const card = next.pop();
+    const p = [...players];
 
-    const nextDeck = [...deck];
-    const card = nextDeck.pop();
-    const updated = [...players];
-    const current = updated[turn];
+    p[turn].beers++;
 
-    if (card.rank === "7") setPowers(p => ({ ...p, heaven: current.name }));
-    if (card.rank === "J") setPowers(p => ({ ...p, thumb: current.name }));
-    if (card.rank === "Q") setPowers(p => ({ ...p, question: current.name }));
+    if (card.rank === "7") setPowers(x => ({ ...x, heaven: p[turn].name }));
+    if (card.rank === "J") setPowers(x => ({ ...x, thumb: p[turn].name }));
+    if (card.rank === "Q") setPowers(x => ({ ...x, question: p[turn].name }));
 
-    current.beers += 1;
-
-    setPlayers(updated);
-    setDeck(nextDeck);
+    setPlayers(p);
+    setDeck(next);
     setDiscard([...discard, card]);
-
-    if (!nextDeck.length) setGameOver(true);
-    else setTurn((turn + 1) % players.length);
-  }
-
-  const card = discard[discard.length - 1];
+    setTurn((turn + 1) % p.length);
+  };
 
   return (
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {deck.length === 0 && !gameOver && (
+      {!deck.length && (
         <div className="setup">
-          <input
-            value={nameInput}
-            placeholder="Add degenerate"
-            onChange={e => setNameInput(e.target.value)}
-          />
-          <button onClick={addPlayer}>Add</button>
-
-          <ul className="player-list">
-            {players.map((p, i) => <li key={i}>{p.name}</li>)}
-          </ul>
-
-          <button className="start" onClick={startGame}>
-            Start the Disaster
-          </button>
-        </div>
-      )}
-
-      {deck.length > 0 && !gameOver && (
-        <>
-          <h2 className="turn">
-            Turn: <span>{players[turn].name}</span>
-          </h2>
-
-          <div className="powers">
-            <p>👼 {powers.heaven || "—"}</p>
-            <p>👍 {powers.thumb || "—"}</p>
-            <p>❓ {powers.question || "—"}</p>
+          <div className="add">
+            <input
+              placeholder="Add degenerate"
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
+            <button onClick={addPlayer}>Add</button>
           </div>
 
-          <button className="draw" onClick={drawCard}>Draw Card</button>
-          <p className="count">Cards left: {deck.length}</p>
-
-          {card && (
-            <div className="card">
-              <div className="corner top">{card.rank}{card.suit}</div>
-              <div className="center">{card.suit}</div>
-              <div className="corner bottom">{card.rank}{card.suit}</div>
-              <div className="rule">{getRuleText(card.rank)}</div>
-            </div>
-          )}
-
-          <ul className="scores">
-            {players.map((p, i) => (
-              <li key={i} className={i === turn ? "active" : ""}>
-                <div className="name">{p.name}</div>
-                <div className="beer">🍺 {p.beers}</div>
-                <div className="medal">{getMedal(p.beers)}</div>
-              </li>
+          <div className="lobby">
+            {players.map((p,i) => (
+              <div key={i} className="lobby-player">{p.name}</div>
             ))}
-          </ul>
-        </>
+          </div>
+
+          {players.length >= 2 && (
+            <button className="start" onClick={start}>
+              Start the Disaster
+            </button>
+          )}
+        </div>
       )}
 
-      {gameOver && (
-        <div className="game-over">
-          <h2>Deck Empty</h2>
-          <p>No winners. Only survivors.</p>
-        </div>
+      {deck.length > 0 && (
+        <>
+          <div className="top-bar">
+            <div className="turn">
+              Turn: <span>{players[turn].name}</span>
+            </div>
+            <div className="powers">
+              <span>👼 {powers.heaven || "—"}</span>
+              <span>👍 {powers.thumb || "—"}</span>
+              <span>❓ {powers.question || "—"}</span>
+            </div>
+          </div>
+
+          <div className="table">
+            {currentCard ? (
+              <div className="card">
+                <div className="corner tl">{currentCard.rank}{currentCard.suit}</div>
+                <div className="suit">{currentCard.suit}</div>
+                <div className="rule">{getRule(currentCard.rank)}</div>
+                <div className="corner br">{currentCard.rank}{currentCard.suit}</div>
+              </div>
+            ) : (
+              <div className="card placeholder">Draw</div>
+            )}
+          </div>
+
+          <button className="draw" onClick={draw}>Draw Card</button>
+          <div className="deck">Cards left: {deck.length}</div>
+
+          <div className="players">
+            {players.map((p,i) => (
+              <div key={i} className={`player ${i===turn?"active":""}`}>
+                <div className="p-name">{p.name}</div>
+                <div className="p-beer">🍺 {p.beers}</div>
+                <div className="p-medal">{getMedal(p.beers)}</div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
