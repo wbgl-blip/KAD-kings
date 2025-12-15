@@ -1,67 +1,57 @@
 import { useState } from "react";
 
-export default function App() {
-  const [players, setPlayers] = useState([
-    { id: 1, name: "Player 1", beers: 0 },
-    { id: 2, name: "Player 2", beers: 0 },
-    { id: 3, name: "Player 3", beers: 0 },
-  ]);
+const seats = Array.from({ length: 8 }, (_, i) => ({
+  id: i,
+  name: "",
+  beers: 0,
+}));
 
-  const [turnIndex, setTurnIndex] = useState(0);
+export default function App() {
+  const [players, setPlayers] = useState(seats);
+  const [turn, setTurn] = useState(0);
+
+  const setName = (id, name) => {
+    setPlayers(p =>
+      p.map(player =>
+        player.id === id ? { ...player, name } : player
+      )
+    );
+  };
 
   const addBeer = (id) => {
-    setPlayers(players.map(p => p.id === id ? { ...p, beers: p.beers + 1 } : p));
-  };
-
-  const removePlayer = (id) => {
-    const filtered = players.filter(p => p.id !== id);
-    setPlayers(filtered);
-    if (turnIndex >= filtered.length) setTurnIndex(0);
-  };
-
-  const updateName = (id, name) => {
-    setPlayers(players.map(p => p.id === id ? { ...p, name } : p));
-  };
-
-  const addPlayer = () => {
-    setPlayers([...players, { id: Date.now(), name: "New Player", beers: 0 }]);
-  };
-
-  const nextTurn = () => {
-    setTurnIndex((turnIndex + 1) % players.length);
+    setPlayers(p =>
+      p.map(player =>
+        player.id === id ? { ...player, beers: player.beers + 1 } : player
+      )
+    );
   };
 
   return (
     <div className="app">
-      <h1>KINGS</h1>
+      <h1>KAD Kings</h1>
 
-      <ul className="player-list">
+      <div className="grid">
         {players.map((p, i) => (
-          <li
-            key={p.id}
-            className={`player-card ${i === turnIndex ? "active" : ""}`}
-          >
+          <div key={p.id} className={`card ${i === turn ? "active" : ""}`}>
             <input
+              placeholder={`Seat ${i + 1}`}
               value={p.name}
-              onChange={(e) => updateName(p.id, e.target.value)}
+              onChange={(e) => setName(p.id, e.target.value)}
             />
 
-            <div className="stats">
-              🍺 {p.beers}
+            <div className="beer">
+              <span>🍺 {p.beers}</span>
+              <button onClick={() => addBeer(p.id)}>+1</button>
             </div>
 
-            <div className="actions">
-              <button onClick={() => addBeer(p.id)}>+1 Beer</button>
-              <button className="danger" onClick={() => removePlayer(p.id)}>✕</button>
-            </div>
-
-            {i === turnIndex && <div className="turn">👉 Current Turn</div>}
-          </li>
+            {i === turn && <div className="turn">👉 Current Turn</div>}
+          </div>
         ))}
-      </ul>
+      </div>
 
-      <button className="add" onClick={addPlayer}>+ Add Player</button>
-      <button className="draw" onClick={nextTurn}>DRAW</button>
+      <button className="draw" onClick={() => setTurn((turn + 1) % players.length)}>
+        Draw Card
+      </button>
     </div>
   );
 }
