@@ -5,93 +5,77 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #1b1b1b, #000);
+  background: #0c0c0c;
   color: white;
 }
 
 .app {
-  max-width: 420px;
-  margin: 0 auto;
   padding: 16px;
+  max-width: 420px;
+  margin: auto;
 }
 
 h1 {
-  font-size: 40px;
-  margin-bottom: 12px;
+  text-align: center;
+  margin-bottom: 16px;
 }
 
-.player-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
-.player-card {
-  background: #222;
-  border-radius: 14px;
+.card {
+  background: #1a1a1a;
   padding: 12px;
-  margin-bottom: 10px;
+  border-radius: 14px;
   border: 2px solid transparent;
 }
 
-.player-card.active {
-  border-color: #2cff7a;
-  box-shadow: 0 0 12px rgba(44, 255, 122, 0.6);
+.card.active {
+  border-color: #3cff8f;
+  box-shadow: 0 0 10px #3cff8f55;
 }
 
-.player-card input {
+input {
   width: 100%;
   padding: 8px;
-  border-radius: 8px;
-  border: none;
-  font-size: 16px;
-}
-
-.stats {
-  margin-top: 6px;
-  font-size: 18px;
-}
-
-.actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-button {
-  flex: 1;
-  padding: 10px;
   border-radius: 10px;
   border: none;
-  font-size: 16px;
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.beer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.beer button {
   background: #333;
   color: white;
-}
-
-button:active {
-  transform: scale(0.97);
-}
-
-button.danger {
-  background: #7a1e1e;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
 }
 
 .turn {
   margin-top: 6px;
-  font-size: 14px;
-  color: #2cff7a;
-}
-
-.add {
-  width: 100%;
-  margin-top: 8px;
-  background: #444;
+  font-size: 12px;
+  color: #3cff8f;
+  text-align: center;
 }
 
 .draw {
+  margin-top: 20px;
   width: 100%;
-  margin-top: 10px;
-  font-size: 20px;
-  background: #2cff7a;
+  padding: 14px;
+  font-size: 18px;
+  border-radius: 16px;
+  border: none;
+  background: white;
   color: black;
 }
