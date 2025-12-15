@@ -1,57 +1,99 @@
 import { useState } from "react";
 
-const seats = Array.from({ length: 8 }, (_, i) => ({
-  id: i,
-  name: "",
-  beers: 0,
-}));
+const SUITS = ["♠", "♥", "♦", "♣"];
+const VALUES = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+
+function buildDeck() {
+  let deck = [];
+  SUITS.forEach(s =>
+    VALUES.forEach(v => deck.push(`${v}${s}`))
+  );
+  return deck.sort(() => Math.random() - 0.5);
+}
 
 export default function App() {
-  const [players, setPlayers] = useState(seats);
-  const [turn, setTurn] = useState(0);
+  const [players, setPlayers] = useState([
+    { name: "Player 1", beers: 0 },
+    { name: "Player 2", beers: 0 },
+    { name: "Player 3", beers: 0 }
+  ]);
 
-  const setName = (id, name) => {
-    setPlayers(p =>
-      p.map(player =>
-        player.id === id ? { ...player, name } : player
-      )
-    );
+  const [deck, setDeck] = useState(buildDeck());
+  const [currentCard, setCurrentCard] = useState(null);
+  const [turn, setTurn] = useState(0);
+  const [kings, setKings] = useState(0);
+
+  const drawCard = () => {
+    if (deck.length === 0) return;
+
+    const newDeck = [...deck];
+    const card = newDeck.pop();
+
+    setDeck(newDeck);
+    setCurrentCard(card);
+
+    if (card.startsWith("K")) {
+      setKings(k => k + 1);
+    }
+
+    setTurn((turn + 1) % players.length);
   };
 
-  const addBeer = (id) => {
-    setPlayers(p =>
-      p.map(player =>
-        player.id === id ? { ...player, beers: player.beers + 1 } : player
-      )
-    );
+  const addBeer = (index) => {
+    const updated = [...players];
+    updated[index].beers += 1;
+    setPlayers(updated);
+  };
+
+  const updateName = (index, value) => {
+    const updated = [...players];
+    updated[index].name = value;
+    setPlayers(updated);
   };
 
   return (
     <div className="app">
-      <h1>KAD Kings</h1>
+      <h1>KINGS</h1>
 
-      <div className="grid">
+      <div className="players">
         {players.map((p, i) => (
-          <div key={p.id} className={`card ${i === turn ? "active" : ""}`}>
+          <div
+            key={i}
+            className={`player ${i === turn ? "active" : ""}`}
+          >
             <input
-              placeholder={`Seat ${i + 1}`}
               value={p.name}
-              onChange={(e) => setName(p.id, e.target.value)}
+              onChange={e => updateName(i, e.target.value)}
             />
-
-            <div className="beer">
-              <span>🍺 {p.beers}</span>
-              <button onClick={() => addBeer(p.id)}>+1</button>
+            <div className="beer-row">
+              🍺 {p.beers}
             </div>
-
+            <button onClick={() => addBeer(i)}>+1 Beer</button>
             {i === turn && <div className="turn">👉 Current Turn</div>}
           </div>
         ))}
       </div>
 
-      <button className="draw" onClick={() => setTurn((turn + 1) % players.length)}>
-        Draw Card
-      </button>
+      <div className="draw">
+        <button onClick={drawCard}>Draw Card</button>
+        <div className="status">
+          🃏 Cards Left: {deck.length} / 52  
+          <br />
+          👑 Kings Drawn: {kings} / 4
+        </div>
+      </div>
+
+      {currentCard && (
+        <div className="card">
+          {currentCard}
+        </div>
+      )}
+
+      {deck.length === 0 && (
+        <div className="game-over">
+          🎉 Deck Empty — Game Over 🎉
+        </div>
+      )}
     </div>
   );
 }
