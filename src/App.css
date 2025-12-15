@@ -1,228 +1,114 @@
-/* =========================
-   GLOBAL RESET
-========================= */
-
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #1a1a1a, #000);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: radial-gradient(circle at top, #111, #000);
   color: white;
-  overflow: hidden;
+  font-family: system-ui, sans-serif;
 }
-
-/* =========================
-   APP WRAPPER
-========================= */
 
 .app {
   height: 100vh;
-  width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* =========================
-   TITLE
-========================= */
-
 .title {
-  font-size: 2.2rem;
-  font-weight: 800;
-  letter-spacing: 1px;
-  margin: 18px 0 0;
+  margin: 12px 0;
+  letter-spacing: 2px;
 }
-
-/* =========================
-   TABLE LAYOUT
-========================= */
 
 .table {
-  position: relative;
   flex: 1;
   width: 100%;
-  max-width: 420px;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  align-items: center;
 }
-
-/* =========================
-   CENTER / DECK ZONE
-   (LOCKED – NOTHING TOUCHES)
-========================= */
-
-.center-stack {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 92%;
-  max-width: 360px;
-  text-align: center;
-  z-index: 10;
-}
-
-/* =========================
-   CARD
-========================= */
-
-.card {
-  background: white;
-  color: black;
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-  font-weight: 700;
-}
-
-.card .rank {
-  font-size: 1.4rem;
-}
-
-.card .rule {
-  margin-top: 10px;
-  font-size: 1.1rem;
-  line-height: 1.3;
-}
-
-/* =========================
-   DRAW BUTTON
-========================= */
-
-.draw-btn {
-  margin: 14px auto 8px;
-  padding: 12px 22px;
-  border-radius: 999px;
-  border: none;
-  font-size: 1.1rem;
-  font-weight: 700;
-  background: #f0f0f0;
-  color: #000;
-}
-
-.draw-btn:active {
-  transform: scale(0.96);
-}
-
-/* =========================
-   STATUS TEXT
-========================= */
-
-.status {
-  font-size: 0.95rem;
-  opacity: 0.8;
-  margin-top: 4px;
-}
-
-/* =========================
-   PLAYER ZONE (BOTTOM ARC)
-========================= */
 
 .players {
-  position: absolute;
-  bottom: 4%;
-  left: 0;
-  right: 0;
-  height: 42%;
-  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 8px;
 }
-
-/* =========================
-   PLAYER CARD
-========================= */
 
 .player {
-  position: absolute;
-  background: rgba(30,30,30,0.85);
+  background: rgba(255,255,255,0.08);
   border-radius: 14px;
-  padding: 10px 12px;
-  min-width: 110px;
+  padding: 8px;
   text-align: center;
-  pointer-events: auto;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.6);
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.player-name {
-  font-weight: 700;
-  margin-bottom: 6px;
+.player.active {
+  box-shadow: 0 0 18px #ff3b3b;
+  border: 1px solid #ff3b3b;
 }
 
-.counter {
+.name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.drinks {
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
   gap: 6px;
 }
 
-.counter button {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+.drinks button {
+  background: white;
   border: none;
-  font-size: 1.2rem;
-  font-weight: 800;
-  background: #eee;
-  color: #000;
+  border-radius: 8px;
+  padding: 4px 8px;
 }
 
-.counter span {
-  font-size: 1.1rem;
-  font-weight: 700;
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
-/* =========================
-   TURN HIGHLIGHT
-========================= */
-
-.player.active {
-  outline: 2px solid #ff3b3b;
-  box-shadow: 0 0 20px rgba(255,60,60,0.6);
+.deck {
+  width: 70px;
+  height: 100px;
+  background: linear-gradient(145deg, #ffb347, #ff8c00);
+  border-radius: 10px;
 }
 
-/* =========================
-   HORSESHOE POSITIONS
-   (ADJUSTABLE BUT SAFE)
-========================= */
-
-.player.p0 {
-  top: 0%;
-  left: 50%;
-  transform: translateX(-50%);
+.card {
+  width: 140px;
+  height: 200px;
+  background: white;
+  color: black;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  text-align: center;
 }
 
-.player.p1 {
-  top: 18%;
-  right: 6%;
+.card-value {
+  font-size: 24px;
+  font-weight: bold;
 }
 
-.player.p2 {
-  top: 44%;
-  right: 18%;
+.card-text {
+  margin-top: 8px;
 }
 
-.player.p3 {
-  top: 44%;
-  left: 18%;
-}
-
-.player.p4 {
-  top: 18%;
-  left: 6%;
-}
-
-/* =========================
-   RESPONSIVE SAFETY
-========================= */
-
-@media (max-height: 700px) {
-  .center-stack {
-    top: 16%;
-  }
-
-  .players {
-    height: 45%;
-  }
+.draw {
+  margin-top: 6px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: none;
+  background: white;
+  font-weight: bold;
 }
