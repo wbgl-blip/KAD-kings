@@ -1,156 +1,174 @@
-import { useState, useMemo } from "react";
-import "./App.css";
+import { useState } from "react";
+import "./styles.css";
 
+/* =========================
+   CARD SETUP
+========================= */
 const SUITS = ["♠", "♥", "♦", "♣"];
-const VALUES = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 
-const RULES = {
-  A:"Waterfall. Keep up, idiot.",
-  2:"Pick someone. Ruin their night.",
-  3:"Me. Congrats, dumbass.",
-  4:"Whores. Everyone drinks.",
-  5:"Thumb master. Miss it, drink.",
-  6:"Dicks drink. Sorry boys.",
-  7:"Heaven. Look up or shut up.",
-  8:"Mate. You’re not free.",
-  9:"Rhyme. Hesitate = drink.",
-  10:"Categories. Brain optional.",
-  J:"Make a rule. Abuse it.",
-  Q:"Questions. Speak and suffer.",
-  K:"King’s Cup. God help you."
-};
+function buildDeck() {
+  const deck = [];
+  SUITS.forEach(suit => {
+    RANKS.forEach(rank => {
+      deck.push({ suit, rank });
+    });
+  });
+  return shuffle(deck);
+}
 
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+/* =========================
+   RULE TEXT
+========================= */
+function getRuleText(rank) {
+  switch (rank) {
+    case "A": return "Waterfall. No mercy.";
+    case "2": return "You choose who suffers.";
+    case "3": return "Drink it. Yes, you.";
+    case "4": return "Everyone drinks. Cry later.";
+    case "5": return "Guys drink. Sorry.";
+    case "6": return "All drink. Society collapses.";
+    case "7": return "Heaven. Last hand up drinks.";
+    case "8": return "Mate. You’re bonded now.";
+    case "9": return "Rhyme. Fail = drink.";
+    case "10": return "Categories. Brain cells optional.";
+    case "J": return "Thumb Master. Abuse responsibly.";
+    case "Q": return "Question Master. Annoy everyone.";
+    case "K": return "Make a rule. Ruin lives.";
+    default: return "";
+  }
+}
+
+/* =========================
+   APP
+========================= */
 export default function App() {
   const [players, setPlayers] = useState([
-    { name: "dt", beers: 0 },
-    { name: "vh", beers: 0 },
-    { name: "rf", beers: 0 },
-    { name: "fff", beers: 0 },
-    { name: "gg", beers: 0 },
-    { name: "hh", beers: 0 }
+    { name: "Player 1", beers: 0 },
+    { name: "Player 2", beers: 0 },
+    { name: "Player 3", beers: 0 },
+    { name: "Player 4", beers: 0 },
+    { name: "Player 5", beers: 0 },
+    { name: "Player 6", beers: 0 }
   ]);
 
-  const [deck, setDeck] = useState(shuffleDeck());
-  const [card, setCard] = useState(null);
+  const [deck, setDeck] = useState(buildDeck());
+  const [discard, setDiscard] = useState([]);
   const [turn, setTurn] = useState(0);
-  const [trash, setTrash] = useState("");
+  const [gameOver, setGameOver] = useState(false);
 
-  function shuffleDeck() {
-    const d=[];
-    for (let s of SUITS) for (let v of VALUES) d.push({suit:s,value:v});
-    return d.sort(()=>Math.random()-0.5);
-  }
-
-  function adjustBeer(i, d) {
-    setPlayers(p =>
-      p.map((pl,idx)=>
-        idx===i ? {...pl,beers:Math.max(0,pl.beers+d)} : pl
-      )
-    );
-  }
+  const [heaven, setHeaven] = useState(null);
+  const [thumbMaster, setThumbMaster] = useState(null);
+  const [questionMaster, setQuestionMaster] = useState(null);
 
   function drawCard() {
-    if (!deck.length) return;
-    const next = deck[0];
-    setCard(next);
-    setDeck(deck.slice(1));
-    setTurn((turn+1)%players.length);
-    setTrash(generateTrash());
+    if (deck.length === 0) return;
+
+    const nextDeck = [...deck];
+    const card = nextDeck.pop();
+
+    if (card.rank === "7") setHeaven(players[turn].name);
+    if (card.rank === "J") setThumbMaster(players[turn].name);
+    if (card.rank === "Q") setQuestionMaster(players[turn].name);
+
+    setDeck(nextDeck);
+    setDiscard([...discard, card]);
+
+    if (nextDeck.length === 0) {
+      setGameOver(true);
+    } else {
+      setTurn((turn + 1) % players.length);
+    }
   }
 
-  const gameOver = deck.length === 0;
-
-  const ranked = useMemo(() => {
-    return [...players].sort((a,b)=>b.beers-a.beers);
-  }, [players]);
-
-  function generateTrash() {
-    const avg = players.reduce((s,p)=>s+p.beers,0)/players.length;
-    const top = ranked[0];
-    const bottom = ranked[ranked.length-1];
-
-    const lines = [
-      `${top.name} is a menace to sobriety.`,
-      `${bottom.name} is nursing that drink like a child.`,
-      `Some of you aren’t pulling your weight.`,
-      `This table is embarrassing.`,
-      `${top.name} needs supervision.`,
-      `${bottom.name} is basically sober. Gross.`
-    ];
-    return lines[Math.floor(Math.random()*lines.length)];
+  function adjustBeer(index, delta) {
+    const updated = [...players];
+    updated[index].beers = Math.max(0, updated[index].beers + delta);
+    setPlayers(updated);
   }
 
-  function medal(p, i) {
-    if (i===0) return "🥇 Menace to Sobriety";
-    if (i===1) return "🥈 Public Intoxication";
-    if (i===2) return "🥉 Walking Red Flag";
-    if (p.beers<=2) return "🧃 Designated Liar";
-    if (i===ranked.length-1) return "🤡 Hydrated Little Bitch";
-    return "🧠 Functional Alcoholic";
+  const currentCard = discard[discard.length - 1];
+
+  if (gameOver) {
+    return (
+      <div className="app">
+        <h1>Game Over</h1>
+        <ol className="leaderboard">
+          {[...players]
+            .sort((a, b) => b.beers - a.beers)
+            .map((p, i) => (
+              <li key={i}>
+                🏅 {p.name} — {p.beers} beers
+              </li>
+            ))}
+        </ol>
+      </div>
+    );
   }
 
   return (
     <div className="app">
-      <h1>KAD Kings</h1>
+      <div className="roles">
+        <span>👼 Heaven: {heaven || "—"}</span>
+        <span>👍 Thumb: {thumbMaster || "—"}</span>
+        <span>❓ Question: {questionMaster || "—"}</span>
+      </div>
 
-      {!gameOver && (
-        <>
-          <div className="table">
-            {players.map((p,i)=>{
-              const angleStart=210, angleEnd=-30;
-              const step=(angleEnd-angleStart)/(players.length-1);
-              const a=(angleStart+step*i)*(Math.PI/180);
-              const x=50+Math.cos(a)*42;
-              const y=52+Math.sin(a)*28;
-
-              return (
-                <div
-                  key={i}
-                  className={`player ${i===turn?"active":""}`}
-                  style={{left:`${x}%`,top:`${y}%`,transform:"translate(-50%,-50%)"}}
-                >
-                  <div className="name">{p.name}</div>
-                  <div className="controls">
-                    <button onClick={()=>adjustBeer(i,-1)}>-</button>
-                    <span>🍺 {p.beers}</span>
-                    <button onClick={()=>adjustBeer(i,1)}>+</button>
-                  </div>
-                </div>
-              );
-            })}
-
-            <div className="center">
-              {card && (
-                <div className="card">
-                  <div className="top">{card.value}{card.suit}</div>
-                  <div className="middle">{card.suit}</div>
-                  <div className="rule">{RULES[card.value]}</div>
-                </div>
-              )}
-
-              <button className="draw" onClick={drawCard}>Draw Card</button>
-              <div className="meta">Cards left: {deck.length}</div>
-              {trash && <div className="trash">{trash}</div>}
-            </div>
-          </div>
-        </>
-      )}
-
-      {gameOver && (
-        <div className="scoreboard">
-          <h2>Final Damage Report</h2>
-          {ranked.map((p,i)=>(
-            <div key={p.name} className="score-row">
-              <span>{p.name}</span>
-              <span>🍺 {p.beers}</span>
-              <span>{medal(p,i)}</span>
+      <div className="table">
+        <div className="side left">
+          {players.slice(0, 3).map((p, i) => (
+            <div
+              key={i}
+              className={`player ${turn === i ? "active" : ""}`}
+            >
+              <strong>{p.name}</strong>
+              <div className="beer-controls">
+                <button onClick={() => adjustBeer(i, -1)}>-</button>
+                <span>{p.beers} 🍺</span>
+                <button onClick={() => adjustBeer(i, 1)}>+</button>
+              </div>
             </div>
           ))}
-          <div className="trash big">
-            This was a disgrace. See you next weekend.
-          </div>
         </div>
-      )}
+
+        <div className="center">
+          <div className="deck" />
+          {currentCard && (
+            <div className="card">
+              <div className="rank">{currentCard.rank}</div>
+              <div className="suit">{currentCard.suit}</div>
+              <div className="rule">{getRuleText(currentCard.rank)}</div>
+            </div>
+          )}
+          <button className="draw-btn" onClick={drawCard}>
+            Draw Card
+          </button>
+          <div className="count">{deck.length} cards left</div>
+        </div>
+
+        <div className="side right">
+          {players.slice(3, 6).map((p, i) => {
+            const index = i + 3;
+            return (
+              <div
+                key={index}
+                className={`player ${turn === index ? "active" : ""}`}
+              >
+                <strong>{p.name}</strong>
+                <div className="beer-controls">
+                  <button onClick={() => adjustBeer(index, -1)}>-</button>
+                  <span>{p.beers} 🍺</span>
+                  <button onClick={() => adjustBeer(index, 1)}>+</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
