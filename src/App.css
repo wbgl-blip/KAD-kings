@@ -4,89 +4,79 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle, #1b5e20, #0b3d17);
-  font-family: system-ui, sans-serif;
+  background: radial-gradient(circle at top, #111, #000);
   color: #fff;
+  font-family: system-ui, sans-serif;
 }
 
 .app {
-  height: 100vh;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  min-height: 100vh;
+  padding: 16px;
 }
 
-.roles {
-  display: flex;
-  gap: 12px;
-  font-size: 12px;
-  margin-bottom: 6px;
+.title {
+  text-align: center;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
 }
 
 .table {
-  flex: 1;
-  width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
+  gap: 12px;
 }
 
+/* SIDES */
 .side {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 4px;
+  gap: 16px;
+  align-items: center;
 }
 
 .player {
-  background: #111;
-  border-radius: 12px;
-  padding: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 10px 12px;
+  width: 120px;
   text-align: center;
-  font-size: 14px;
-  opacity: 0.85;
+  transition: 0.2s;
 }
 
 .player.active {
-  border: 2px solid gold;
-  box-shadow: 0 0 12px gold;
-  opacity: 1;
+  outline: 3px solid #ffb703;
+  box-shadow: 0 0 20px rgba(255,183,3,0.7);
 }
 
-.beer-controls {
+.name {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.counter {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-top: 4px;
+  gap: 8px;
 }
 
-.beer-controls button {
-  width: 32px;
-  height: 32px;
+.counter button {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: none;
+  background: #222;
+  color: #fff;
   font-size: 18px;
 }
 
+/* CENTER */
 .center {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.deck {
-  width: 70px;
-  height: 100px;
-  background: repeating-linear-gradient(
-    45deg,
-    #222,
-    #222 5px,
-    #111 5px,
-    #111 10px
-  );
-  border-radius: 8px;
-  margin-bottom: 6px;
+  gap: 12px;
 }
 
 .card {
@@ -94,41 +84,43 @@ body {
   height: 130px;
   background: #fff;
   color: #000;
-  border-radius: 10px;
-  padding: 6px;
-  text-align: center;
-  margin-bottom: 6px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 800;
 }
 
-.rank {
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.suit {
-  font-size: 20px;
+.draw {
+  background: #00b4d8;
+  border: none;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: 800;
 }
 
 .rule {
-  font-size: 10px;
-  margin-top: 6px;
+  background: rgba(255,255,255,0.08);
+  padding: 10px 14px;
+  border-radius: 14px;
+  text-align: center;
+  max-width: 220px;
 }
 
-.draw-btn {
-  margin-top: 6px;
-  padding: 10px 18px;
-  font-size: 16px;
-  border-radius: 20px;
-  border: none;
-  background: crimson;
-  color: white;
-}
-
-.count {
+.remaining {
+  opacity: 0.6;
   font-size: 12px;
-  margin-top: 4px;
 }
 
-.leaderboard {
-  font-size: 18px;
+/* MOBILE */
+@media (max-width: 600px) {
+  .table {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .player {
+    width: 100px;
+  }
 }
