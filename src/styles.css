@@ -1,81 +1,107 @@
 * {
   box-sizing: border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
   margin: 0;
-  background: #0c0c0c;
+  background: radial-gradient(circle at top, #222, #000);
+  font-family: system-ui, sans-serif;
   color: white;
 }
 
 .app {
-  padding: 16px;
   max-width: 420px;
   margin: auto;
+  padding: 16px;
 }
 
 h1 {
   text-align: center;
+  letter-spacing: 3px;
   margin-bottom: 16px;
 }
 
-.grid {
+.players {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
-.card {
-  background: #1a1a1a;
-  padding: 12px;
+.player {
+  background: #111;
   border-radius: 14px;
-  border: 2px solid transparent;
+  padding: 12px;
+  border: 2px solid #222;
 }
 
-.card.active {
-  border-color: #3cff8f;
-  box-shadow: 0 0 10px #3cff8f55;
+.player.active {
+  border-color: #00ff88;
+  box-shadow: 0 0 12px #00ff8844;
 }
 
-input {
+.player input {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border-radius: 10px;
   border: none;
-  text-align: center;
-  margin-bottom: 8px;
-  font-size: 15px;
+  font-size: 16px;
 }
 
-.beer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.beer-row {
+  margin: 8px 0;
+  font-size: 18px;
 }
 
-.beer button {
+.player button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
   background: #333;
   color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 8px;
+  font-size: 16px;
 }
 
 .turn {
   margin-top: 6px;
-  font-size: 12px;
-  color: #3cff8f;
-  text-align: center;
+  font-size: 14px;
+  color: #00ff88;
 }
 
 .draw {
   margin-top: 20px;
+  text-align: center;
+}
+
+.draw button {
   width: 100%;
   padding: 14px;
   font-size: 18px;
-  border-radius: 16px;
+  border-radius: 14px;
   border: none;
   background: white;
   color: black;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.card {
+  margin-top: 20px;
+  background: white;
+  color: black;
+  border-radius: 18px;
+  padding: 40px 0;
+  text-align: center;
+  font-size: 48px;
+  font-weight: bold;
+}
+
+.game-over {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 18px;
+  color: #00ff88;
 }
