@@ -1,77 +1,86 @@
 import { useState } from "react";
+import "./styles.css";
 
-const SUITS = ["♠", "♥", "♦", "♣"];
-const VALUES = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+const INITIAL_PLAYERS = [
+  { id: 1, name: "Player 1", beers: 0 },
+  { id: 2, name: "Player 2", beers: 0 },
+  { id: 3, name: "Player 3", beers: 0 },
+];
 
-function buildDeck() {
-  const deck = [];
-  SUITS.forEach(suit => {
-    VALUES.forEach(value => {
-      deck.push({ suit, value });
-    });
-  });
-  return deck.sort(() => Math.random() - 0.5);
-}
+const DECK = [
+  { rank: "A", rule: "Waterfall" },
+  { rank: "2", rule: "You drink" },
+  { rank: "3", rule: "Me drink" },
+  { rank: "4", rule: "Floor" },
+  { rank: "5", rule: "Guys" },
+  { rank: "6", rule: "Chicks" },
+  { rank: "7", rule: "Heaven" },
+  { rank: "8", rule: "Mate" },
+  { rank: "9", rule: "Rhyme" },
+  { rank: "10", rule: "Categories" },
+  { rank: "J", rule: "Make a rule" },
+  { rank: "Q", rule: "Question master" },
+  { rank: "K", rule: "Pour into the King’s Cup" },
+];
 
 export default function App() {
-  const [players, setPlayers] = useState([
-    { name: "Player 1", beers: 0 },
-    { name: "Player 2", beers: 0 },
-    { name: "Player 3", beers: 0 },
-  ]);
+  const [players, setPlayers] = useState(INITIAL_PLAYERS);
+  const [currentPlayer, setCurrentPlayer] = useState(0);
+  const [deck, setDeck] = useState(shuffle([...DECK]));
+  const [currentCard, setCurrentCard] = useState(null);
 
-  const [deck, setDeck] = useState(buildDeck());
-  const [card, setCard] = useState(null);
-  const [turn, setTurn] = useState(0);
+  function shuffle(cards) {
+    return [...cards].sort(() => Math.random() - 0.5);
+  }
 
   function drawCard() {
     if (deck.length === 0) return;
     const [next, ...rest] = deck;
+    setCurrentCard(next);
     setDeck(rest);
-    setCard(next);
-    setTurn((turn + 1) % players.length);
+    setCurrentPlayer((currentPlayer + 1) % players.length);
   }
 
   function addBeer(index) {
-    const updated = [...players];
-    updated[index].beers += 1;
-    setPlayers(updated);
+    setPlayers(players.map((p, i) =>
+      i === index ? { ...p, beers: p.beers + 1 } : p
+    ));
   }
 
   function updateName(index, name) {
-    const updated = [...players];
-    updated[index].name = name;
-    setPlayers(updated);
+    setPlayers(players.map((p, i) =>
+      i === index ? { ...p, name } : p
+    ));
   }
 
   return (
     <div className="app">
       <h1 className="title">KINGS</h1>
 
-      <div className="table">
-        {players.map((p, i) => (
+      <div className="players">
+        {players.map((player, index) => (
           <div
-            key={i}
-            className={`player ${i === turn ? "active" : ""}`}
+            key={player.id}
+            className={`player ${index === currentPlayer ? "active" : ""}`}
           >
             <input
-              value={p.name}
-              onChange={e => updateName(i, e.target.value)}
+              value={player.name}
+              onChange={(e) => updateName(index, e.target.value)}
             />
-            <div className="beer-count">🍺 {p.beers}</div>
-            <button onClick={() => addBeer(i)}>+1 Beer</button>
+            <div className="beers">🍺 {player.beers}</div>
+            <button onClick={() => addBeer(index)}>+1 Beer</button>
           </div>
         ))}
       </div>
 
-      <div className="deck-area">
-        {card ? (
+      <div className="card-area">
+        {currentCard ? (
           <div className="card">
-            <div className="value">{card.value}</div>
-            <div className="suit">{card.suit}</div>
+            <div className="rank">{currentCard.rank}</div>
+            <div className="rule">{currentCard.rule}</div>
           </div>
         ) : (
-          <div className="card back">DRAW</div>
+          <div className="card placeholder">Draw a card</div>
         )}
       </div>
 
