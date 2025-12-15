@@ -4,21 +4,24 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #111, #000);
-  color: white;
+  background: radial-gradient(circle, #1b5e20, #0b3d17);
   font-family: system-ui, sans-serif;
+  color: #fff;
 }
 
 .app {
   height: 100vh;
+  padding: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.title {
-  margin: 12px 0;
-  letter-spacing: 2px;
+.roles {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  margin-bottom: 6px;
 }
 
 .table {
@@ -29,86 +32,103 @@ body {
   align-items: center;
 }
 
-.players {
+.side {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 0 8px;
+  gap: 10px;
+  padding: 4px;
 }
 
 .player {
-  background: rgba(255,255,255,0.08);
-  border-radius: 14px;
+  background: #111;
+  border-radius: 12px;
   padding: 8px;
   text-align: center;
+  font-size: 14px;
+  opacity: 0.85;
 }
 
 .player.active {
-  box-shadow: 0 0 18px #ff3b3b;
-  border: 1px solid #ff3b3b;
+  border: 2px solid gold;
+  box-shadow: 0 0 12px gold;
+  opacity: 1;
 }
 
-.name {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-.drinks {
+.beer-controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
+  margin-top: 4px;
 }
 
-.drinks button {
-  background: white;
+.beer-controls button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   border: none;
-  border-radius: 8px;
-  padding: 4px 8px;
+  font-size: 18px;
 }
 
 .center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
 }
 
 .deck {
   width: 70px;
   height: 100px;
-  background: linear-gradient(145deg, #ffb347, #ff8c00);
-  border-radius: 10px;
+  background: repeating-linear-gradient(
+    45deg,
+    #222,
+    #222 5px,
+    #111 5px,
+    #111 10px
+  );
+  border-radius: 8px;
+  margin-bottom: 6px;
 }
 
 .card {
-  width: 140px;
-  height: 200px;
-  background: white;
-  color: black;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 12px;
+  width: 90px;
+  height: 130px;
+  background: #fff;
+  color: #000;
+  border-radius: 10px;
+  padding: 6px;
   text-align: center;
+  margin-bottom: 6px;
 }
 
-.card-value {
-  font-size: 24px;
+.rank {
+  font-size: 22px;
   font-weight: bold;
 }
 
-.card-text {
-  margin-top: 8px;
+.suit {
+  font-size: 20px;
 }
 
-.draw {
+.rule {
+  font-size: 10px;
   margin-top: 6px;
-  padding: 10px 20px;
+}
+
+.draw-btn {
+  margin-top: 6px;
+  padding: 10px 18px;
+  font-size: 16px;
   border-radius: 20px;
   border: none;
-  background: white;
-  font-weight: bold;
+  background: crimson;
+  color: white;
+}
+
+.count {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.leaderboard {
+  font-size: 18px;
 }
