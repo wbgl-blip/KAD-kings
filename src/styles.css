@@ -4,112 +4,69 @@
 
 body {
   margin: 0;
-  background: #0e0e0e;
-  color: #f5f5f5;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: radial-gradient(circle at top, #1b1b1b, #000);
+  color: #fff;
+  font-family: system-ui, sans-serif;
 }
 
 .app {
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 16px;
+  min-height: 100vh;
+  padding: 24px;
 }
 
-.title {
-  text-align: center;
-  font-size: 42px;
-  margin-bottom: 20px;
-  letter-spacing: 2px;
+h1 {
+  font-size: 48px;
+  letter-spacing: 4px;
+  margin-bottom: 24px;
+}
+
+h2 {
+  margin-top: 40px;
+  font-size: 36px;
 }
 
 .players {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .player {
-  background: #1b1b1b;
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.player.active {
-  outline: 2px solid #ff3b3b;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 16px;
 }
 
 .player input {
-  flex: 1;
-  background: #2a2a2a;
-  border: none;
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  margin-bottom: 8px;
   border-radius: 6px;
-  padding: 6px 8px;
-  color: white;
-}
-
-.beers {
-  min-width: 60px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.player button {
-  background: #ff3b3b;
   border: none;
+}
+
+.beer-count {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+button {
+  padding: 10px 14px;
+  font-size: 16px;
   border-radius: 8px;
-  padding: 6px 10px;
-  color: white;
-  font-weight: bold;
-}
-
-.card-area {
-  margin: 28px 0;
-  display: flex;
-  justify-content: center;
-}
-
-.card {
-  width: 160px;
-  height: 220px;
-  background: white;
-  color: black;
-  border-radius: 16px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transform: rotate(-3deg);
-}
-
-.card.placeholder {
+  border: none;
   background: #333;
-  color: #aaa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: #fff;
 }
 
-.rank {
-  font-size: 32px;
-  font-weight: bold;
-}
-
-.rule {
-  text-align: center;
-  font-size: 18px;
-  font-weight: 600;
+button:active {
+  transform: scale(0.97);
 }
 
 .draw-btn {
+  margin-top: 16px;
   width: 100%;
-  padding: 14px;
-  font-size: 18px;
-  font-weight: bold;
-  background: #ff3b3b;
-  border: none;
-  border-radius: 14px;
-  color: white;
+  background: #7a0000;
 }
