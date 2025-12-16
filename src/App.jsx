@@ -14,10 +14,21 @@ export default function App() {
   const [cardsLeft, setCardsLeft] = useState(52);
   const [cardText, setCardText] = useState("Draw a card\nNo mercy");
 
+  const positions = [
+    { gridColumn: 1, gridRow: 1 },
+    { gridColumn: 2, gridRow: 1 },
+    { gridColumn: 3, gridRow: 1 },
+    { gridColumn: 1, gridRow: 2 },
+    { gridColumn: 3, gridRow: 2 },
+    { gridColumn: 1, gridRow: 3 },
+    { gridColumn: 2, gridRow: 3 },
+    { gridColumn: 3, gridRow: 3 },
+  ];
+
   function drawCard() {
     if (cardsLeft === 0) return;
     setCardsLeft(cardsLeft - 1);
-    setCardText("🍺 Rule happens 🍺");
+    setCardText("No mercy 😈\nDrink wisely");
   }
 
   function addBeer(index) {
@@ -28,51 +39,41 @@ export default function App() {
 
   return (
     <div className="app">
-      <h1 className="title">KAD Kings</h1>
+      <h1>KAD Kings</h1>
 
       <div className="table">
-        <div className="players top">
-          {players.slice(0, 2).map((p, i) => (
-            <Player key={i} player={p} onDrink={() => addBeer(i)} />
-          ))}
-        </div>
+        {players.slice(0, 8).map((player, i) => (
+          <div
+            key={player.name}
+            className="player"
+            style={positions[i]}
+          >
+            <div className="avatar" />
+            <div className="name">{player.name}</div>
+            <div className="beers">🍺 {player.beers}</div>
+            <button onClick={() => addBeer(i)}>+1 Beer</button>
+          </div>
+        ))}
 
-        <div className="players left">
-          {players.slice(2, 4).map((p, i) => (
-            <Player key={i} player={p} onDrink={() => addBeer(i + 2)} />
-          ))}
-        </div>
-
-        <div className="deck">
-          <div className="card">
+        <div
+          className="card"
+          style={{ gridColumn: 2, gridRow: 2 }}
+        >
+          <div className="card-text">
             {cardText.split("\n").map((line, i) => (
               <div key={i}>{line}</div>
             ))}
           </div>
-
-          <button className="draw" onClick={drawCard}>
-            DRAW CARD
-          </button>
-          <div className="counter">Cards Left: {cardsLeft} / 52</div>
-        </div>
-
-        <div className="players right">
-          {players.slice(4, 6).map((p, i) => (
-            <Player key={i} player={p} onDrink={() => addBeer(i + 4)} />
-          ))}
         </div>
       </div>
-    </div>
-  );
-}
 
-function Player({ player, onDrink }) {
-  return (
-    <div className="player">
-      <div className="avatar" />
-      <div className="name">{player.name}</div>
-      <div className="beers">🍺 {player.beers}</div>
-      <button onClick={onDrink}>+1 Beer</button>
+      <button className="draw-button" onClick={drawCard}>
+        DRAW CARD
+      </button>
+
+      <div className="cards-left">
+        Cards Left: {cardsLeft} / 52
+      </div>
     </div>
   );
 }
