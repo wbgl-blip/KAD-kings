@@ -13,6 +13,7 @@ export default function App() {
     { name: "Natalie", beers: 0 },
   ]);
 
+  const [currentPlayer, setCurrentPlayer] = useState(0);
   const [cardsLeft, setCardsLeft] = useState(52);
   const [card, setCard] = useState("Draw a card");
 
@@ -29,8 +30,11 @@ export default function App() {
 
   function drawCard() {
     if (cardsLeft === 0) return;
+
     setCardsLeft(cardsLeft - 1);
     setCard("A♠");
+
+    setCurrentPlayer((prev) => (prev + 1) % players.length);
   }
 
   function addBeer(i) {
@@ -47,7 +51,7 @@ export default function App() {
         {players.map((p, i) => (
           <div
             key={p.name}
-            className="player"
+            className={`player ${i === currentPlayer ? "active" : ""}`}
             style={{
               gridColumn: seats[i].col,
               gridRow: seats[i].row,
