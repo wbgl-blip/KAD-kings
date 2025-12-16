@@ -4,104 +4,138 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #222, #000);
-  font-family: system-ui, sans-serif;
-  color: white;
+  background: radial-gradient(circle at top, #1b1b1b, #0b0b0b);
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .app {
-  max-width: 420px;
-  margin: auto;
+  min-height: 100vh;
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-h1 {
-  text-align: center;
-  letter-spacing: 3px;
-  margin-bottom: 16px;
+.title {
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  margin: 12px 0 20px;
 }
 
-.players {
+/* ===== BOARD ===== */
+
+.board {
+  width: 100%;
+  max-width: 430px;
   display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
 
+/* ===== PLAYER SEATS ===== */
+
 .player {
-  background: #111;
-  border-radius: 14px;
-  padding: 12px;
-  border: 2px solid #222;
+  background: #1f1f1f;
+  border-radius: 16px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  position: relative;
 }
 
 .player.active {
-  border-color: #00ff88;
-  box-shadow: 0 0 12px #00ff8844;
+  outline: 3px solid #2fffdc;
+  box-shadow: 0 0 25px rgba(47,255,220,0.6);
 }
 
-.player input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
+.avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #444;
+  margin: 0 auto 6px;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.beers {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+
+.beer-btn {
+  background: #2a2a2a;
   border: none;
-  font-size: 16px;
-}
-
-.beer-row {
-  margin: 8px 0;
-  font-size: 18px;
-}
-
-.player button {
-  width: 100%;
-  padding: 10px;
   border-radius: 10px;
-  border: none;
-  background: #333;
-  color: white;
+  color: #fff;
   font-size: 16px;
+  padding: 6px 0;
+  width: 100%;
+  cursor: pointer;
 }
 
-.turn {
+.beer-btn:active {
+  transform: scale(0.96);
+}
+
+/* ===== CENTER CARD ===== */
+
+.center {
+  grid-column: 2 / span 2;
+  grid-row: 2 / span 2;
+  background: #f7f7f7;
+  color: #000;
+  border-radius: 22px;
+  padding: 28px 16px;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+}
+
+.card-rank {
+  font-size: 72px;
+  font-weight: 900;
+}
+
+.card-rule {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.card-sub {
+  font-size: 14px;
+  opacity: 0.75;
+  margin-top: 4px;
+}
+
+/* ===== DRAW BUTTON ===== */
+
+.draw-wrap {
+  grid-column: 2 / span 2;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.draw-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 20px;
+  font-weight: 900;
+  border-radius: 18px;
+  border: none;
+  background: #ffffff;
+  color: #000;
+  cursor: pointer;
+}
+
+.cards-left {
   margin-top: 6px;
   font-size: 14px;
-  color: #00ff88;
-}
-
-.draw {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.draw button {
-  width: 100%;
-  padding: 14px;
-  font-size: 18px;
-  border-radius: 14px;
-  border: none;
-  background: white;
-  color: black;
-}
-
-.status {
-  margin-top: 10px;
-  font-size: 14px;
-  opacity: 0.85;
-}
-
-.card {
-  margin-top: 20px;
-  background: white;
-  color: black;
-  border-radius: 18px;
-  padding: 40px 0;
-  text-align: center;
-  font-size: 48px;
-  font-weight: bold;
-}
-
-.game-over {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 18px;
-  color: #00ff88;
+  opacity: 0.7;
 }
