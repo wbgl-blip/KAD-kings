@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./App.css";
+import "./styles.css";
 
 export default function App() {
   const [players, setPlayers] = useState([
