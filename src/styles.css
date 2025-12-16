@@ -11,17 +11,17 @@ body {
 
 .app {
   min-height: 100vh;
-  padding: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .title {
-  font-size: 42px;
+  font-size: 34px;
   font-weight: 900;
-  letter-spacing: 4px;
-  margin: 12px 0 20px;
+  letter-spacing: 3px;
+  margin: 8px 0 14px;
 }
 
 /* ===== BOARD ===== */
@@ -30,19 +30,19 @@ body {
   width: 100%;
   max-width: 430px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr 1.2fr 1.2fr 1fr;
+  grid-template-rows: auto auto auto auto;
   gap: 12px;
 }
 
-/* ===== PLAYER SEATS ===== */
+/* ===== PLAYER ===== */
 
 .player {
   background: #1f1f1f;
   border-radius: 16px;
-  padding: 10px;
+  padding: 10px 6px;
   text-align: center;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-  position: relative;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.55);
 }
 
 .player.active {
@@ -51,8 +51,8 @@ body {
 }
 
 .avatar {
-  width: 54px;
-  height: 54px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: #444;
   margin: 0 auto 6px;
@@ -74,7 +74,7 @@ body {
   border: none;
   border-radius: 10px;
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
   padding: 6px 0;
   width: 100%;
   cursor: pointer;
@@ -91,21 +91,21 @@ body {
   grid-row: 2 / span 2;
   background: #f7f7f7;
   color: #000;
-  border-radius: 22px;
-  padding: 28px 16px;
+  border-radius: 20px;
+  padding: 20px 14px;
   text-align: center;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.6);
 }
 
 .card-rank {
-  font-size: 72px;
+  font-size: 56px;
   font-weight: 900;
 }
 
 .card-rule {
-  font-size: 20px;
-  font-weight: 700;
-  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  margin-top: 6px;
 }
 
 .card-sub {
@@ -114,20 +114,19 @@ body {
   margin-top: 4px;
 }
 
-/* ===== DRAW BUTTON ===== */
+/* ===== DRAW ===== */
 
 .draw-wrap {
   grid-column: 2 / span 2;
   text-align: center;
-  margin-top: 10px;
 }
 
 .draw-btn {
   width: 100%;
-  padding: 16px;
-  font-size: 20px;
+  padding: 14px;
+  font-size: 18px;
   font-weight: 900;
-  border-radius: 18px;
+  border-radius: 16px;
   border: none;
   background: #ffffff;
   color: #000;
@@ -136,6 +135,6 @@ body {
 
 .cards-left {
   margin-top: 6px;
-  font-size: 14px;
-  opacity: 0.7;
+  font-size: 13px;
+  opacity: 0.65;
 }
