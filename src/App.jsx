@@ -1,99 +1,106 @@
 import { useState } from "react";
+import "./styles.css";
 
-const SUITS = ["♠", "♥", "♦", "♣"];
-const VALUES = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+const RULES = {
+  A: ["Waterfall", "Everyone drinks"],
+  K: ["King", "Add to the cup"],
+  Q: ["Question Master", "Ask or drink"],
+  J: ["Thumb Master", "Last thumb drinks"],
+  "10": ["Categories", "Fail = drink"],
+  "9": ["Bust a rhyme", "Mess up = drink"],
+  "8": ["Mate", "Pick a drinking buddy"],
+  "7": ["Heaven", "Last hand drinks"],
+  "6": ["Dicks", "Guys drink"],
+  "5": ["Thumbs", "Last thumb drinks"],
+  "4": ["Whores", "Girls drink"],
+  "3": ["Me", "You drink"],
+  "2": ["You", "Give drinks"]
+};
 
-function buildDeck() {
+const createDeck = () => {
+  const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
   let deck = [];
-  SUITS.forEach(s =>
-    VALUES.forEach(v => deck.push(`${v}${s}`))
-  );
+  ranks.forEach(r => {
+    for (let i = 0; i < 4; i++) deck.push(r);
+  });
   return deck.sort(() => Math.random() - 0.5);
-}
+};
 
 export default function App() {
   const [players, setPlayers] = useState([
-    { name: "Player 1", beers: 0 },
-    { name: "Player 2", beers: 0 },
-    { name: "Player 3", beers: 0 }
+    { name: "Beau", beers: 3 },
+    { name: "Mike", beers: 5 },
+    { name: "Jess", beers: 2 },
+    { name: "Alex", beers: 7 },
+    { name: "Emily", beers: 4 },
+    { name: "Sean", beers: 7 },
+    { name: "Tom", beers: 1 },
+    { name: "Natalie", beers: 5 }
   ]);
 
-  const [deck, setDeck] = useState(buildDeck());
-  const [currentCard, setCurrentCard] = useState(null);
+  const [deck, setDeck] = useState(createDeck());
+  const [card, setCard] = useState(null);
   const [turn, setTurn] = useState(0);
-  const [kings, setKings] = useState(0);
 
   const drawCard = () => {
     if (deck.length === 0) return;
-
-    const newDeck = [...deck];
-    const card = newDeck.pop();
-
-    setDeck(newDeck);
-    setCurrentCard(card);
-
-    if (card.startsWith("K")) {
-      setKings(k => k + 1);
-    }
-
+    const next = deck[0];
+    setDeck(deck.slice(1));
+    setCard(next);
     setTurn((turn + 1) % players.length);
   };
 
-  const addBeer = (index) => {
-    const updated = [...players];
-    updated[index].beers += 1;
-    setPlayers(updated);
+  const addBeer = (i) => {
+    setPlayers(players.map((p, idx) =>
+      idx === i ? { ...p, beers: p.beers + 1 } : p
+    ));
   };
 
-  const updateName = (index, value) => {
-    const updated = [...players];
-    updated[index].name = value;
-    setPlayers(updated);
-  };
+  const rule = card ? RULES[card] : null;
 
   return (
     <div className="app">
-      <h1>KINGS</h1>
+      <div className="title">KINGS</div>
 
-      <div className="players">
+      <div className="board">
         {players.map((p, i) => (
           <div
             key={i}
             className={`player ${i === turn ? "active" : ""}`}
           >
-            <input
-              value={p.name}
-              onChange={e => updateName(i, e.target.value)}
-            />
-            <div className="beer-row">
-              🍺 {p.beers}
-            </div>
-            <button onClick={() => addBeer(i)}>+1 Beer</button>
-            {i === turn && <div className="turn">👉 Current Turn</div>}
+            <div className="avatar" />
+            <div className="name">{p.name}</div>
+            <div className="beers">🍺 {p.beers}</div>
+            <button className="beer-btn" onClick={() => addBeer(i)}>
+              +1 Beer
+            </button>
           </div>
         ))}
-      </div>
 
-      <div className="draw">
-        <button onClick={drawCard}>Draw Card</button>
-        <div className="status">
-          🃏 Cards Left: {deck.length} / 52  
-          <br />
-          👑 Kings Drawn: {kings} / 4
+        <div className="center">
+          {card ? (
+            <>
+              <div className="card-rank">{card}</div>
+              <div className="card-rule">{rule[0]}</div>
+              <div className="card-sub">{rule[1]}</div>
+            </>
+          ) : (
+            <>
+              <div className="card-rule">Draw a card</div>
+              <div className="card-sub">No mercy</div>
+            </>
+          )}
+        </div>
+
+        <div className="draw-wrap">
+          <button className="draw-btn" onClick={drawCard}>
+            DRAW CARD
+          </button>
+          <div className="cards-left">
+            Cards Left: {deck.length} / 52
+          </div>
         </div>
       </div>
-
-      {currentCard && (
-        <div className="card">
-          {currentCard}
-        </div>
-      )}
-
-      {deck.length === 0 && (
-        <div className="game-over">
-          🎉 Deck Empty — Game Over 🎉
-        </div>
-      )}
     </div>
   );
 }
