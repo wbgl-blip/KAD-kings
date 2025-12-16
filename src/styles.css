@@ -18,13 +18,12 @@ body {
 }
 
 /* =========================
-   APP LAYOUT
+   APP WRAPPER
 ========================= */
 .app {
   height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  align-items: center;
 }
 
 /* =========================
@@ -32,59 +31,75 @@ body {
 ========================= */
 .title {
   text-align: center;
-  font-size: 42px;
+  font-size: 40px;
   letter-spacing: 2px;
-  padding: 12px 0;
+  padding: 10px 0;
 }
 
 /* =========================
-   PLAYER GRIDS (TOP & BOTTOM)
+   TABLE LAYOUT
+   (8-player max)
 ========================= */
-.player-grid {
+.table {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+}
+
+/* =========================
+   PLAYER ROWS
+========================= */
+.player-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  padding: 0 16px;
+  gap: 14px;
+  padding: 0 14px;
   justify-items: center;
+}
+
+/* Middle rows (left + right) */
+.player-sides {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
 }
 
 /* =========================
    PLAYER CARD
 ========================= */
 .player-card {
-  width: 100%;
-  max-width: 120px;
-  height: 135px;
-  background: #0d0d0d;
+  width: 115px;
+  height: 130px;
+  background: #0c0c0c;
   border-radius: 18px;
-  padding: 10px 6px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
   transition: all 0.25s ease;
 }
 
 /* Avatar */
 .player-avatar {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: #666;
 }
 
 /* Name */
 .player-name {
-  font-size: 16px;
+  font-size: 15px;
 }
 
-/* Drink Count */
+/* Drink count */
 .player-drinks {
   font-size: 14px;
 }
 
-/* Beer Button */
+/* Button */
 .player-btn {
   background: white;
   color: black;
@@ -99,18 +114,17 @@ body {
 ========================= */
 .player-card.active {
   border: 2px solid #00ffd0;
-  box-shadow: 0 0 22px rgba(0, 255, 208, 0.9);
+  box-shadow: 0 0 22px rgba(0,255,208,0.9);
   transform: scale(1.05);
 }
 
 /* =========================
    CENTER AREA
 ========================= */
-.center-area {
+.center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 10px;
 }
 
@@ -127,20 +141,20 @@ body {
   text-align: center;
   font-size: 26px;
   padding: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.9);
 }
 
-/* Draw Button */
+/* Draw button */
 .draw-btn {
   background: white;
   color: black;
   border: none;
   border-radius: 999px;
-  padding: 6px 20px;
+  padding: 6px 22px;
   font-size: 14px;
 }
 
-/* Game Stats */
+/* Stats */
 .game-stats {
   font-size: 13px;
   opacity: 0.75;
@@ -149,7 +163,7 @@ body {
 }
 
 /* =========================
-   MOBILE TWEAKS
+   MOBILE SAFETY NET
 ========================= */
 @media (max-height: 700px) {
   .card {
@@ -159,6 +173,7 @@ body {
   }
 
   .player-card {
+    width: 105px;
     height: 120px;
   }
 }
