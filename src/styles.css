@@ -1,78 +1,108 @@
-import { useState } from "react";
-import "./styles.css";
+* {
+  box-sizing: border-box;
+}
 
-export default function App() {
-  const [players, setPlayers] = useState([
-    { name: "Beau", beers: 0 },
-    { name: "Mike", beers: 0 },
-    { name: "Jess", beers: 0 },
-    { name: "Alex", beers: 0 },
-    { name: "Emily", beers: 0 },
-    { name: "Sean", beers: 0 },
-  ]);
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #222, #000);
+  font-family: Georgia, serif;
+  color: white;
+}
 
-  const [cardsLeft, setCardsLeft] = useState(52);
-  const [cardText, setCardText] = useState("Draw a card\nNo mercy");
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+}
 
-  // Explicit table positions (no guessing, no chaos)
-  const seatMap = [
-    { col: 1, row: 1 }, // Beau
-    { col: 2, row: 1 }, // Mike
-    { col: 3, row: 1 }, // Jess
-    { col: 1, row: 2 }, // Alex
-    { col: 3, row: 2 }, // Emily
-    { col: 2, row: 3 }, // Sean (BOTTOM CENTER)
-  ];
+h1 {
+  margin: 6px 0;
+  font-size: 36px;
+  letter-spacing: 2px;
+}
 
-  function drawCard() {
-    if (cardsLeft === 0) return;
-    setCardsLeft(cardsLeft - 1);
-    setCardText("No mercy 😈\nDrink wisely");
-  }
+.table {
+  flex: 1;
+  width: 100%;
+  max-width: 420px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 12px;
+  align-items: center;
+  justify-items: center;
+  position: relative;
+}
 
-  function addBeer(index) {
-    const copy = [...players];
-    copy[index].beers += 1;
-    setPlayers(copy);
-  }
+.player {
+  background: #0d0d0d;
+  border-radius: 16px;
+  padding: 8px;
+  width: 100%;
+  max-width: 110px;
+  text-align: center;
+  box-shadow: 0 0 18px rgba(0,0,0,0.8);
+}
 
-  return (
-    <div className="app">
-      <h1>KAD Kings</h1>
+.avatar {
+  width: 42px;
+  height: 42px;
+  background: #555;
+  border-radius: 50%;
+  margin: 0 auto 4px;
+}
 
-      <div className="table">
-        {players.map((player, i) => (
-          <div
-            key={player.name}
-            className="player"
-            style={{
-              gridColumn: seatMap[i].col,
-              gridRow: seatMap[i].row,
-            }}
-          >
-            <div className="avatar" />
-            <div className="name">{player.name}</div>
-            <div className="beers">🍺 {player.beers}</div>
-            <button onClick={() => addBeer(i)}>+1 Beer</button>
-          </div>
-        ))}
+.name {
+  font-size: 14px;
+}
 
-        <div className="card">
-          <div className="card-text">
-            {cardText.split("\n").map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
-          </div>
-        </div>
-      </div>
+.beers {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
 
-      <button className="draw-button" onClick={drawCard}>
-        DRAW CARD
-      </button>
+.player button {
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: none;
+  background: white;
+  color: black;
+}
 
-      <div className="cards-left">
-        Cards Left: {cardsLeft} / 52
-      </div>
-    </div>
-  );
-                                               }
+.card {
+  grid-column: 2;
+  grid-row: 2;
+  background: white;
+  color: black;
+  width: 100%;
+  height: 100%;
+  max-width: 180px;
+  max-height: 240px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 18px;
+  padding: 12px;
+}
+
+.draw-button {
+  margin-top: 6px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 14px;
+  border: none;
+  background: white;
+  color: black;
+}
+
+.cards-left {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-bottom: 6px;
+}
