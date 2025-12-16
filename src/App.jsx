@@ -25,37 +25,39 @@ export default function KingsBoard() {
     <div className="board">
       <h1 className="title">KAD Kings</h1>
 
-      {/* TOP */}
-      <div className="players top">
-        {players.slice(0, 2).map(renderPlayer)}
-      </div>
+      <div className="table">
+        {/* TOP */}
+        <div className="row top">
+          {players.slice(0, 2).map(renderPlayer)}
+        </div>
 
-      {/* LEFT */}
-      <div className="players left">
-        {players.slice(2, 4).map(renderPlayer)}
-      </div>
+        {/* MIDDLE */}
+        <div className="middle">
+          <div className="side left">
+            {players.slice(2, 4).map(renderPlayer)}
+          </div>
 
-      {/* CENTER CARD */}
-      <div className="center">
-        <div className="card">
-          <div className="card-text">
-            <div>Draw a card</div>
-            <div className="sub">No mercy</div>
+          <div className="center">
+            <div className="card">
+              <div className="card-text">
+                <div>Draw a card</div>
+                <div className="sub">No mercy</div>
+              </div>
+            </div>
+
+            <button className="draw-btn">DRAW CARD</button>
+            <div className="cards-left">Cards Left: 52 / 52</div>
+          </div>
+
+          <div className="side right">
+            {players.slice(4, 6).map(renderPlayer)}
           </div>
         </div>
 
-        <button className="draw-btn">DRAW CARD</button>
-        <div className="cards-left">Cards Left: 52 / 52</div>
-      </div>
-
-      {/* RIGHT */}
-      <div className="players right">
-        {players.slice(4, 6).map(renderPlayer)}
-      </div>
-
-      {/* BOTTOM */}
-      <div className="players bottom">
-        {players.slice(6, 8).map(renderPlayer)}
+        {/* BOTTOM */}
+        <div className="row bottom">
+          {players.slice(6, 8).map(renderPlayer)}
+        </div>
       </div>
     </div>
   );
