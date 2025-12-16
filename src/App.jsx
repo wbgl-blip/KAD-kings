@@ -7,17 +7,17 @@ const players = [
   { name: "Alex", beers: 0 },
   { name: "Emily", beers: 0 },
   { name: "Sean", beers: 0 },
-  { name: "Tom", beers: 0 },
-  { name: "Natalie", beers: 0 },
+  { name: "Chris", beers: 0 },
+  { name: "Taylor", beers: 0 },
 ];
 
-function Player({ player, active }) {
+function Player({ player }) {
   return (
-    <div className={`player ${active ? "active" : ""}`}>
+    <div className="player">
       <div className="avatar" />
       <div className="name">{player.name}</div>
-      <div className="beers">🍺 {player.beers}</div>
-      <div className="add-beer">+1 Beer</div>
+      <div className="stats">🍺 {player.beers}</div>
+      <div className="penalty">+1 Beer</div>
     </div>
   );
 }
@@ -27,42 +27,42 @@ export default function App() {
     <div className="board">
       <h1 className="title">KAD Kings</h1>
 
-      {/* TOP */}
+      {/* TOP PLAYERS */}
       <div className="players top">
-        {players.slice(0, 2).map((p, i) => (
-          <Player key={i} player={p} />
+        {players.slice(0, 2).map((p) => (
+          <Player key={p.name} player={p} />
         ))}
       </div>
 
-      {/* LEFT */}
+      {/* LEFT PLAYERS */}
       <div className="players left">
-        {players.slice(2, 4).map((p, i) => (
-          <Player key={i} player={p} />
+        {players.slice(2, 4).map((p) => (
+          <Player key={p.name} player={p} />
         ))}
       </div>
 
-      {/* CENTER */}
+      {/* RIGHT PLAYERS */}
+      <div className="players right">
+        {players.slice(4, 6).map((p) => (
+          <Player key={p.name} player={p} />
+        ))}
+      </div>
+
+      {/* CENTER CARD */}
       <div className="center">
         <div className="card">
-          <div className="card-title">Draw a card</div>
-          <div className="card-sub">No mercy</div>
+          <p>Draw a card</p>
+          <p>No mercy</p>
         </div>
 
-        <button className="draw">DRAW CARD</button>
+        <button className="draw-btn">DRAW CARD</button>
         <div className="cards-left">Cards Left: 52 / 52</div>
       </div>
 
-      {/* RIGHT */}
-      <div className="players right">
-        {players.slice(4, 6).map((p, i) => (
-          <Player key={i} player={p} />
-        ))}
-      </div>
-
-      {/* BOTTOM */}
+      {/* BOTTOM PLAYERS (FIXED 🔧) */}
       <div className="players bottom">
-        {players.slice(6, 8).map((p, i) => (
-          <Player key={i} player={p} />
+        {players.slice(6, 8).map((p) => (
+          <Player key={p.name} player={p} />
         ))}
       </div>
     </div>
