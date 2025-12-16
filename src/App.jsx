@@ -8,12 +8,12 @@ const RULES = {
   J: ["Thumb Master", "Last thumb drinks"],
   "10": ["Categories", "Fail = drink"],
   "9": ["Bust a rhyme", "Mess up = drink"],
-  "8": ["Mate", "Pick a drinking buddy"],
+  "8": ["Mate", "Pick a buddy"],
   "7": ["Heaven", "Last hand drinks"],
-  "6": ["Dicks", "Guys drink"],
+  "6": ["Guys", "Drink"],
   "5": ["Thumbs", "Last thumb drinks"],
-  "4": ["Whores", "Girls drink"],
-  "3": ["Me", "You drink"],
+  "4": ["Girls", "Drink"],
+  "3": ["Me", "Drink"],
   "2": ["You", "Give drinks"]
 };
 
@@ -28,14 +28,14 @@ const createDeck = () => {
 
 export default function App() {
   const [players, setPlayers] = useState([
-    { name: "Beau", beers: 3 },
-    { name: "Mike", beers: 5 },
-    { name: "Jess", beers: 2 },
-    { name: "Alex", beers: 7 },
-    { name: "Emily", beers: 4 },
-    { name: "Sean", beers: 7 },
-    { name: "Tom", beers: 1 },
-    { name: "Natalie", beers: 5 }
+    { name: "Beau", beers: 0 },
+    { name: "Mike", beers: 0 },
+    { name: "Jess", beers: 0 },
+    { name: "Alex", beers: 0 },
+    { name: "Emily", beers: 0 },
+    { name: "Sean", beers: 0 },
+    { name: "Tom", beers: 0 },
+    { name: "Natalie", beers: 0 }
   ]);
 
   const [deck, setDeck] = useState(createDeck());
@@ -60,23 +60,30 @@ export default function App() {
 
   return (
     <div className="app">
-      <div className="title">KINGS</div>
+      <div className="title">KAD Kings</div>
 
       <div className="board">
-        {players.map((p, i) => (
-          <div
-            key={i}
-            className={`player ${i === turn ? "active" : ""}`}
-          >
-            <div className="avatar" />
+        {/* TOP */}
+        {players.slice(0,2).map((p,i)=>(
+          <div key={i} className={`player ${turn===i?"active":""}`}>
+            <div className="avatar"/>
             <div className="name">{p.name}</div>
             <div className="beers">🍺 {p.beers}</div>
-            <button className="beer-btn" onClick={() => addBeer(i)}>
-              +1 Beer
-            </button>
+            <button className="beer-btn" onClick={()=>addBeer(i)}>+1 Beer</button>
           </div>
         ))}
 
+        {/* LEFT */}
+        {players.slice(2,4).map((p,i)=>(
+          <div key={i+2} className={`player ${turn===i+2?"active":""}`}>
+            <div className="avatar"/>
+            <div className="name">{p.name}</div>
+            <div className="beers">🍺 {p.beers}</div>
+            <button className="beer-btn" onClick={()=>addBeer(i+2)}>+1 Beer</button>
+          </div>
+        ))}
+
+        {/* CENTER */}
         <div className="center">
           {card ? (
             <>
@@ -92,10 +99,28 @@ export default function App() {
           )}
         </div>
 
+        {/* RIGHT */}
+        {players.slice(4,6).map((p,i)=>(
+          <div key={i+4} className={`player ${turn===i+4?"active":""}`}>
+            <div className="avatar"/>
+            <div className="name">{p.name}</div>
+            <div className="beers">🍺 {p.beers}</div>
+            <button className="beer-btn" onClick={()=>addBeer(i+4)}>+1 Beer</button>
+          </div>
+        ))}
+
+        {/* BOTTOM */}
+        {players.slice(6,8).map((p,i)=>(
+          <div key={i+6} className={`player ${turn===i+6?"active":""}`}>
+            <div className="avatar"/>
+            <div className="name">{p.name}</div>
+            <div className="beers">🍺 {p.beers}</div>
+            <button className="beer-btn" onClick={()=>addBeer(i+6)}>+1 Beer</button>
+          </div>
+        ))}
+
         <div className="draw-wrap">
-          <button className="draw-btn" onClick={drawCard}>
-            DRAW CARD
-          </button>
+          <button className="draw-btn" onClick={drawCard}>DRAW CARD</button>
           <div className="cards-left">
             Cards Left: {deck.length} / 52
           </div>
