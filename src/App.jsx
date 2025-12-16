@@ -27,28 +27,28 @@ export default function App() {
     <div className="board">
       <h1 className="title">KAD Kings</h1>
 
-      {/* TOP PLAYERS */}
+      {/* TOP */}
       <div className="players top">
         {players.slice(0, 2).map((p) => (
           <Player key={p.name} player={p} />
         ))}
       </div>
 
-      {/* LEFT PLAYERS */}
+      {/* LEFT */}
       <div className="players left">
         {players.slice(2, 4).map((p) => (
           <Player key={p.name} player={p} />
         ))}
       </div>
 
-      {/* RIGHT PLAYERS */}
+      {/* RIGHT */}
       <div className="players right">
         {players.slice(4, 6).map((p) => (
           <Player key={p.name} player={p} />
         ))}
       </div>
 
-      {/* CENTER CARD */}
+      {/* CENTER COLUMN */}
       <div className="center">
         <div className="card">
           <p>Draw a card</p>
@@ -57,13 +57,13 @@ export default function App() {
 
         <button className="draw-btn">DRAW CARD</button>
         <div className="cards-left">Cards Left: 52 / 52</div>
-      </div>
 
-      {/* BOTTOM PLAYERS (FIXED 🔧) */}
-      <div className="players bottom">
-        {players.slice(6, 8).map((p) => (
-          <Player key={p.name} player={p} />
-        ))}
+        {/* ✅ BOTTOM PLAYERS — ACTUALLY UNDER CARDS */}
+        <div className="players bottom">
+          {players.slice(6, 8).map((p) => (
+            <Player key={p.name} player={p} />
+          ))}
+        </div>
       </div>
     </div>
   );
