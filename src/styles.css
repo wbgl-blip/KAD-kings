@@ -1,126 +1,98 @@
-/* =========================
-   RESET + BASE
-========================= */
 * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
 }
 
-html,
-body {
+html, body {
   margin: 0;
-  padding: 0;
   height: 100%;
   overflow: hidden;
-  font-family: "Georgia", serif;
-  background: radial-gradient(circle at center, #1a1a1a 0%, #000 70%);
+  background: radial-gradient(circle, #1a1a1a 0%, #000 70%);
+  font-family: Georgia, serif;
   color: white;
 }
 
-/* =========================
-   APP WRAPPER
-========================= */
 .app {
   height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
 }
 
-/* =========================
-   TITLE
-========================= */
+/* TITLE */
 .title {
   text-align: center;
-  font-size: 40px;
-  letter-spacing: 2px;
+  font-size: 38px;
   padding: 10px 0;
 }
 
-/* =========================
-   TABLE LAYOUT
-   (8-player max)
-========================= */
+/* TABLE */
 .table {
+  flex: 1;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  height: 100%;
+  align-items: center;
 }
 
-/* =========================
-   PLAYER ROWS
-========================= */
+/* PLAYER ROWS */
 .player-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: center;
   gap: 14px;
-  padding: 0 14px;
-  justify-items: center;
+  padding: 6px 0;
 }
 
-/* Middle rows (left + right) */
+/* CENTER ROW */
 .player-sides {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
 }
 
-/* =========================
-   PLAYER CARD
-========================= */
+/* PLAYER CARD */
 .player-card {
-  width: 115px;
-  height: 130px;
-  background: #0c0c0c;
+  width: 110px;
+  height: 125px;
+  background: #0b0b0b;
   border-radius: 18px;
   padding: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-  transition: all 0.25s ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  transition: 0.25s ease;
 }
 
-/* Avatar */
-.player-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #666;
-}
-
-/* Name */
-.player-name {
-  font-size: 15px;
-}
-
-/* Drink count */
-.player-drinks {
-  font-size: 14px;
-}
-
-/* Button */
-.player-btn {
-  background: white;
-  color: black;
-  border: none;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 13px;
-}
-
-/* =========================
-   ACTIVE PLAYER
-========================= */
 .player-card.active {
   border: 2px solid #00ffd0;
   box-shadow: 0 0 22px rgba(0,255,208,0.9);
   transform: scale(1.05);
 }
 
-/* =========================
-   CENTER AREA
-========================= */
+.player-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #666;
+}
+
+.player-name {
+  font-size: 14px;
+}
+
+.player-drinks {
+  font-size: 13px;
+}
+
+.player-btn {
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+/* CENTER */
 .center {
   display: flex;
   flex-direction: column;
@@ -128,52 +100,30 @@ body {
   gap: 10px;
 }
 
-/* Card */
 .card {
-  width: 140px;
-  height: 200px;
-  background: #f9f9f9;
+  width: 135px;
+  height: 190px;
+  background: white;
   color: black;
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: 26px;
+  font-size: 24px;
   padding: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.9);
 }
 
-/* Draw button */
 .draw-btn {
   background: white;
   color: black;
-  border: none;
   border-radius: 999px;
+  border: none;
   padding: 6px 22px;
-  font-size: 14px;
 }
 
-/* Stats */
 .game-stats {
   font-size: 13px;
   opacity: 0.75;
   text-align: center;
-  line-height: 1.3;
-}
-
-/* =========================
-   MOBILE SAFETY NET
-========================= */
-@media (max-height: 700px) {
-  .card {
-    width: 120px;
-    height: 175px;
-    font-size: 22px;
-  }
-
-  .player-card {
-    width: 105px;
-    height: 120px;
-  }
 }
