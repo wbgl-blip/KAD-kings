@@ -2,150 +2,112 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #222, #000);
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* 🚫 SCROLLING DIES HERE */
   font-family: Georgia, serif;
+  background: radial-gradient(circle at center, #222, #000);
   color: white;
 }
 
-.board {
-  min-height: 100vh;
-  padding: 20px;
-  text-align: center;
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .title {
-  font-size: 48px;
-  margin-bottom: 20px;
+  font-size: 28px;
+  margin: 10px 0 5px;
 }
 
-/* TABLE LAYOUT */
+/* MAIN TABLE */
 .table {
+  flex: 1;
+  width: 100%;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  justify-content: space-between;
 }
 
-.row {
+/* PLAYER STACK */
+.players {
   display: flex;
-  gap: 24px;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.middle {
-  display: grid;
-  grid-template-columns: 1fr 300px 1fr;
-  gap: 24px;
-  align-items: center;
-  width: 100%;
-  max-width: 900px;
-}
-
-/* PLAYER */
 .player {
-  background: #111;
-  border-radius: 16px;
-  padding: 12px;
-  width: 120px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  width: 130px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  text-align: center;
 }
 
 .avatar {
-  width: 50px;
-  height: 50px;
-  background: #444;
+  width: 36px;
+  height: 36px;
+  background: #555;
   border-radius: 50%;
-  margin: 0 auto 8px;
+  margin: 0 auto 4px;
 }
 
 .name {
-  font-weight: bold;
+  font-size: 14px;
 }
 
 .beers {
-  margin: 4px 0;
+  font-size: 13px;
 }
 
-.beer-btn {
-  background: #222;
-  color: white;
+.player button {
+  margin-top: 4px;
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 6px;
   border: none;
-  border-radius: 8px;
-  padding: 6px;
+  cursor: pointer;
 }
 
-/* CENTER CARD */
-.center {
+/* CARD AREA */
+.deck {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 6px;
 }
 
 .card {
-  width: 260px;
-  height: 360px;
+  width: 150px;
+  height: 210px;
   background: white;
   color: black;
-  border-radius: 24px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.card-text {
-  font-size: 22px;
-}
-
-.card-text .sub {
-  margin-top: 10px;
-  font-size: 18px;
-}
-
-.draw-btn {
-  margin-top: 16px;
-  padding: 10px 18px;
+  text-align: center;
   font-size: 16px;
+  font-weight: bold;
+  padding: 10px;
 }
 
-.cards-left {
-  margin-top: 8px;
+.draw {
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.counter {
+  font-size: 12px;
   opacity: 0.8;
-}
-
-/* SIDES */
-.side {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
-}
-@media (max-width: 700px) {
-  .middle {
-    grid-template-columns: 1fr;
-  }
-
-  .side {
-    flex-direction: row;
-    justify-content: center;
-    gap: 16px;
-  }
-
-  .left {
-    order: 2;
-  }
-
-  .center {
-    order: 1;
-  }
-
-  .right {
-    order: 3;
-  }
-
-  .card {
-    width: 90%;
-    max-width: 300px;
-    height: 360px;
-  }
 }
