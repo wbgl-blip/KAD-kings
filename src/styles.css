@@ -7,7 +7,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden; /* 🚫 SCROLLING DIES HERE */
+  overflow: hidden;
   font-family: Georgia, serif;
   background: radial-gradient(circle at center, #222, #000);
   color: white;
@@ -21,34 +21,54 @@ body {
 }
 
 .title {
+  margin: 12px 0;
   font-size: 28px;
-  margin: 10px 0 5px;
 }
 
-/* MAIN TABLE */
+/* TABLE GRID */
 .table {
   flex: 1;
   width: 100%;
   max-width: 420px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, auto);
+  gap: 10px;
+  padding: 10px;
   align-items: center;
-  justify-content: space-between;
+  justify-items: center;
 }
 
-/* PLAYER STACK */
-.players {
+/* CENTER CARD */
+.card {
+  grid-column: 2;
+  grid-row: 2;
+  width: 160px;
+  height: 220px;
+  background: white;
+  color: black;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  justify-content: center;
+  text-align: center;
+  padding: 12px;
+  font-weight: bold;
 }
 
+/* PLAYER CARDS */
 .player {
-  width: 130px;
-  padding: 6px;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 12px;
+  width: 100%;
+  max-width: 110px;
+  background: rgba(0, 0, 0, 0.65);
+  border-radius: 14px;
+  padding: 8px;
   text-align: center;
+}
+
+.player.active {
+  outline: 3px solid #2fffd5;
+  box-shadow: 0 0 20px #2fffd5;
 }
 
 .avatar {
@@ -56,7 +76,7 @@ body {
   height: 36px;
   background: #555;
   border-radius: 50%;
-  margin: 0 auto 4px;
+  margin: 0 auto 6px;
 }
 
 .name {
@@ -68,43 +88,27 @@ body {
 }
 
 .player button {
-  margin-top: 4px;
-  font-size: 12px;
-  padding: 3px 6px;
+  margin-top: 6px;
+  font-size: 11px;
+  padding: 4px 6px;
   border-radius: 6px;
   border: none;
-  cursor: pointer;
 }
 
-/* CARD AREA */
-.deck {
+/* DRAW BUTTON */
+.controls {
+  padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
 }
 
-.card {
-  width: 150px;
-  height: 210px;
-  background: white;
-  color: black;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 16px;
-  font-weight: bold;
-  padding: 10px;
-}
-
 .draw {
-  font-size: 13px;
-  padding: 6px 10px;
-  border-radius: 8px;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 10px;
   border: none;
-  cursor: pointer;
 }
 
 .counter {
