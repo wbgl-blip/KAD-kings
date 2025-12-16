@@ -16,7 +16,7 @@ export default function App() {
   const [cardsLeft, setCardsLeft] = useState(52);
   const [card, setCard] = useState("Draw a card");
 
-  const seatPositions = [
+  const seats = [
     { col: 1, row: 1 },
     { col: 2, row: 1 },
     { col: 3, row: 1 },
@@ -33,9 +33,9 @@ export default function App() {
     setCard("A♠");
   }
 
-  function addBeer(index) {
+  function addBeer(i) {
     const updated = [...players];
-    updated[index].beers += 1;
+    updated[i].beers++;
     setPlayers(updated);
   }
 
@@ -44,18 +44,18 @@ export default function App() {
       <h1>KAD Kings</h1>
 
       <div className="table">
-        {players.map((player, i) => (
+        {players.map((p, i) => (
           <div
-            key={player.name}
+            key={p.name}
             className="player"
             style={{
-              gridColumn: seatPositions[i].col,
-              gridRow: seatPositions[i].row,
+              gridColumn: seats[i].col,
+              gridRow: seats[i].row,
             }}
           >
             <div className="avatar" />
-            <div className="name">{player.name}</div>
-            <div className="beers">🍺 {player.beers}</div>
+            <div className="name">{p.name}</div>
+            <div className="beers">🍺 {p.beers}</div>
             <button onClick={() => addBeer(i)}>+1 Beer</button>
           </div>
         ))}
