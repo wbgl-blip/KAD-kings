@@ -1,140 +1,105 @@
-* {
-  box-sizing: border-box;
+/* BOARD GRID */
+.board {
+  height: 100vh;
+  background: radial-gradient(circle at top, #1a1a1a, #000);
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "title title title"
+    "left center right"
+    "bottom bottom bottom";
+  padding: 16px;
+  color: white;
 }
 
-body {
-  margin: 0;
-  background: radial-gradient(circle at top, #1b1b1b, #0b0b0b);
-  color: #fff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+/* TITLE */
+.title {
+  grid-area: title;
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
 }
 
-.app {
-  min-height: 100vh;
-  padding: 14px;
+/* PLAYER ZONES */
+.players {
   display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.top {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.left {
+  grid-area: left;
   flex-direction: column;
   align-items: center;
 }
 
-.title {
-  font-size: 34px;
-  font-weight: 900;
-  letter-spacing: 3px;
-  margin: 8px 0 14px;
+.right {
+  grid-area: right;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* ===== BOARD ===== */
-
-.board {
-  width: 100%;
-  max-width: 430px;
-  display: grid;
-  grid-template-columns: 1fr 1.2fr 1.2fr 1fr;
-  grid-template-rows: auto auto auto auto;
-  gap: 12px;
+.bottom {
+  grid-area: bottom;
+  justify-content: center;
+  margin-top: 10px;
 }
 
-/* ===== PLAYER ===== */
+/* CENTER */
+.center {
+  grid-area: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-.player {
-  background: #1f1f1f;
+.card {
+  width: 220px;
+  height: 300px;
+  background: white;
+  color: black;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.draw-btn {
+  padding: 14px 30px;
+  border-radius: 30px;
+  font-weight: bold;
+  border: none;
+}
+
+.cards-left {
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+/* PLAYER CARD */
+.player-card {
+  width: 110px;
+  background: #1e1e1e;
   border-radius: 16px;
-  padding: 10px 6px;
+  padding: 10px;
   text-align: center;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.55);
-}
-
-.player.active {
-  outline: 3px solid #2fffdc;
-  box-shadow: 0 0 25px rgba(47,255,220,0.6);
 }
 
 .avatar {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
   background: #444;
+  border-radius: 50%;
   margin: 0 auto 6px;
-}
-
-.name {
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.beers {
-  font-size: 13px;
-  opacity: 0.85;
-  margin-bottom: 6px;
-}
-
-.beer-btn {
-  background: #2a2a2a;
-  border: none;
-  border-radius: 10px;
-  color: #fff;
-  font-size: 15px;
-  padding: 6px 0;
-  width: 100%;
-  cursor: pointer;
-}
-
-.beer-btn:active {
-  transform: scale(0.96);
-}
-
-/* ===== CENTER CARD ===== */
-
-.center {
-  grid-column: 2 / span 2;
-  grid-row: 2 / span 2;
-  background: #f7f7f7;
-  color: #000;
-  border-radius: 20px;
-  padding: 20px 14px;
-  text-align: center;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.6);
-}
-
-.card-rank {
-  font-size: 56px;
-  font-weight: 900;
-}
-
-.card-rule {
-  font-size: 18px;
-  font-weight: 800;
-  margin-top: 6px;
-}
-
-.card-sub {
-  font-size: 14px;
-  opacity: 0.75;
-  margin-top: 4px;
-}
-
-/* ===== DRAW ===== */
-
-.draw-wrap {
-  grid-column: 2 / span 2;
-  text-align: center;
-}
-
-.draw-btn {
-  width: 100%;
-  padding: 14px;
-  font-size: 18px;
-  font-weight: 900;
-  border-radius: 16px;
-  border: none;
-  background: #ffffff;
-  color: #000;
-  cursor: pointer;
-}
-
-.cards-left {
-  margin-top: 6px;
-  font-size: 13px;
-  opacity: 0.65;
 }
