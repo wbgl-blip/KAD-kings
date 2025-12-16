@@ -14,15 +14,14 @@ export default function App() {
   const [cardsLeft, setCardsLeft] = useState(52);
   const [cardText, setCardText] = useState("Draw a card\nNo mercy");
 
-  const positions = [
-    { gridColumn: 1, gridRow: 1 },
-    { gridColumn: 2, gridRow: 1 },
-    { gridColumn: 3, gridRow: 1 },
-    { gridColumn: 1, gridRow: 2 },
-    { gridColumn: 3, gridRow: 2 },
-    { gridColumn: 1, gridRow: 3 },
-    { gridColumn: 2, gridRow: 3 },
-    { gridColumn: 3, gridRow: 3 },
+  // Explicit table positions (no guessing, no chaos)
+  const seatMap = [
+    { col: 1, row: 1 }, // Beau
+    { col: 2, row: 1 }, // Mike
+    { col: 3, row: 1 }, // Jess
+    { col: 1, row: 2 }, // Alex
+    { col: 3, row: 2 }, // Emily
+    { col: 2, row: 3 }, // Sean (BOTTOM CENTER)
   ];
 
   function drawCard() {
@@ -32,9 +31,9 @@ export default function App() {
   }
 
   function addBeer(index) {
-    const updated = [...players];
-    updated[index].beers += 1;
-    setPlayers(updated);
+    const copy = [...players];
+    copy[index].beers += 1;
+    setPlayers(copy);
   }
 
   return (
@@ -42,11 +41,14 @@ export default function App() {
       <h1>KAD Kings</h1>
 
       <div className="table">
-        {players.slice(0, 8).map((player, i) => (
+        {players.map((player, i) => (
           <div
             key={player.name}
             className="player"
-            style={positions[i]}
+            style={{
+              gridColumn: seatMap[i].col,
+              gridRow: seatMap[i].row,
+            }}
           >
             <div className="avatar" />
             <div className="name">{player.name}</div>
@@ -55,10 +57,7 @@ export default function App() {
           </div>
         ))}
 
-        <div
-          className="card"
-          style={{ gridColumn: 2, gridRow: 2 }}
-        >
+        <div className="card">
           <div className="card-text">
             {cardText.split("\n").map((line, i) => (
               <div key={i}>{line}</div>
