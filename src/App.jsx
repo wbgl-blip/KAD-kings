@@ -8,32 +8,35 @@ export default function App() {
     { name: "Jess", beers: 0 },
     { name: "Alex", beers: 0 },
     { name: "Emily", beers: 0 },
+    { name: "Tom", beers: 0 },
     { name: "Sean", beers: 0 },
+    { name: "Natalie", beers: 0 },
   ]);
 
   const [cardsLeft, setCardsLeft] = useState(52);
-  const [cardText, setCardText] = useState("Draw a card\nNo mercy");
+  const [card, setCard] = useState("Draw a card");
 
-  // Explicit table positions (no guessing, no chaos)
-  const seatMap = [
-    { col: 1, row: 1 }, // Beau
-    { col: 2, row: 1 }, // Mike
-    { col: 3, row: 1 }, // Jess
-    { col: 1, row: 2 }, // Alex
-    { col: 3, row: 2 }, // Emily
-    { col: 2, row: 3 }, // Sean (BOTTOM CENTER)
+  const seatPositions = [
+    { col: 1, row: 1 },
+    { col: 2, row: 1 },
+    { col: 3, row: 1 },
+    { col: 1, row: 2 },
+    { col: 3, row: 2 },
+    { col: 1, row: 3 },
+    { col: 2, row: 3 },
+    { col: 3, row: 3 },
   ];
 
   function drawCard() {
     if (cardsLeft === 0) return;
     setCardsLeft(cardsLeft - 1);
-    setCardText("No mercy 😈\nDrink wisely");
+    setCard("A♠");
   }
 
   function addBeer(index) {
-    const copy = [...players];
-    copy[index].beers += 1;
-    setPlayers(copy);
+    const updated = [...players];
+    updated[index].beers += 1;
+    setPlayers(updated);
   }
 
   return (
@@ -46,8 +49,8 @@ export default function App() {
             key={player.name}
             className="player"
             style={{
-              gridColumn: seatMap[i].col,
-              gridRow: seatMap[i].row,
+              gridColumn: seatPositions[i].col,
+              gridRow: seatPositions[i].row,
             }}
           >
             <div className="avatar" />
@@ -57,21 +60,15 @@ export default function App() {
           </div>
         ))}
 
-        <div className="card">
-          <div className="card-text">
-            {cardText.split("\n").map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
+        <div className="center">
+          <div className="card">{card}</div>
+          <button className="draw" onClick={drawCard}>
+            DRAW CARD
+          </button>
+          <div className="cards-left">
+            Cards Left: {cardsLeft} / 52
           </div>
         </div>
-      </div>
-
-      <button className="draw-button" onClick={drawCard}>
-        DRAW CARD
-      </button>
-
-      <div className="cards-left">
-        Cards Left: {cardsLeft} / 52
       </div>
     </div>
   );
