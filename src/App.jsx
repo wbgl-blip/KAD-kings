@@ -1,52 +1,78 @@
-import { useState } from "react"; import "./styles.css";
+import { useState } from "react";
+import "./styles.css";
 
-export default function App() { const [players, setPlayers] = useState([ { name: "Beau", beers: 0 }, { name: "Mike", beers: 0 }, { name: "Jess", beers: 0 }, { name: "Alex", beers: 0 }, { name: "Emily", beers: 0 }, { name: "Sean", beers: 0 }, ]);
+export default function App() {
+  const [players, setPlayers] = useState([
+    { name: "Beau", beers: 0 },
+    { name: "Mike", beers: 0 },
+    { name: "Jess", beers: 0 },
+    { name: "Alex", beers: 0 },
+    { name: "Emily", beers: 0 },
+    { name: "Sean", beers: 0 },
+  ]);
 
-const [cardsLeft, setCardsLeft] = useState(52); const [cardText, setCardText] = useState("Draw a card"); const [cardSubtext, setCardSubtext] = useState("No mercy"); const [currentPlayer, setCurrentPlayer] = useState(0);
+  const [cardsLeft, setCardsLeft] = useState(52);
+  const [cardText, setCardText] = useState("Draw a card\nNo mercy");
 
-function drawCard() { if (cardsLeft === 0) return;
+  function drawCard() {
+    if (cardsLeft === 0) return;
+    setCardsLeft(cardsLeft - 1);
+    setCardText("🍺 Rule happens 🍺");
+  }
 
-setCardsLeft(cardsLeft - 1);
-setCardText("Rule Happens");
-setCardSubtext("Everyone watches closely 👀");
+  function addBeer(index) {
+    const updated = [...players];
+    updated[index].beers += 1;
+    setPlayers(updated);
+  }
 
-setCurrentPlayer((prev) => (prev + 1) % players.length);
+  return (
+    <div className="app">
+      <h1 className="title">KAD Kings</h1>
 
+      <div className="table">
+        <div className="players top">
+          {players.slice(0, 2).map((p, i) => (
+            <Player key={i} player={p} onDrink={() => addBeer(i)} />
+          ))}
+        </div>
+
+        <div className="players left">
+          {players.slice(2, 4).map((p, i) => (
+            <Player key={i} player={p} onDrink={() => addBeer(i + 2)} />
+          ))}
+        </div>
+
+        <div className="deck">
+          <div className="card">
+            {cardText.split("\n").map((line, i) => (
+              <div key={i}>{line}</div>
+            ))}
+          </div>
+
+          <button className="draw" onClick={drawCard}>
+            DRAW CARD
+          </button>
+          <div className="counter">Cards Left: {cardsLeft} / 52</div>
+        </div>
+
+        <div className="players right">
+          {players.slice(4, 6).map((p, i) => (
+            <Player key={i} player={p} onDrink={() => addBeer(i + 4)} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
-function addBeer(index) { const updated = [...players]; updated[index].beers += 1; setPlayers(updated); }
-
-return ( <div className="app"> <h1 className="title">KAD Kings</h1>
-
-<div className="table">
-    {players.map((p, i) => (
-      <div
-        key={i}
-        className={`player ${i === currentPlayer ? "active" : ""}`}
-      >
-        <div className="avatar" />
-        <div className="name">{p.name}</div>
-        <div className="beers">🍺 {p.beers}</div>
-        <button onClick={() => addBeer(i)}>+1 Beer</button>
-      </div>
-    ))}
-
-    <div className="deck">
-      <div className="card">
-        <div className="card-title">{cardText}</div>
-        <div className="card-subtitle">{cardSubtext}</div>
-      </div>
-
-      <div className="turn-text">
-        {players[currentPlayer].name}'s turn. No backing out.
-      </div>
-
-      <button className="draw-btn" onClick={drawCard}>
-        DRAW CARD
-      </button>
-      <div className="cards-left">Cards Left: {cardsLeft} / 52</div>
+function Player({ player, onDrink }) {
+  return (
+    <div className="player">
+      <div className="avatar" />
+      <div className="name">{player.name}</div>
+      <div className="beers">🍺 {player.beers}</div>
+      <button onClick={onDrink}>+1 Beer</button>
     </div>
-  </div>
-</div>
-
-); }
+  );
+}
