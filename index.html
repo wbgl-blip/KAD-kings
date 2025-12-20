@@ -11,12 +11,10 @@
     --tileBorder: rgba(255,255,255,0.06);
     --white:#fff;
 
-    /* Players bigger than the card (portrait tuned) */
     --tileW: 156px;
     --tileH: 190px;
     --avatar: 52px;
 
-    /* Card smaller so it’s not the focal point */
     --cardW: 220px;
     --cardH: 300px;
 
@@ -40,7 +38,6 @@
     user-select: none;
   }
 
-  /* Background */
   .bg1{
     position:fixed; inset:0;
     background: radial-gradient(circle at center, rgba(255,255,255,0.085) 0%, rgba(0,0,0,0.92) 55%, rgba(0,0,0,1) 100%);
@@ -83,7 +80,6 @@
     max-height: 820px;
   }
 
-  /* Auto-scale container */
   .scaleWrap{
     position:relative;
     width:100%;
@@ -93,7 +89,6 @@
 
   .pos{ position:absolute; transform:translate(-50%,-50%); }
 
-  /* Player tiles */
   .tile{
     width: var(--tileW);
     height: var(--tileH);
@@ -147,7 +142,6 @@
   }
   .pill:active{ transform:scale(.99); }
 
-  /* Center card */
   .card{
     width: var(--cardW);
     height: var(--cardH);
@@ -184,27 +178,25 @@
   }
   .drawBtn:active{ transform: translateX(-50%) scale(.99); }
 
-  /* ✅ Balanced “ring” positions (centered group) */
-  .p-top-mid{   left:50%; top:13%; }
-  .p-top-left{  left:30%; top:18%; }
-  .p-top-right{ left:70%; top:18%; }
+  /* ✅ Balanced ring, shifted right to compensate for the panel */
+  .p-top-mid{   left:52%; top:13%; }
+  .p-top-left{  left:32%; top:18%; }
+  .p-top-right{ left:72%; top:18%; }
 
-  .p-mid-left{  left:23%; top:56%; }
-  /* right side is a touch left to make room for panel */
-  .p-mid-right{ left:67%; top:56%; }
+  .p-mid-left{  left:25%; top:56%; }
+  .p-mid-right{ left:69%; top:56%; }
 
-  .p-bot-left{  left:30%; top:88%; }
+  .p-bot-left{  left:32%; top:88%; }
 
-  /* Card slightly lower */
   .center{ left:50%; top:58%; }
 
-  /* Side panel (kept tight, right aligned) */
+  /* Panel slightly narrower so it feels lighter */
   .panel{
     position:absolute;
     right: 6px;
     top: 56%;
     transform: translateY(-50%);
-    width: 212px;
+    width: 200px;
     padding: 12px;
     border-radius: 18px;
     background: rgba(11,11,11,.92);
@@ -238,11 +230,7 @@
     opacity:.9;
   }
 
-  .stickyGrid{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-  }
+  .stickyGrid{ display:flex; flex-direction:column; gap:8px; }
 
   .stickyRow{
     padding: 10px 10px;
@@ -267,7 +255,7 @@
     font-weight: 1000;
     opacity:.85;
     text-align:right;
-    max-width: 120px;
+    max-width: 110px;
     overflow:hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -278,12 +266,7 @@
     border-color: rgba(255,255,255,0.16);
   }
 
-  .rulesList{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    overflow:hidden;
-  }
+  .rulesList{ display:flex; flex-direction:column; gap:8px; overflow:hidden; }
 
   .ruleItem{
     padding: 10px 10px;
@@ -303,10 +286,7 @@
     letter-spacing: .02em;
   }
 
-  .btnRow{
-    display:flex;
-    gap:8px;
-  }
+  .btnRow{ display:flex; gap:8px; }
 
   .miniBtn{
     flex:1;
@@ -320,7 +300,6 @@
   .miniBtn.dark{ background: rgba(255,255,255,0.10); color:#fff; border: 1px solid rgba(255,255,255,0.12); }
   .miniBtn:active{ transform: scale(.99); }
 
-  /* Small phones */
   @media (max-width: 480px){
     :root{
       --tileW: 106px;
@@ -340,19 +319,20 @@
     .pill{ font-size: 11px; padding: 6px 9px; border-radius: 10px; }
     .card{ font-size: 19px; }
 
-    /* balanced mini ring */
-    .p-top-mid{   left:50%; top:14%; }
-    .p-top-left{  left:28%; top:18%; }
+    /* mini ring shifted slightly right too */
+    .p-top-mid{   left:52%; top:14%; }
+    .p-top-left{  left:30%; top:18%; }
     .p-top-right{ left:72%; top:18%; }
-    .p-mid-left{  left:16%; top:54%; }
+    .p-mid-left{  left:18%; top:54%; }
     .p-mid-right{ left:66%; top:54%; }
-    .p-bot-left{  left:28%; top:88%; }
+    .p-bot-left{  left:30%; top:88%; }
+
     .center{ left:50%; top:58%; }
 
     .panel{
       right: 6px;
       top: 69%;
-      width: 172px;
+      width: 168px;
       padding: 10px;
       gap:10px;
     }
@@ -360,7 +340,6 @@
     .ruleItem{ font-size: 12px; padding: 8px 8px; }
   }
 
-  /* Short screens */
   @media (max-height: 740px){
     :root{
       --tileW: 132px;
@@ -569,7 +548,6 @@
     });
   });
 
-  /* Full 52 card deck */
   const suits = ["♠","♥","♦","♣"];
   const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
   const deck = [];
