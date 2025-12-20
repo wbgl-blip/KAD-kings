@@ -101,7 +101,29 @@
     align-items:center;
     justify-content:space-between;
     padding: 16px 16px 14px;
+    position:relative;
   }
+
+  .tile.turn{
+    border-color: rgba(255,255,255,0.22);
+    box-shadow: 0 26px 70px rgba(255,255,255,0.06), 0 22px 54px rgba(0,0,0,0.78);
+  }
+
+  .turnTag{
+    position:absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 11px;
+    font-weight: 1000;
+    letter-spacing: .08em;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.14);
+    opacity:.95;
+    display:none;
+  }
+  .tile.turn .turnTag{ display:block; }
 
   .avatar{
     width: var(--avatar);
@@ -178,19 +200,35 @@
   }
   .drawBtn:active{ transform: translateX(-50%) scale(.99); }
 
-  /* ✅ Balanced ring, shifted right to compensate for the panel */
+  .ghostBtn{
+    position:absolute;
+    left:50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.12);
+    color:#fff;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 12px;
+    font-weight: 1000;
+    letter-spacing: .09em;
+    padding: var(--btnPadY) var(--btnPadX);
+    box-shadow: 0 14px 34px rgba(0,0,0,.40);
+    cursor:pointer;
+    z-index: 6;
+    display:none;
+  }
+  .ghostBtn:active{ transform: translateX(-50%) scale(.99); }
+
+  /* Balanced ring shifted right (matches your current best look) */
   .p-top-mid{   left:52%; top:13%; }
   .p-top-left{  left:32%; top:18%; }
   .p-top-right{ left:72%; top:18%; }
-
   .p-mid-left{  left:25%; top:56%; }
   .p-mid-right{ left:69%; top:56%; }
-
   .p-bot-left{  left:32%; top:88%; }
 
   .center{ left:50%; top:58%; }
 
-  /* Panel slightly narrower so it feels lighter */
   .panel{
     position:absolute;
     right: 6px;
@@ -300,15 +338,30 @@
   .miniBtn.dark{ background: rgba(255,255,255,0.10); color:#fff; border: 1px solid rgba(255,255,255,0.12); }
   .miniBtn:active{ transform: scale(.99); }
 
+  /* History pill */
+  .historyWrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    justify-content:flex-start;
+  }
+  .hist{
+    font-size: 12px;
+    font-weight: 1000;
+    padding: 6px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.10);
+    opacity:.95;
+  }
+
   @media (max-width: 480px){
     :root{
       --tileW: 106px;
       --tileH: 130px;
       --avatar: 34px;
-
       --cardW: 180px;
       --cardH: 240px;
-
       --titleSize: 32px;
       --btnPadY: 9px;
       --btnPadX: 14px;
@@ -319,14 +372,12 @@
     .pill{ font-size: 11px; padding: 6px 9px; border-radius: 10px; }
     .card{ font-size: 19px; }
 
-    /* mini ring shifted slightly right too */
     .p-top-mid{   left:52%; top:14%; }
     .p-top-left{  left:30%; top:18%; }
     .p-top-right{ left:72%; top:18%; }
     .p-mid-left{  left:18%; top:54%; }
     .p-mid-right{ left:66%; top:54%; }
     .p-bot-left{  left:30%; top:88%; }
-
     .center{ left:50%; top:58%; }
 
     .panel{
@@ -338,6 +389,7 @@
     }
 
     .ruleItem{ font-size: 12px; padding: 8px 8px; }
+    .hist{ font-size: 11px; padding: 5px 7px; }
   }
 
   @media (max-height: 740px){
@@ -345,10 +397,8 @@
       --tileW: 132px;
       --tileH: 162px;
       --avatar: 46px;
-
       --cardW: 210px;
       --cardH: 280px;
-
       --titleSize: 40px;
     }
     .panel{ top: 56%; }
@@ -372,6 +422,19 @@
 
         <div class="panel" id="panel">
           <div class="sectionTitle">
+            Turn <span class="chip" id="turnChip">Mike</span>
+          </div>
+
+          <div class="sectionTitle">
+            Progress <span class="chip" id="progressChip">0 / 52</span>
+          </div>
+
+          <div class="sectionTitle">
+            History <span class="chip" id="leftChip">52 left</span>
+          </div>
+          <div class="historyWrap" id="historyWrap"></div>
+
+          <div class="sectionTitle" style="margin-top:4px;">
             Sticky Powers <span class="chip">LIVE</span>
           </div>
 
@@ -410,6 +473,7 @@
         </div>
 
         <button class="drawBtn" id="drawBtn">DRAW CARD</button>
+        <button class="ghostBtn" id="restartBtn">RESTART DECK</button>
       </div>
     </div>
   </div>
@@ -444,6 +508,7 @@
   const wrap = document.getElementById("scaleWrap");
   const centerCard = document.getElementById("centerCard");
   const drawBtn = document.getElementById("drawBtn");
+  const restartBtn = document.getElementById("restartBtn");
 
   const thumbRow = document.getElementById("thumbRow");
   const questionRow = document.getElementById("questionRow");
@@ -457,8 +522,19 @@
   const addRuleBtn = document.getElementById("addRuleBtn");
   const clearRulesBtn = document.getElementById("clearRulesBtn");
 
+  const turnChip = document.getElementById("turnChip");
+  const progressChip = document.getElementById("progressChip");
+  const leftChip = document.getElementById("leftChip");
+  const historyWrap = document.getElementById("historyWrap");
+
   const activeRules = [];
   const sticky = { thumbmaster:null, questionMaster:null, heavenMaster:null };
+
+  // Turn + history state
+  let turnIdx = 0;                 // whose turn BEFORE the draw
+  let history = [];                // newest first
+  let deck = [];
+  let idx = 0;
 
   function escapeHtml(str){
     return String(str)
@@ -467,6 +543,15 @@
       .replaceAll(">","&gt;")
       .replaceAll('"',"&quot;")
       .replaceAll("'","&#039;");
+  }
+
+  function buildDeck(){
+    const suits = ["♠","♥","♦","♣"];
+    const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+    const d = [];
+    for (const r of ranks) for (const s of suits) d.push(`${r}${s}`);
+    d.sort(() => Math.random() - 0.5);
+    return d;
   }
 
   function renderSticky(){
@@ -524,7 +609,8 @@
   function tileHTML(p){
     return `
       <div class="pos ${p.pos}" data-id="${p.id}">
-        <div class="tile">
+        <div class="tile" id="tile-${p.id}">
+          <div class="turnTag">TURN</div>
           <div class="avatar"></div>
           <div>
             <div class="name">${p.name}</div>
@@ -548,62 +634,116 @@
     });
   });
 
-  const suits = ["♠","♥","♦","♣"];
-  const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
-  const deck = [];
-  for (const r of ranks) for (const s of suits) deck.push(`${r}${s}`);
-  deck.sort(() => Math.random() - 0.5);
+  function setTurn(newTurnIdx){
+    turnIdx = (newTurnIdx + players.length) % players.length;
+    const who = players[turnIdx].name;
+    turnChip.textContent = who;
 
-  let idx = 0;
-
-  function whoDrewThis(){
-    return players[(idx - 1) % players.length]?.name || "someone";
+    // update highlight
+    players.forEach(p => {
+      const el = document.getElementById(`tile-${p.id}`);
+      if (!el) return;
+      el.classList.toggle("turn", p === players[turnIdx]);
+    });
   }
 
-  drawBtn.addEventListener("click", () => {
+  function renderHistory(){
+    historyWrap.innerHTML = history.slice(0, 6).map(h => {
+      return `<div class="hist">${escapeHtml(h.card)}</div>`;
+    }).join("");
+
+    progressChip.textContent = `${idx} / 52`;
+    leftChip.textContent = `${52 - idx} left`;
+  }
+
+  function endState(){
+    centerCard.innerHTML = `
+      <div style="font-size:20px;font-weight:900;line-height:1.15">
+        All 52 cards drawn<br/>
+        <span style="font-size:14px;opacity:.8;font-family:system-ui">Restart?</span>
+      </div>
+    `;
+    drawBtn.style.display = "none";
+    restartBtn.style.display = "block";
+  }
+
+  function normalState(){
+    drawBtn.style.display = "block";
+    restartBtn.style.display = "none";
+  }
+
+  function restartGame(){
+    deck = buildDeck();
+    idx = 0;
+    history = [];
+    sticky.thumbmaster = null;
+    sticky.questionMaster = null;
+    sticky.heavenMaster = null;
+    // keep rules unless you want reset: leave as-is
+    normalState();
+    renderSticky();
+    renderHistory();
+    setTurn(0);
+    centerCard.innerHTML = "Draw a card<br/>No mercy";
+    fitToScreen();
+  }
+
+  restartBtn.addEventListener("click", restartGame);
+
+  function drawCard(){
     if (idx >= deck.length){
-      centerCard.innerHTML = `
-        <div style="font-size:20px;font-weight:900;line-height:1.15">
-          All 52 cards drawn<br/>
-          <span style="font-size:14px;opacity:.8;font-family:system-ui">Game over</span>
-        </div>
-      `;
+      endState();
       return;
     }
 
+    const drawer = players[turnIdx].name;
     const card = deck[idx++];
     const rank = card.slice(0, -1);
     const rule = kingsRules[rank] || "";
-    const who = whoDrewThis();
 
-    if (rank === "J") sticky.thumbmaster = who;
-    if (rank === "Q") sticky.questionMaster = who;
-    if (rank === "7") sticky.heavenMaster = who;
+    // Sticky powers
+    if (rank === "J") sticky.thumbmaster = drawer;
+    if (rank === "Q") sticky.questionMaster = drawer;
+    if (rank === "7") sticky.heavenMaster = drawer;
 
-    if (rank === "K") setTimeout(() => promptForRule(who), 20);
+    // King adds rule
+    if (rank === "K") setTimeout(() => promptForRule(drawer), 20);
+
+    // History (newest first)
+    history.unshift({ card, by: drawer, rank });
 
     renderSticky();
+    renderHistory();
 
     let stickyHint = "";
-    if (rank === "J") stickyHint = `<div style="margin-top:8px;font-size:12px;opacity:.78;font-family:system-ui;font-weight:900">Thumbmaster: ${escapeHtml(who)}</div>`;
-    if (rank === "Q") stickyHint = `<div style="margin-top:8px;font-size:12px;opacity:.78;font-family:system-ui;font-weight:900">Question Master: ${escapeHtml(who)}</div>`;
-    if (rank === "7") stickyHint = `<div style="margin-top:8px;font-size:12px;opacity:.78;font-family:system-ui;font-weight:900">Heaven: ${escapeHtml(who)}</div>`;
+    if (rank === "J") stickyHint = `<div style="margin-top:8px;font-size:12px;opacity:.78;font-family:system-ui;font-weight:900">Thumbmaster: ${escapeHtml(drawer)}</div>`;
+    if (rank === "Q") stickyHint = `<div style="margin-top:8px;font-size:12px;opacity:.78;font-family:system-ui;font-weight:900">Question Master: ${escapeHtml(drawer)}</div>`;
+    if (rank === "7") stickyHint = `<div style="margin-top:8px;font-size:12px;opacity:.78;font-family:system-ui;font-weight:900">Heaven: ${escapeHtml(drawer)}</div>`;
 
     centerCard.innerHTML = `
       <div style="font-size:40px;font-weight:900;margin-bottom:6px">
         ${card}
       </div>
       <div style="font-size:14px;font-weight:900;opacity:.92;line-height:1.2;font-family:system-ui">
-        ${rule}
+        ${escapeHtml(rule)}
       </div>
       ${stickyHint}
       <div style="margin-top:8px;font-size:12px;opacity:.65;font-family:system-ui;font-weight:900">
-        ${idx} / 52 • Drew: ${escapeHtml(who)}
+        Drew: ${escapeHtml(drawer)}
       </div>
     `;
 
+    // Advance turn AFTER draw
+    setTurn(turnIdx + 1);
+
+    if (idx >= 52){
+      setTimeout(endState, 80);
+    }
+
     fitToScreen();
-  });
+  }
+
+  drawBtn.addEventListener("click", drawCard);
 
   function fitToScreen(){
     if (!stage || !wrap) return;
@@ -616,8 +756,11 @@
   }
 
   window.addEventListener("load", () => {
+    deck = buildDeck();
     renderSticky();
     renderRules();
+    setTurn(0);
+    renderHistory();
     fitToScreen();
   });
   window.addEventListener("resize", () => requestAnimationFrame(fitToScreen));
