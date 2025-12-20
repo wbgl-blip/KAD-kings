@@ -11,17 +11,19 @@
     --tileBorder: rgba(255,255,255,0.06);
     --white:#fff;
 
-    --tileW: 156px;
-    --tileH: 190px;
-    --avatar: 52px;
+    /* Players: slightly larger */
+    --tileW: 170px;
+    --tileH: 206px;
+    --avatar: 56px;
 
-    --cardW: 220px;
-    --cardH: 300px;
+    /* Center card: smaller (less star) */
+    --cardW: 190px;
+    --cardH: 255px;
 
     --titleSize: 48px;
 
-    --btnPadY: 12px;
-    --btnPadX: 22px;
+    --btnPadY: 11px;
+    --btnPadX: 20px;
   }
 
   *{box-sizing:border-box}
@@ -87,31 +89,40 @@
     display:flex;
     align-items:center;
     gap:10px;
+    max-width: min(92vw, 720px);
   }
   .turnDot{
     width:10px; height:10px; border-radius:999px;
     background: rgba(255,255,255,0.95);
     box-shadow: 0 0 0 0 rgba(255,255,255,0.35);
     animation: pulse 1.2s infinite;
+    flex: 0 0 auto;
   }
   @keyframes pulse{
     0%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.30); }
     70%{ box-shadow: 0 0 0 12px rgba(255,255,255,0.00); }
     100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.00); }
   }
+  .turnText{
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .turnSmall{
-    opacity:.75;
+    opacity:.70;
     font-weight: 900;
     letter-spacing: .06em;
     font-size: 11px;
     text-transform:none;
+    margin-left:auto;
+    white-space: nowrap;
   }
 
   .stage{
     position:relative;
-    width:min(980px, 96vw);
+    width:min(1040px, 98vw);
     height: calc(100% - 118px);
-    max-height: 820px;
+    max-height: 900px;
   }
 
   .scaleWrap{
@@ -190,7 +201,7 @@
   .name{
     margin-top:-6px;
     font-weight:950;
-    font-size: 17px;
+    font-size: 18px;
     text-align:center;
   }
 
@@ -225,15 +236,15 @@
     background:#fff;
     color:#000;
     border-radius: 22px;
-    box-shadow: 0 18px 46px rgba(0,0,0,.6);
+    box-shadow: 0 18px 46px rgba(0,0,0,.55);
     display:flex;
     align-items:center;
     justify-content:center;
-    padding: 0 22px;
+    padding: 0 18px;
     text-align:center;
     font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     font-weight: 800;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 1.15;
   }
 
@@ -274,21 +285,23 @@
   }
   .ghostBtn:active{ transform: translateX(-50%) scale(.99); }
 
-  .p-top-mid{   left:52%; top:13%; }
-  .p-top-left{  left:32%; top:18%; }
-  .p-top-right{ left:72%; top:18%; }
-  .p-mid-left{  left:25%; top:56%; }
-  .p-mid-right{ left:69%; top:56%; }
-  .p-bot-left{  left:32%; top:88%; }
+  /* ✅ SAFER POSITIONS: more spacing, less overlap */
+  .p-top-mid{   left:50%; top:13%; }
+  .p-top-left{  left:26%; top:19%; }
+  .p-top-right{ left:74%; top:19%; }
+  .p-mid-left{  left:20%; top:56%; }
+  .p-mid-right{ left:64%; top:56%; }  /* shifted left to avoid panel */
+  .p-bot-left{  left:30%; top:89%; }
 
-  .center{ left:50%; top:58%; }
+  /* Center card moved slightly left and up to balance with right panel */
+  .center{ left:46%; top:58%; }
 
   .panel{
     position:absolute;
-    right: 6px;
+    right: 0px;
     top: 56%;
     transform: translateY(-50%);
-    width: 210px;
+    width: 196px;            /* slimmer */
     padding: 12px;
     border-radius: 18px;
     background: rgba(11,11,11,.92);
@@ -360,7 +373,7 @@
     font-weight: 1000;
     opacity:.85;
     text-align:right;
-    max-width: 120px;
+    max-width: 112px;
     overflow:hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -425,7 +438,6 @@
   .miniBtn.dark{ background: rgba(255,255,255,0.10); color:#fff; border: 1px solid rgba(255,255,255,0.12); }
   .miniBtn:active{ transform: scale(.99); }
 
-  /* Toast */
   #toast{
     position:fixed;
     left:50%;
@@ -450,13 +462,16 @@
     pointer-events:none;
   }
 
+  /* ✅ Mobile portrait tuning */
   @media (max-width: 480px){
     :root{
-      --tileW: 106px;
-      --tileH: 130px;
-      --avatar: 34px;
-      --cardW: 180px;
-      --cardH: 240px;
+      --tileW: 112px;
+      --tileH: 142px;
+      --avatar: 36px;
+
+      --cardW: 160px;
+      --cardH: 210px;
+
       --titleSize: 32px;
       --btnPadY: 9px;
       --btnPadX: 14px;
@@ -464,24 +479,36 @@
 
     .turnSmall{ display:none; }
 
-    .p-top-mid{   left:52%; top:14%; }
-    .p-top-left{  left:30%; top:18%; }
+    /* tighter but safe */
+    .p-top-mid{   left:50%; top:14%; }
+    .p-top-left{  left:28%; top:18%; }
     .p-top-right{ left:72%; top:18%; }
     .p-mid-left{  left:18%; top:54%; }
-    .p-mid-right{ left:66%; top:54%; }
+    .p-mid-right{ left:60%; top:54%; }
     .p-bot-left{  left:30%; top:88%; }
-    .center{ left:50%; top:58%; }
+    .center{ left:46%; top:58%; }
 
     .panel{
-      right: 6px;
-      top: 69%;
-      width: 176px;
+      right: 2px;
+      top: 70%;
+      width: 170px;
       padding: 10px;
       gap:10px;
     }
 
-    .hist{ font-size: 11px; padding: 5px 7px; }
-    .powerBtn{ padding: 9px 8px; font-size: 12px; }
+    .card{ font-size: 18px; }
+    .name{ font-size: 14px; }
+  }
+
+  /* If height is tight, shrink a bit */
+  @media (max-height: 760px){
+    :root{
+      --tileW: 156px;
+      --tileH: 192px;
+      --cardW: 180px;
+      --cardH: 240px;
+      --titleSize: 40px;
+    }
   }
 </style>
 </head>
@@ -495,7 +522,7 @@
 
     <div class="turnBanner">
       <span class="turnDot"></span>
-      <span id="turnBannerText">MIKE’S TURN</span>
+      <span class="turnText" id="turnBannerText">MIKE’S TURN</span>
       <span class="turnSmall">tap a player to set turn</span>
     </div>
 
@@ -634,15 +661,13 @@
   let deck = [];
   let idx = 0;
 
-  // Sneaky round: no countdown shown anywhere.
-  // Change this number if you want it more/less evil.
+  // Sneaky round length (no visible countdown)
   const ROUND_MS = 4500;
 
   let round = {
     active: false,
     type: null,           // "J" | "7"
     timerId: null,
-    endAt: 0,
     lastTap: null,        // {playerId, t}
   };
 
@@ -813,7 +838,6 @@
       restartRoundBtn.disabled = true;
       return;
     }
-    // No timer, no seconds, just "LIVE"
     roundChip.textContent = `${round.type} LIVE`;
     restartRoundBtn.disabled = false;
   }
@@ -822,24 +846,18 @@
     round.active = false;
     round.type = null;
     round.lastTap = null;
-    round.endAt = 0;
     if (round.timerId) clearTimeout(round.timerId);
     round.timerId = null;
     updateRoundChip();
   }
 
   function startRound(type){
-    // type = "J" or "7"
     clearRound();
     round.active = true;
     round.type = type;
     round.lastTap = null;
-    round.endAt = Date.now() + ROUND_MS;
 
-    // Sneaky: don’t announce start loudly. Tiny cue only:
     updateRoundChip();
-
-    // End after fixed time, no visible countdown
     round.timerId = setTimeout(() => finishRound(), ROUND_MS);
   }
 
@@ -850,7 +868,6 @@
     const label = (type === "J") ? "Thumb (J)" : "Heaven (7)";
 
     if (!round.lastTap){
-      // If nobody taps, nothing happens (still sneaky)
       clearRound();
       return;
     }
@@ -860,16 +877,15 @@
 
     addDrink(loserId, 1);
 
-    // Small result, not a whole countdown show
     showToast(`${loserName} drinks 🥴 (${label})`);
     centerCard.innerHTML = `
-      <div style="font-size:18px;font-weight:900;line-height:1.1">
+      <div style="font-size:16px;font-weight:900;line-height:1.1">
         LAST TAP
       </div>
-      <div style="margin-top:10px;font-size:36px;font-weight:900">
+      <div style="margin-top:10px;font-size:32px;font-weight:900">
         ${escapeHtml(loserName)}
       </div>
-      <div style="margin-top:8px;font-size:14px;font-weight:900;opacity:.85;font-family:system-ui">
+      <div style="margin-top:8px;font-size:13px;font-weight:900;opacity:.85;font-family:system-ui">
         +1 drink • ${label}
       </div>
     `;
@@ -901,9 +917,9 @@
   // ---- Cards ----
   function endState(){
     centerCard.innerHTML = `
-      <div style="font-size:20px;font-weight:900;line-height:1.15">
+      <div style="font-size:18px;font-weight:900;line-height:1.15">
         All 52 cards drawn<br/>
-        <span style="font-size:14px;opacity:.8;font-family:system-ui">Restart?</span>
+        <span style="font-size:13px;opacity:.8;font-family:system-ui">Restart?</span>
       </div>
     `;
     drawBtn.style.display = "none";
@@ -956,13 +972,13 @@
     renderHistory();
 
     centerCard.innerHTML = `
-      <div style="font-size:40px;font-weight:900;margin-bottom:6px">
+      <div style="font-size:34px;font-weight:900;margin-bottom:6px">
         ${card}
       </div>
-      <div style="font-size:14px;font-weight:900;opacity:.92;line-height:1.2;font-family:system-ui">
+      <div style="font-size:13px;font-weight:900;opacity:.92;line-height:1.2;font-family:system-ui">
         ${escapeHtml(rule)}
       </div>
-      <div style="margin-top:8px;font-size:12px;opacity:.65;font-family:system-ui;font-weight:900">
+      <div style="margin-top:8px;font-size:11px;opacity:.65;font-family:system-ui;font-weight:900">
         Drew: ${escapeHtml(drawer)}
       </div>
     `;
@@ -977,11 +993,18 @@
   // ---- Fit ----
   function fitToScreen(){
     if (!stage || !wrap) return;
+
+    // Reset before measuring
     wrap.style.transform = "scale(1)";
+
     const stageRect = stage.getBoundingClientRect();
     const wrapRect = wrap.getBoundingClientRect();
-    const scaleX = stageRect.width / wrapRect.width;
-    const scaleY = stageRect.height / wrapRect.height;
+
+    // Add a small safety margin so nothing kisses edges
+    const margin = 0.98;
+    const scaleX = (stageRect.width / wrapRect.width) * margin;
+    const scaleY = (stageRect.height / wrapRect.height) * margin;
+
     wrap.style.transform = `scale(${Math.min(1, scaleX, scaleY)})`;
   }
 
