@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState } from "react";
 import "./styles.css";
 
 const PLAYERS = ["Beau", "Mike", "Jess", "Alex", "Emily"];
