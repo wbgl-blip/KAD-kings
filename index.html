@@ -73,13 +73,14 @@
     line-height:1;
   }
 
+  /* Turn banner */
   .turnBanner{
     margin: 0 0 14px;
-    padding: 6px 10px;
+    padding: 7px 12px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 14px 34px rgba(0,0,0,.40);
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.16);
+    box-shadow: 0 18px 46px rgba(0,0,0,.55);
     font-weight: 1000;
     letter-spacing: .12em;
     text-transform: uppercase;
@@ -90,17 +91,18 @@
     max-width: min(92vw, 680px);
     position: relative;
     z-index: 30;
+    backdrop-filter: blur(6px);
   }
   .turnDot{
     width:9px; height:9px; border-radius:999px;
     background: rgba(255,255,255,0.95);
     box-shadow: 0 0 0 0 rgba(255,255,255,0.35);
-    animation: pulse 1.2s infinite;
+    animation: pulse 1.15s infinite;
     flex: 0 0 auto;
   }
   @keyframes pulse{
     0%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.30); }
-    70%{ box-shadow: 0 0 0 12px rgba(255,255,255,0.00); }
+    70%{ box-shadow: 0 0 0 14px rgba(255,255,255,0.00); }
     100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.00); }
   }
   .turnText{
@@ -109,7 +111,7 @@
     white-space: nowrap;
   }
   .turnSmall{
-    opacity:.70;
+    opacity:.75;
     font-weight: 900;
     letter-spacing: .06em;
     font-size: 10px;
@@ -134,6 +136,7 @@
 
   .pos{ position:absolute; transform:translate(-50%,-50%); }
 
+  /* Player tile */
   .tile{
     width: var(--tileW);
     height: var(--tileH);
@@ -148,13 +151,40 @@
     padding: 16px 16px 14px;
     position:relative;
     cursor:pointer;
+    overflow:hidden;
   }
 
+  /* ✅ MUCH stronger turn highlight */
   .tile.turn{
-    border-color: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.32);
+    transform: translateZ(0) scale(1.04);
     box-shadow:
-      0 0 0 2px rgba(255,255,255,0.07),
-      0 22px 52px rgba(0,0,0,0.76);
+      0 0 0 2px rgba(255,255,255,0.10),
+      0 28px 70px rgba(0,0,0,0.80);
+  }
+  .tile.turn::before{
+    content:"";
+    position:absolute;
+    inset:-14px;
+    background: radial-gradient(circle at 50% 18%, rgba(255,255,255,0.28), transparent 55%);
+    filter: blur(6px);
+    opacity: .85;
+    pointer-events:none;
+  }
+  .tile.turn::after{
+    content:"";
+    position:absolute;
+    inset:-6px;
+    border-radius: 26px;
+    border: 1px solid rgba(255,255,255,0.22);
+    opacity:.85;
+    animation: ring 1.25s infinite;
+    pointer-events:none;
+  }
+  @keyframes ring{
+    0%{ transform: scale(1); opacity: .75; }
+    70%{ transform: scale(1.04); opacity: .05; }
+    100%{ transform: scale(1); opacity: 0; }
   }
 
   .turnTag{
@@ -166,28 +196,12 @@
     letter-spacing: .10em;
     padding: 4px 8px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.14);
-    border: 1px solid rgba(255,255,255,0.14);
-    opacity:.95;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.18);
+    opacity:.98;
     display:none;
   }
   .tile.turn .turnTag{ display:block; }
-
-  .tapBadge{
-    position:absolute;
-    left: 10px;
-    top: 10px;
-    font-size: 11px;
-    font-weight: 1000;
-    letter-spacing: .10em;
-    padding: 4px 8px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.14);
-    opacity:.95;
-    display:none;
-  }
-  .tile.tapping .tapBadge{ display:block; }
 
   .avatar{
     width: var(--avatar);
@@ -228,6 +242,25 @@
   }
   .pill:active{ transform:scale(.99); }
 
+  /* ✅ Round reaction button (only shows during 7/J rounds) */
+  .reactBtn{
+    display:none;
+    width: 100%;
+    border:0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-weight: 1000;
+    letter-spacing: .08em;
+    background: rgba(255,255,255,0.10);
+    color:#fff;
+    border: 1px solid rgba(255,255,255,0.14);
+    cursor:pointer;
+  }
+  body.roundActive .pill{ display:none; }
+  body.roundActive .reactBtn{ display:block; }
+  .reactBtn:active{ transform:scale(.99); }
+
+  /* Center card */
   .card{
     width: var(--cardW);
     height: var(--cardH);
@@ -288,7 +321,7 @@
   .drawBtn{
     position:absolute;
     left:50%;
-    bottom: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px) + 16px);
     transform: translateX(-50%);
     background:#fff;
     color:#000;
@@ -306,7 +339,7 @@
   .ghostBtn{
     position:absolute;
     left:50%;
-    bottom: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px) + 16px);
     transform: translateX(-50%);
     background: rgba(255,255,255,0.12);
     color:#fff;
@@ -330,7 +363,7 @@
   .p-bot-left{  left:26%; top:90%; }
   .center{ left:41%; top:60%; }
 
-  /* Right panel (desktop) */
+  /* HUD button (panel placeholder) */
   .panel{
     position:absolute;
     right: 0px;
@@ -474,7 +507,7 @@
   #toast{
     position:fixed;
     left:50%;
-    bottom:22px;
+    bottom: calc(22px + env(safe-area-inset-bottom, 0px) + 14px);
     transform:translateX(-50%);
     padding:10px 12px;
     border-radius:999px;
@@ -495,7 +528,7 @@
     pointer-events:none;
   }
 
-  /* ✅ Bottom sheet for mobile panel */
+  /* Bottom sheet */
   .sheetOverlay{
     position:fixed; inset:0;
     background: rgba(0,0,0,0.55);
@@ -509,7 +542,7 @@
     left: 0;
     right: 0;
     bottom: -100%;
-    padding: 12px 12px 18px;
+    padding: 12px 12px calc(18px + env(safe-area-inset-bottom, 0px));
     transition: transform .22s ease, bottom .22s ease;
     z-index: 100;
   }
@@ -557,7 +590,7 @@
     bottom: 10px;
   }
 
-  /* ✅ Mobile portrait */
+  /* Mobile */
   @media (max-width: 480px){
     :root{
       --tileW: 112px;
@@ -587,11 +620,11 @@
     .cardMid{ font-size: 17px; }
     .name{ font-size: 14px; }
 
-    /* ✅ Convert panel into floating HUD button */
+    /* HUD button */
     .panel{
       position: fixed;
       right: 10px;
-      bottom: 90px;
+      bottom: calc(180px + env(safe-area-inset-bottom, 0px));
       top: auto;
       transform: none;
       width: 56px;
@@ -601,6 +634,7 @@
       overflow: hidden;
       z-index: 70;
       cursor:pointer;
+      display:block;
     }
     .panel > *{ display:none; }
     .panel::after{
@@ -613,12 +647,8 @@
       font-weight:900;
       color:white;
     }
-
-    /* sheet only matters on mobile */
-    .sheet{ display:block; }
   }
 
-  /* Desktop: hide sheet UI */
   @media (min-width: 481px){
     .sheetOverlay, .sheet{ display:none; }
   }
@@ -634,7 +664,7 @@
 
     <div class="turnBanner">
       <span class="turnDot"></span>
-      <span class="turnText" id="turnBannerText">MIKE’S TURN</span>
+      <span class="turnText" id="turnBannerText">BEAU’S TURN</span>
       <span class="turnSmall">tap a player to set turn</span>
     </div>
 
@@ -648,7 +678,7 @@
           </div>
         </div>
 
-        <!-- Desktop panel / Mobile HUD -->
+        <!-- Mobile HUD -->
         <div class="panel" id="panelHud" aria-label="Open panel"></div>
 
         <button class="drawBtn" id="drawBtn">DRAW CARD</button>
@@ -741,11 +771,11 @@
     "4": "For whores – everyone drinks",
     "5": "Guys – all guys drink",
     "6": "For dicks – everyone drinks",
-    "7": "Heaven – last to point to heaven drinks",
+    "7": "Heaven – last to react drinks",
     "8": "Mate – pick a drinking buddy",
     "9": "Rhyme – say a word, others rhyme",
     "10": "Categories – pick a category",
-    J: "Thumbmaster – last thumb down drinks",
+    J: "Thumbmaster – last to react drinks",
     Q: "Question master – answer questions or drink",
     K: "King – make a rule"
   };
@@ -789,7 +819,6 @@
   function isMobile(){
     return window.matchMedia && window.matchMedia("(max-width: 480px)").matches;
   }
-
   function openSheet(){
     if (!isMobile()) return;
     document.body.classList.add("sheetOpen");
@@ -798,9 +827,7 @@
     document.body.classList.remove("sheetOpen");
   }
 
-  panelHud.addEventListener("click", () => {
-    if (isMobile()) openSheet();
-  });
+  panelHud.addEventListener("click", () => { if (isMobile()) openSheet(); });
   sheetOverlay.addEventListener("click", closeSheet);
   sheetClose.addEventListener("click", closeSheet);
 
@@ -812,13 +839,16 @@
   let deck = [];
   let idx = 0;
 
+  // Sneaky window (no visible countdown)
   const ROUND_MS = 4500;
 
+  // Round state for J and 7
   let round = {
     active: false,
-    type: null,
+    type: null,        // "J" or "7"
+    startedBy: null,   // name of power owner
     timerId: null,
-    lastTap: null,
+    lastReact: null,   // {playerId, t}
   };
 
   function escapeHtml(str){
@@ -933,13 +963,13 @@
       <div class="pos ${p.pos}" data-id="${p.id}">
         <div class="tile" id="tile-${p.id}">
           <div class="turnTag">TURN</div>
-          <div class="tapBadge">TAP!</div>
           <div class="avatar"></div>
           <div>
             <div class="name">${p.name}</div>
             <div class="stats"><span>🍺</span><span class="drinkCount">${p.drinks}</span></div>
           </div>
           <button class="pill">+1 Beer</button>
+          <button class="reactBtn" data-react="${p.id}">REACT</button>
         </div>
       </div>
     `;
@@ -947,6 +977,7 @@
 
   wrap.insertAdjacentHTML("afterbegin", players.map(tileHTML).join(""));
 
+  // +1 Beer (only when not roundActive; CSS hides it during rounds)
   wrap.querySelectorAll(".pos[data-id] .pill").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -955,77 +986,104 @@
     });
   });
 
+  // Tap tile to set turn (only when not in round)
   wrap.querySelectorAll(".pos[data-id] .tile").forEach((tile) => {
     tile.addEventListener("click", (e) => {
+      if (round.active) return; // during rounds, use REACT buttons only
       const id = e.currentTarget.closest(".pos[data-id]").getAttribute("data-id");
-
-      if (round.active){
-        round.lastTap = { playerId: id, t: Date.now() };
-        flashTap(id);
-        return;
-      }
-
       const i = players.findIndex(p => p.id === id);
       if (i >= 0) setTurn(i);
     });
   });
 
-  function flashTap(playerId){
-    const el = document.getElementById(`tile-${playerId}`);
-    if (!el) return;
-    el.classList.add("tapping");
-    flashTap._t = flashTap._t || {};
-    clearTimeout(flashTap._t[playerId]);
-    flashTap._t[playerId] = setTimeout(() => el.classList.remove("tapping"), 220);
-  }
+  // ✅ REACT buttons for J/7 rounds
+  wrap.querySelectorAll(".reactBtn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!round.active) return;
+
+      const playerId = e.currentTarget.getAttribute("data-react");
+      round.lastReact = { playerId, t: Date.now() };
+
+      // tiny feedback without “timer vibes”
+      const tile = document.getElementById(`tile-${playerId}`);
+      if (tile){
+        tile.style.transform = "scale(1.02)";
+        clearTimeout(tile._b);
+        tile._b = setTimeout(() => tile.style.transform = "", 120);
+      }
+    });
+  });
 
   function updateRoundChip(){
     if (!round.active){
       roundChip.textContent = "READY";
       restartRoundBtn.disabled = true;
+      document.body.classList.remove("roundActive");
       return;
     }
     roundChip.textContent = `${round.type} LIVE`;
     restartRoundBtn.disabled = false;
+    document.body.classList.add("roundActive");
   }
 
   function clearRound(){
     round.active = false;
     round.type = null;
-    round.lastTap = null;
+    round.startedBy = null;
+    round.lastReact = null;
     if (round.timerId) clearTimeout(round.timerId);
     round.timerId = null;
     updateRoundChip();
   }
 
   function startRound(type){
+    // only the power owner should start it (we enforce by enabling buttons only when owner exists)
     clearRound();
     round.active = true;
     round.type = type;
-    round.lastTap = null;
+    round.lastReact = null;
+
+    if (type === "J") round.startedBy = sticky.thumbmaster;
+    if (type === "7") round.startedBy = sticky.heavenMaster;
+
     updateRoundChip();
-    round.timerId = setTimeout(() => finishRound(), ROUND_MS);
+
+    // No visible countdown, just ends after a short “sneaky” window
+    round.timerId = setTimeout(finishRound, ROUND_MS);
+
+    // subtle cue in center card (not a timer)
+    setCenterCardResult({
+      face: type === "J" ? "J" : "7",
+      rule: "REACT NOW",
+      by: `${round.startedBy || "Someone"} started`
+    });
+
+    // optionally close sheet so board is clear
+    closeSheet();
   }
 
   function finishRound(){
     if (!round.active) return;
 
-    const type = round.type;
-    const label = (type === "J") ? "Thumb (J)" : "Heaven (7)";
+    const label = (round.type === "J") ? "Thumb (J)" : "Heaven (7)";
 
-    if (!round.lastTap){
+    // If nobody reacted, no punishment
+    if (!round.lastReact){
+      showToast("No one reacted 🤫");
       clearRound();
+      setCenterCardIdle();
       return;
     }
 
-    const loserId = round.lastTap.playerId;
+    const loserId = round.lastReact.playerId;
     const loserName = players.find(p => p.id === loserId)?.name || "Someone";
 
     addDrink(loserId, 1);
     showToast(`${loserName} drinks 🥴 (${label})`);
 
     setCenterCardResult({
-      face: "LAST TAP",
+      face: "LAST",
       rule: `${loserName} +1 drink`,
       by: label
     });
@@ -1047,6 +1105,7 @@
   clearRoundBtn.addEventListener("click", () => {
     clearRound();
     showToast("CLEARED");
+    setCenterCardIdle();
   });
 
   restartRoundBtn.addEventListener("click", () => {
@@ -1121,10 +1180,12 @@
     const rank = card.slice(0, -1);
     const rule = kingsRules[rank] || "";
 
+    // sticky owners
     if (rank === "J") sticky.thumbmaster = drawer;
     if (rank === "Q") sticky.questionMaster = drawer;
     if (rank === "7") sticky.heavenMaster = drawer;
 
+    // King adds rule (game continues until all 52)
     if (rank === "K") setTimeout(() => promptForRule(drawer), 20);
 
     history.unshift({ card, by: drawer, rank });
@@ -1160,6 +1221,11 @@
     wrap.style.transform = `scale(${Math.min(1, scaleX, scaleY)})`;
   }
 
+  // Sheet open/close
+  function closeSheet(){
+    document.body.classList.remove("sheetOpen");
+  }
+
   window.addEventListener("load", () => {
     deck = buildDeck();
     renderSticky();
@@ -1177,10 +1243,29 @@
   });
   window.addEventListener("orientationchange", () => setTimeout(() => { closeSheet(); fitToScreen(); }, 80));
 
-  // ESC to close sheet on desktop keyboards (safe)
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeSheet();
   });
 </script>
+
+<script>
+  // Mobile sheet controls (needs to be after closeSheet definition)
+  const panelHud = document.getElementById("panelHud");
+  const sheetOverlay = document.getElementById("sheetOverlay");
+  const sheetClose = document.getElementById("sheetClose");
+
+  function isMobile(){
+    return window.matchMedia && window.matchMedia("(max-width: 480px)").matches;
+  }
+  function openSheet(){
+    if (!isMobile()) return;
+    document.body.classList.add("sheetOpen");
+  }
+
+  panelHud.addEventListener("click", () => { if (isMobile()) openSheet(); });
+  sheetOverlay.addEventListener("click", closeSheet);
+  sheetClose.addEventListener("click", closeSheet);
+</script>
+
 </body>
 </html>
