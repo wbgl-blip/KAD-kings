@@ -1,0 +1,154 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  font-family: system-ui, sans-serif;
+}
+
+/* App shell */
+.app {
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* Title */
+.title {
+  text-align: center;
+  margin: 24px 0;
+}
+
+/* Toggle */
+.layout-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 1000;
+}
+
+.layout-toggle button {
+  background: #111;
+  color: white;
+  border: 1px solid #333;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.layout-toggle .active {
+  background: white;
+  color: black;
+}
+
+/* Table layout */
+.table {
+  display: flex;
+  gap: 24px;
+  padding: 16px;
+}
+
+/* Players */
+.players {
+  display: grid;
+  gap: 16px;
+}
+
+/* Player card */
+.player {
+  background: #0e0e0e;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  border: 1px solid #222;
+}
+
+.player.active {
+  border: 2px solid white;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  background: #555;
+  border-radius: 50%;
+  margin: 0 auto 8px;
+}
+
+.player button {
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* Card area */
+.card-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.card {
+  width: 160px;
+  height: 220px;
+  background: white;
+  color: black;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.draw {
+  padding: 10px 16px;
+}
+
+/* Sidebar */
+.sidebar {
+  background: #0b0b0b;
+  border-radius: 16px;
+  padding: 16px;
+  min-width: 220px;
+}
+
+.panel {
+  margin-bottom: 16px;
+}
+
+.restart {
+  width: 100%;
+  padding: 10px;
+  background: white;
+  color: black;
+  border-radius: 10px;
+}
+
+/* DESKTOP */
+.app.desktop .players {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.app.desktop .table {
+  justify-content: center;
+}
+
+/* MOBILE */
+.app.mobile .table {
+  flex-direction: column;
+}
+
+.app.mobile .players {
+  grid-template-columns: 1fr;
+}
+
+.app.mobile .sidebar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 16px 16px 0 0;
+}
