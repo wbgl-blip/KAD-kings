@@ -9,45 +9,53 @@
   :root{
     --bg:#000;
     --white:#fff;
-    --panel: rgba(12,12,12,.92);
 
-    --title: 54px;
+    --title: 62px;
 
-    /* Players > card */
-    --tileW: 176px;
-    --tileH: 206px;
-    --avatar: 58px;
+    /* main scale */
+    --tileW: 182px;
+    --tileH: 212px;
+    --avatar: 60px;
 
-    /* Card smaller + softer */
-    --cardW: 150px;
-    --cardH: 208px;
+    /* card is intentionally quieter */
+    --cardW: 148px;
+    --cardH: 206px;
 
     --btnY: 10px;
     --btnX: 18px;
+
+    --panelW: 300px;
+    --radius: 24px;
+
+    --line: rgba(255,255,255,.10);
+    --line2: rgba(255,255,255,.06);
+    --glass: rgba(12,12,12,.90);
+    --glass2: rgba(255,255,255,.06);
   }
 
-  *{box-sizing:border-box}
-  html,body{
+  *{ box-sizing:border-box }
+  html, body{
     margin:0;
     height:100%;
     overflow:hidden;
-    background:var(--bg);
-    color:var(--white);
+    background: var(--bg);
+    color: var(--white);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     -webkit-user-select:none;
     user-select:none;
     touch-action: manipulation;
   }
 
+  /* Background */
   .bg1{
     position:fixed; inset:0;
-    background: radial-gradient(circle at center, rgba(255,255,255,0.085) 0%, rgba(0,0,0,0.92) 58%, rgba(0,0,0,1) 100%);
+    background: radial-gradient(circle at center, rgba(255,255,255,0.085) 0%, rgba(0,0,0,0.93) 58%, rgba(0,0,0,1) 100%);
     pointer-events:none;
   }
   .bg2{
     position:fixed; inset:0;
-    opacity:.22;
-    filter: blur(52px);
+    opacity:.20;
+    filter: blur(56px);
     background:
       radial-gradient(circle at 22% 30%, rgba(255,255,255,0.11), transparent 46%),
       radial-gradient(circle at 76% 62%, rgba(255,255,255,0.09), transparent 42%);
@@ -62,87 +70,29 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    padding: 8px 10px calc(12px + env(safe-area-inset-bottom, 0px));
-    gap: 10px;
+    padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+    gap: 12px;
   }
 
   h1{
-    margin: 6px 0 0;
+    margin: 8px 0 0;
     font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     font-size: var(--title);
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: .06em;
     line-height: 1;
     text-align:center;
   }
 
-  /* Top status / round banner */
-  .statusBar{
-    width: min(1120px, 96vw);
-    display:flex;
-    gap:10px;
-    align-items:center;
-    justify-content:center;
-    flex-wrap:wrap;
-    z-index: 50;
-  }
-
-  .pill{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding: 8px 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.10);
-    border: 1px solid rgba(255,255,255,.14);
-    box-shadow: 0 18px 46px rgba(0,0,0,.55);
-    font-weight: 1000;
-    letter-spacing:.12em;
-    text-transform: uppercase;
-    font-size: 11px;
-    backdrop-filter: blur(6px);
-  }
-
-  .dot{
-    width: 9px; height: 9px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.92);
-    box-shadow: 0 0 0 0 rgba(255,255,255,0.28);
-    animation: pulse 1.2s infinite;
-  }
-  @keyframes pulse{
-    0%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.26); }
-    70%{ box-shadow: 0 0 0 14px rgba(255,255,255,0.00); }
-    100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.00); }
-  }
-
-  .roundPill{
-    display:none;
-    padding: 8px 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.14);
-    border: 1px solid rgba(255,255,255,.18);
-    font-weight: 1000;
-    letter-spacing: .10em;
-    text-transform: uppercase;
-    font-size: 11px;
-  }
-  body.roundActive .roundPill{ display:flex; align-items:center; gap:10px; }
-  .flash{ animation: flash 0.8s infinite; }
-  @keyframes flash{
-    0%, 100%{ filter: brightness(1); }
-    50%{ filter: brightness(1.35); }
-  }
-
   /* Stage */
   .stage{
-    width: min(1240px, 96vw);
+    width: min(1280px, 96vw);
     flex: 1;
     display:grid;
-    grid-template-columns: 1fr 280px;  /* board + panel */
-    gap: 18px;
+    grid-template-columns: 1fr var(--panelW);
+    gap: 22px;
+    align-items: start;
     min-height: 0;
-    align-items: start;               /* ✅ top align everything */
   }
 
   /* Board */
@@ -150,41 +100,62 @@
     min-width: 0;
     height: 100%;
     display:flex;
-    align-items:center;
     justify-content:center;
-    padding-top: 6px;                 /* tiny nudge */
+    align-items:start;
+    padding-top: 6px;
+    position:relative;
+  }
+
+  /* subtle "dock" divider glow so board + panel feel unified */
+  .board:after{
+    content:"";
+    position:absolute;
+    right: -11px;
+    top: 10px;
+    width: 1px;
+    height: calc(100% - 20px);
+    background: linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.00),
+      rgba(255,255,255,0.10),
+      rgba(255,255,255,0.00)
+    );
+    opacity:.55;
+    pointer-events:none;
   }
 
   .boardGrid{
     width: 100%;
-    max-width: 760px;
-    height: 100%;
+    max-width: 780px;
     display:grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: auto auto auto;
-    gap: 16px;
-    align-content: start;             /* ✅ board starts at top */
+    gap: 18px;
+    align-content: start;
     justify-items: center;
   }
 
-  .slot{ display:flex; justify-content:center; width:100%; }
+  .slot{ width:100%; display:flex; justify-content:center; }
 
-  /* Center block */
+  /* Center */
   .centerWrap{
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:12px;
+    gap: 12px;
   }
 
-  /* Card (less spotlight) */
   .card{
     width: var(--cardW);
     height: var(--cardH);
-    background: #f7f7f7;              /* softer than pure white */
+    border-radius: var(--radius);
+    background: #f6f6f6;
     color:#000;
-    border-radius: 22px;
-    box-shadow: 0 16px 44px rgba(0,0,0,.52);
+    box-shadow:
+      0 18px 52px rgba(0,0,0,.50),
+      0 0 0 1px rgba(0,0,0,.08) inset;
+    position:relative;
+    overflow:hidden;
     display:flex;
     flex-direction:column;
     padding: 14px 16px 12px;
@@ -192,26 +163,25 @@
     font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     font-weight: 900;
     line-height: 1.15;
-    position:relative;
-    overflow:hidden;
   }
-  /* subtle vignette inside card so it doesn’t scream */
+
+  /* make the card quieter: slight inner fade + reduced contrast */
   .card:before{
     content:"";
     position:absolute; inset:0;
-    background: radial-gradient(circle at 50% 12%, rgba(0,0,0,.10), transparent 55%);
+    background:
+      radial-gradient(circle at 50% 10%, rgba(0,0,0,.14), transparent 56%),
+      linear-gradient(to bottom, rgba(255,255,255,.10), rgba(255,255,255,0));
+    opacity:.45;
     pointer-events:none;
-    mix-blend-mode:multiply;
-    opacity:.55;
   }
-
   .cardTop, .cardMid, .cardFooter{ position:relative; z-index:1; }
 
   .cardTop{
     display:flex;
-    align-items:flex-start;
     justify-content:center;
-    gap:10px;
+    align-items:flex-start;
+    gap: 10px;
     min-height: 48px;
   }
   .cardFace{
@@ -220,11 +190,11 @@
     line-height: 1;
   }
   .cardRule{
+    font-family: system-ui;
     font-size: 12px;
     font-weight: 1000;
-    font-family: system-ui;
-    opacity:.86;
-    line-height: 1.15;
+    opacity:.82;
+    line-height: 1.12;
     text-align:left;
     max-width: 96px;
   }
@@ -235,12 +205,13 @@
     justify-content:center;
     font-size: 17px;
     padding: 8px 8px;
+    opacity:.96;
   }
   .cardFooter{
     font-family: system-ui;
     font-size: 11px;
     font-weight: 1000;
-    opacity:.65;
+    opacity:.62;
     min-height: 16px;
   }
 
@@ -252,19 +223,21 @@
     font-weight: 1000;
     letter-spacing:.10em;
     padding: var(--btnY) var(--btnX);
-    box-shadow: 0 14px 34px rgba(0,0,0,.50);
+    box-shadow: 0 14px 34px rgba(0,0,0,.52);
     cursor:pointer;
   }
   .drawBtn:active{ transform: scale(.99); }
 
-  /* Player tile */
+  /* Tiles */
   .tile{
     width: var(--tileW);
     height: var(--tileH);
-    border-radius: 24px;
+    border-radius: var(--radius);
     background: rgba(11,11,11,.96);
-    border: 1px solid rgba(255,255,255,.08);
-    box-shadow: 0 18px 44px rgba(0,0,0,0.72);
+    border: 1px solid var(--line2);
+    box-shadow:
+      0 22px 62px rgba(0,0,0,.76),
+      0 0 0 1px rgba(255,255,255,.02) inset;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -275,14 +248,33 @@
     cursor:pointer;
   }
 
-  /* Turn highlight (stronger + clearer) */
+  /* unify the "glass" look */
+  .tile:before{
+    content:"";
+    position:absolute; inset:-1px;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,255,255,.06), transparent 42%),
+      radial-gradient(circle at 70% 0%, rgba(255,255,255,.05), transparent 46%);
+    opacity:.55;
+    pointer-events:none;
+  }
+
+  /* Premium turn highlight: ring + subtle top glow */
   .tile.turn{
-    border-color: rgba(255,255,255,0.40);
+    border-color: rgba(255,255,255,.24);
     box-shadow:
       0 0 0 2px rgba(255,255,255,0.12),
-      0 26px 70px rgba(0,0,0,0.82),
-      0 0 70px rgba(255,255,255,0.14);
+      0 28px 76px rgba(0,0,0,0.85),
+      0 0 90px rgba(255,255,255,0.10);
   }
+  .tile.turn:after{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 50% 12%, rgba(255,255,255,.16), transparent 56%);
+    opacity:.35;
+    pointer-events:none;
+  }
+
   .turnTag{
     position:absolute;
     top:10px; right:10px;
@@ -291,10 +283,11 @@
     letter-spacing:.10em;
     padding: 4px 9px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.16);
     border: 1px solid rgba(255,255,255,0.22);
     opacity:.98;
     display:none;
+    backdrop-filter: blur(6px);
   }
   .tile.turn .turnTag{ display:block; }
 
@@ -304,12 +297,14 @@
     border-radius: 999px;
     background: rgba(255,255,255,.35);
   }
+
   .name{
     margin-top:-6px;
     font-weight: 1000;
     font-size: 18px;
     text-align:center;
   }
+
   .stats{
     margin-top:6px;
     display:flex;
@@ -321,49 +316,55 @@
     font-weight: 900;
   }
 
-  .plusBtn{
+  .plusBtn, .reactBtn{
     width: 100%;
     border:0;
-    border-radius: 12px;
-    padding: 9px 10px;
+    border-radius: 14px;
+    padding: 10px 10px;
     font-weight: 1000;
+    cursor:pointer;
+  }
+
+  .plusBtn{
     background:#fff;
     color:#000;
-    cursor:pointer;
-    box-shadow: 0 8px 20px rgba(0,0,0,.35);
+    box-shadow: 0 10px 26px rgba(0,0,0,.36);
   }
   .plusBtn:active{ transform: scale(.99); }
 
   .reactBtn{
-    width: 100%;
-    border:0;
-    border-radius: 12px;
-    padding: 10px 10px;
-    font-weight: 1000;
-    letter-spacing:.10em;
+    display:none;
     background: rgba(255,255,255,0.12);
     color:#fff;
     border: 1px solid rgba(255,255,255,0.14);
-    cursor:pointer;
-    display:none;
+    letter-spacing:.10em;
   }
+
   body.roundActive .plusBtn{ display:none; }
   body.roundActive .reactBtn{ display:block; }
 
+  .flash{
+    animation: flash 0.8s infinite;
+  }
+  @keyframes flash{
+    0%,100%{ filter: brightness(1); }
+    50%{ filter: brightness(1.35); }
+  }
+
   /* Panel */
   .side{
-    width: 280px;
-    background: var(--panel);
-    border: 1px solid rgba(255,255,255,.10);
-    border-radius: 22px;
-    box-shadow: 0 22px 64px rgba(0,0,0,.72);
-    padding: 14px;
+    width: var(--panelW);
+    background: var(--glass);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 26px 78px rgba(0,0,0,.78);
+    padding: 16px;
     display:flex;
     flex-direction:column;
-    gap:14px;
+    gap: 14px;
     position: sticky;
-    top: 0;                          /* ✅ hugs top */
-    max-height: calc(100vh - 170px); /* ✅ stays proportional under header */
+    top: 6px;
+    max-height: calc(100vh - 170px);
     overflow:auto;
   }
 
@@ -380,21 +381,22 @@
   .chip{
     font-size: 11px;
     font-weight: 1000;
-    padding: 4px 8px;
+    padding: 5px 10px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.10);
     opacity:.95;
   }
+
   .row{
-    padding: 11px 11px;
-    border-radius: 14px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.06);
+    padding: 12px 12px;
+    border-radius: 16px;
+    background: var(--glass2);
+    border: 1px solid rgba(255,255,255,.07);
     display:flex;
     justify-content:space-between;
     align-items:center;
-    gap:10px;
+    gap:12px;
   }
   .row strong{ font-size: 12px; letter-spacing:.02em; }
   .row span{
@@ -404,18 +406,34 @@
     overflow:hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 140px;
+    max-width: 160px;
     text-align:right;
   }
+
+  .historyWrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .hist{
+    font-size: 12px;
+    font-weight: 1000;
+    padding: 7px 9px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.10);
+    opacity:.95;
+  }
+
   .grid2{
     display:grid;
     grid-template-columns: 1fr 1fr;
-    gap:10px;
+    gap: 10px;
   }
   .btn{
     border:0;
-    border-radius: 14px;
-    padding: 11px 10px;
+    border-radius: 16px;
+    padding: 12px 10px;
     font-weight: 1000;
     letter-spacing:.06em;
     cursor:pointer;
@@ -430,21 +448,6 @@
   }
   .btn[disabled]{ opacity:.45; cursor:not-allowed; }
   .btn.flashBtn{ animation: flash 0.8s infinite; }
-
-  .historyWrap{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-  }
-  .hist{
-    font-size: 12px;
-    font-weight: 1000;
-    padding: 6px 8px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.10);
-    opacity:.95;
-  }
 
   /* Toast */
   #toast{
@@ -471,29 +474,28 @@
     pointer-events:none;
   }
 
-  /* Mobile */
-  @media (max-width: 760px){
+  /* Mobile: hide panel, slightly tighter */
+  @media (max-width: 780px){
     :root{
-      --title: 38px;
+      --title: 40px;
 
-      --tileW: 124px;
-      --tileH: 150px;
-      --avatar: 38px;
+      --tileW: 126px;
+      --tileH: 152px;
+      --avatar: 40px;
 
-      --cardW: 145px;
-      --cardH: 185px;
+      --cardW: 144px;
+      --cardH: 182px;
 
       --btnY: 9px;
       --btnX: 14px;
     }
 
-    .stage{
-      grid-template-columns: 1fr;
-      gap: 0;
-    }
+    .stage{ grid-template-columns: 1fr; gap: 0; }
     .side{ display:none; }
+    .board:after{ display:none; }
+
     .boardGrid{
-      max-width: 460px;
+      max-width: 480px;
       gap: 12px;
       padding-bottom: 44px;
     }
@@ -501,7 +503,7 @@
     .name{ font-size: 14px; }
     .stats{ font-size: 13px; }
     .cardFace{ font-size: 24px; }
-    .cardRule{ font-size: 11px; max-width: 86px; }
+    .cardRule{ font-size: 11px; max-width: 90px; }
     .cardMid{ font-size: 16px; }
   }
 </style>
@@ -513,20 +515,6 @@
 
 <div class="app">
   <h1>KAD Kings</h1>
-
-  <div class="statusBar">
-    <div class="pill">
-      <span class="dot"></span>
-      <span id="turnText">BEAU’S TURN</span>
-      <span style="opacity:.7; font-weight:900; letter-spacing:.06em; text-transform:none;" id="turnHint">tap a player to set turn</span>
-    </div>
-
-    <div class="roundPill flash" id="roundPill">
-      <span style="width:9px;height:9px;border-radius:999px;background:rgba(255,255,255,.92);"></span>
-      <span id="roundText">THUMBS! REACT</span>
-      <span style="opacity:.75; font-weight:900; letter-spacing:.06em;" id="roundSub">everyone tap REACT</span>
-    </div>
-  </div>
 
   <div class="stage">
     <div class="board">
@@ -597,13 +585,6 @@
     "J": "Thumbmaster – last to react drinks",
     "K": "King – make a rule"
   };
-
-  const turnText = document.getElementById("turnText");
-  const turnHint = document.getElementById("turnHint");
-
-  const roundPill = document.getElementById("roundPill");
-  const roundText = document.getElementById("roundText");
-  const roundSub  = document.getElementById("roundSub");
 
   const centerCard = document.getElementById("centerCard");
   const drawBtn = document.getElementById("drawBtn");
@@ -685,10 +666,6 @@
   let turnIdx = 0;
   function setTurn(i){
     turnIdx = (i + players.length) % players.length;
-    const who = players[turnIdx].name;
-    turnText.textContent = `${who.toUpperCase()}’S TURN`;
-    turnHint.style.display = round.active ? "none" : "inline";
-
     players.forEach(p => {
       const el = document.getElementById(`tile-${p.id}`);
       if (!el) return;
@@ -780,23 +757,18 @@
     round.lastReactor = null;
 
     document.body.classList.add("roundActive");
-    roundPill.style.display = "flex";
 
     if (type === "J"){
-      roundText.textContent = "THUMBS! REACT";
-      roundSub.textContent = "thumbs down, then tap REACT";
+      setCenterCard({ face: "J", rule: "Thumbs down. Tap REACT.", by: `Started by: ${owner}` });
+      showToast(`${owner} started Thumbmaster`);
     } else {
-      roundText.textContent = "HEAVEN! REACT";
-      roundSub.textContent = "finger up, then tap REACT";
+      setCenterCard({ face: "7", rule: "Finger up. Tap REACT.", by: `Started by: ${owner}` });
+      showToast(`${owner} started Heaven`);
     }
 
-    setCenterCard({
-      face: type,
-      rule: type === "J" ? "Thumbs down. Tap REACT." : "Finger up. Tap REACT.",
-      by: `Started by: ${owner}`
-    });
+    // flash all react buttons until pressed
+    document.querySelectorAll(".reactBtn").forEach(btn => btn.classList.add("flash"));
 
-    showToast(`${owner} started ${type === "J" ? "Thumbmaster" : "Heaven"}`);
     renderPanel();
   }
 
@@ -810,6 +782,7 @@
     const tile = document.getElementById(`tile-${playerId}`);
     if (tile){
       const btn = tile.querySelector(".reactBtn");
+      btn.classList.remove("flash");
       btn.textContent = "LOCKED";
       btn.style.opacity = ".55";
       btn.disabled = true;
@@ -840,9 +813,9 @@
     round.lastReactor = null;
 
     document.body.classList.remove("roundActive");
-    roundPill.style.display = "none";
 
     document.querySelectorAll(".reactBtn").forEach(btn => {
+      btn.classList.remove("flash");
       btn.textContent = "REACT";
       btn.style.opacity = "";
       btn.disabled = false;
@@ -894,7 +867,6 @@
     renderPanel();
   }
 
-  // restart
   function restartDeck(){
     deck = buildDeck();
     idx = 0;
@@ -912,7 +884,7 @@
     showToast("Restarted");
   }
 
-  // wire buttons
+  // wire
   drawBtn.addEventListener("click", drawCard);
   startJBtn.addEventListener("click", () => startRound("J"));
   start7Btn.addEventListener("click", () => startRound("7"));
