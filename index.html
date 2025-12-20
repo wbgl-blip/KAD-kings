@@ -8,46 +8,48 @@
 <style>
   :root{
     --bg:#000;
-    --tileBorder: rgba(255,255,255,0.06);
     --white:#fff;
+    --panel: rgba(12,12,12,.92);
+    --line: rgba(255,255,255,.10);
+    --soft: rgba(255,255,255,.06);
 
-    --tileW: 160px;
-    --tileH: 196px;
-    --avatar: 54px;
+    --title: 44px;
 
-    --cardW: 165px;
-    --cardH: 225px;
+    --tileW: 150px;
+    --tileH: 180px;
+    --avatar: 50px;
 
-    --titleSize: 54px;
-    --btnPadY: 11px;
-    --btnPadX: 20px;
+    --cardW: 180px;
+    --cardH: 240px;
+
+    --btnY: 10px;
+    --btnX: 18px;
   }
 
   *{box-sizing:border-box}
-
-  html, body{
+  html,body{
     margin:0;
     height:100%;
     overflow:hidden;
-    background: var(--bg);
-    color: var(--white);
+    background:var(--bg);
+    color:var(--white);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    -webkit-user-select:none;
+    user-select:none;
     touch-action: manipulation;
-    -webkit-user-select: none;
-    user-select: none;
   }
 
   .bg1{
     position:fixed; inset:0;
-    background: radial-gradient(circle at center, rgba(255,255,255,0.085) 0%, rgba(0,0,0,0.92) 55%, rgba(0,0,0,1) 100%);
+    background: radial-gradient(circle at center, rgba(255,255,255,0.085) 0%, rgba(0,0,0,0.92) 58%, rgba(0,0,0,1) 100%);
     pointer-events:none;
   }
   .bg2{
     position:fixed; inset:0;
-    opacity:.26;
+    opacity:.22;
     filter: blur(52px);
     background:
-      radial-gradient(circle at 18% 26%, rgba(255,255,255,0.11), transparent 46%),
+      radial-gradient(circle at 22% 30%, rgba(255,255,255,0.11), transparent 46%),
       radial-gradient(circle at 76% 62%, rgba(255,255,255,0.09), transparent 42%);
     pointer-events:none;
   }
@@ -60,339 +62,125 @@
     display:flex;
     flex-direction:column;
     align-items:center;
+    padding: 8px 10px calc(12px + env(safe-area-inset-bottom, 0px));
+    gap: 10px;
   }
 
   h1{
-    margin: 10px 0 4px;
+    margin: 6px 0 0;
     font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-    font-size: var(--titleSize);
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-align:center;
-    line-height:1;
-  }
-
-  /* Turn banner */
-  .turnBanner{
-    margin: 0 0 14px;
-    padding: 7px 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.16);
-    box-shadow: 0 18px 46px rgba(0,0,0,.55);
-    font-weight: 1000;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    font-size: 11px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    max-width: min(92vw, 680px);
-    position: relative;
-    z-index: 30;
-    backdrop-filter: blur(6px);
-  }
-  .turnDot{
-    width:9px; height:9px; border-radius:999px;
-    background: rgba(255,255,255,0.95);
-    box-shadow: 0 0 0 0 rgba(255,255,255,0.35);
-    animation: pulse 1.15s infinite;
-    flex: 0 0 auto;
-  }
-  @keyframes pulse{
-    0%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.30); }
-    70%{ box-shadow: 0 0 0 14px rgba(255,255,255,0.00); }
-    100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.00); }
-  }
-  .turnText{
-    overflow:hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .turnSmall{
-    opacity:.75;
-    font-weight: 900;
+    font-size: var(--title);
+    font-weight: 800;
     letter-spacing: .06em;
-    font-size: 10px;
-    text-transform:none;
-    margin-left:auto;
-    white-space: nowrap;
-  }
-
-  .stage{
-    position:relative;
-    width:min(1040px, 98vw);
-    height: calc(100% - 122px);
-    max-height: 920px;
-  }
-
-  .scaleWrap{
-    position:relative;
-    width:100%;
-    height:100%;
-    transform-origin: top center;
-  }
-
-  .pos{ position:absolute; transform:translate(-50%,-50%); }
-
-  /* Player tile */
-  .tile{
-    width: var(--tileW);
-    height: var(--tileH);
-    border-radius: 22px;
-    background: rgba(11,11,11,.96);
-    border: 1px solid var(--tileBorder);
-    box-shadow: 0 18px 44px rgba(0,0,0,0.74);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:space-between;
-    padding: 16px 16px 14px;
-    position:relative;
-    cursor:pointer;
-    overflow:hidden;
-    transition: box-shadow .15s ease, border-color .15s ease;
-  }
-
-  /* ✅ NO SCALE: highlight without layout collisions */
-  .tile.turn{
-    border-color: rgba(255,255,255,0.34);
-    box-shadow:
-      0 0 0 2px rgba(255,255,255,0.12),
-      0 26px 70px rgba(0,0,0,0.82),
-      0 0 60px rgba(255,255,255,0.10);
-  }
-  .tile.turn::before{
-    content:"";
-    position:absolute;
-    inset:-18px;
-    background: radial-gradient(circle at 50% 18%, rgba(255,255,255,0.26), transparent 58%);
-    filter: blur(7px);
-    opacity: .9;
-    pointer-events:none;
-  }
-  .tile.turn::after{
-    content:"";
-    position:absolute;
-    inset:-10px;
-    border-radius: 28px;
-    border: 1px solid rgba(255,255,255,0.18);
-    opacity:.75;
-    animation: ring 1.25s infinite;
-    pointer-events:none;
-  }
-  @keyframes ring{
-    0%{ transform: scale(1); opacity: .7; }
-    70%{ transform: scale(1.045); opacity: .0; }
-    100%{ transform: scale(1); opacity: 0; }
-  }
-
-  .turnTag{
-    position:absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 11px;
-    font-weight: 1000;
-    letter-spacing: .10em;
-    padding: 4px 8px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.16);
-    border: 1px solid rgba(255,255,255,0.18);
-    opacity:.98;
-    display:none;
-  }
-  .tile.turn .turnTag{ display:block; }
-
-  .avatar{
-    width: var(--avatar);
-    height: var(--avatar);
-    border-radius: 999px;
-    background: rgba(255,255,255,.35);
-  }
-
-  .name{
-    margin-top:-6px;
-    font-weight:950;
-    font-size: 18px;
+    line-height: 1;
     text-align:center;
   }
 
-  .stats{
-    margin-top:6px;
+  /* Top status / round banner */
+  .statusBar{
+    width: min(860px, 96vw);
     display:flex;
-    gap:8px;
+    gap:10px;
     align-items:center;
     justify-content:center;
-    font-size: 14px;
-    opacity:.92;
-    font-weight:800;
+    flex-wrap:wrap;
+    z-index: 50;
   }
 
   .pill{
-    margin-top:10px;
-    font-weight:1000;
-    font-size: 13px;
-    background:#fff;
-    color:#000;
-    border:0;
-    border-radius: 12px;
-    padding: 8px 13px;
-    box-shadow: 0 6px 18px rgba(0,0,0,.35);
-    cursor:pointer;
-  }
-  .pill:active{ transform:scale(.99); }
-
-  /* Round reaction button */
-  .reactBtn{
-    display:none;
-    width: 100%;
-    border:0;
-    border-radius: 12px;
-    padding: 10px 12px;
-    font-weight: 1000;
-    letter-spacing: .08em;
-    background: rgba(255,255,255,0.10);
-    color:#fff;
-    border: 1px solid rgba(255,255,255,0.14);
-    cursor:pointer;
-  }
-  body.roundActive .pill{ display:none; }
-  body.roundActive .reactBtn{ display:block; }
-  .reactBtn:active{ transform:scale(.99); }
-
-  /* Center card */
-  .card{
-    width: var(--cardW);
-    height: var(--cardH);
-    background:#fff;
-    color:#000;
-    border-radius: 22px;
-    box-shadow: 0 16px 40px rgba(0,0,0,.50);
     display:flex;
-    flex-direction:column;
-    padding: 14px 16px 12px;
-    text-align:center;
-    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-    font-weight: 800;
-    line-height: 1.15;
-  }
-  .cardTop{
-    display:flex;
-    align-items:flex-start;
-    justify-content:center;
+    align-items:center;
     gap:10px;
-    min-height: 56px;
-  }
-  .cardFace{
-    font-size: 30px;
-    font-weight: 900;
-    line-height: 1;
-    margin-top: 2px;
-  }
-  .cardRule{
-    font-size: 13px;
-    font-weight: 900;
-    font-family: system-ui;
-    opacity:.88;
-    line-height: 1.15;
-    text-align:left;
-    max-width: 104px;
-  }
-  .cardMid{
-    flex:1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size: 19px;
-    padding: 6px 8px;
-  }
-  .cardFooter{
-    font-family: system-ui;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.14);
+    box-shadow: 0 18px 46px rgba(0,0,0,.55);
+    font-weight: 1000;
+    letter-spacing:.12em;
+    text-transform: uppercase;
     font-size: 11px;
-    font-weight: 900;
-    opacity:.65;
-    letter-spacing: .02em;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height: 18px;
+    backdrop-filter: blur(6px);
   }
 
-  .drawBtn{
-    position:absolute;
-    left:50%;
-    bottom: calc(14px + env(safe-area-inset-bottom, 0px) + 16px);
-    transform: translateX(-50%);
-    background:#fff;
-    color:#000;
-    border:0;
-    border-radius: 12px;
-    font-weight: 1000;
-    letter-spacing: .09em;
-    padding: var(--btnPadY) var(--btnPadX);
-    box-shadow: 0 14px 34px rgba(0,0,0,.50);
-    cursor:pointer;
-    z-index: 6;
+  .dot{
+    width: 9px; height: 9px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.92);
+    box-shadow: 0 0 0 0 rgba(255,255,255,0.28);
+    animation: pulse 1.2s infinite;
   }
-  .drawBtn:active{ transform: translateX(-50%) scale(.99); }
+  @keyframes pulse{
+    0%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.26); }
+    70%{ box-shadow: 0 0 0 14px rgba(255,255,255,0.00); }
+    100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.00); }
+  }
 
-  .ghostBtn{
-    position:absolute;
-    left:50%;
-    bottom: calc(14px + env(safe-area-inset-bottom, 0px) + 16px);
-    transform: translateX(-50%);
-    background: rgba(255,255,255,0.12);
-    color:#fff;
-    border: 1px solid rgba(255,255,255,0.16);
-    border-radius: 12px;
-    font-weight: 1000;
-    letter-spacing: .09em;
-    padding: var(--btnPadY) var(--btnPadX);
-    box-shadow: 0 14px 34px rgba(0,0,0,0.40);
-    cursor:pointer;
-    z-index: 6;
+  .roundPill{
     display:none;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.18);
+    font-weight: 1000;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+  body.roundActive .roundPill{ display:flex; align-items:center; gap:10px; }
+  .flash{
+    animation: flash 0.8s infinite;
+  }
+  @keyframes flash{
+    0%, 100%{ filter: brightness(1); }
+    50%{ filter: brightness(1.35); }
   }
 
-  /* Desktop positions */
-  .p-top-mid{   left:46%; top:14%; }
-  .p-top-left{  left:22%; top:22%; }
-  .p-top-right{ left:68%; top:22%; }
-  .p-mid-left{  left:16%; top:60%; }
-  .p-mid-right{ left:58%; top:60%; }
-  .p-bot-left{  left:26%; top:90%; }
-  .center{ left:41%; top:60%; }
+  /* Main stage */
+  .stage{
+    width: min(980px, 96vw);
+    flex: 1;
+    display:flex;
+    align-items:stretch;
+    justify-content:center;
+    gap: 14px;
+    position: relative;
+    z-index: 10;
+    min-height: 0;
+  }
 
-  /* Mobile HUD / Panel placeholder */
-  .panel{
-    position:absolute;
-    right: 0px;
-    top: 56%;
-    transform: translateY(-50%);
-    width: 196px;
+  /* Desktop layout: board + side panel */
+  .board{
+    flex: 1;
+    min-width: 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+
+  .side{
+    width: 260px;
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 20px;
+    box-shadow: 0 22px 64px rgba(0,0,0,.72);
     padding: 12px;
-    border-radius: 18px;
-    background: rgba(11,11,11,.92);
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 18px 42px rgba(0,0,0,0.72);
     display:flex;
     flex-direction:column;
     gap:12px;
-    z-index: 5;
   }
 
   .sectionTitle{
-    font-weight: 1000;
-    letter-spacing: .06em;
-    font-size: 12px;
-    opacity: .9;
-    text-transform: uppercase;
     display:flex;
-    align-items:center;
     justify-content:space-between;
-    gap:10px;
+    align-items:center;
+    font-weight: 1000;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-size: 12px;
+    opacity:.92;
   }
-
   .chip{
     font-size: 11px;
     font-weight: 1000;
@@ -400,14 +188,59 @@
     border-radius: 999px;
     background: rgba(255,255,255,0.10);
     border: 1px solid rgba(255,255,255,0.10);
-    opacity:.9;
+    opacity:.95;
   }
+
+  .row{
+    padding: 10px 10px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.06);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .row strong{ font-size: 12px; letter-spacing:.02em; }
+  .row span{
+    font-size: 12px;
+    font-weight: 900;
+    opacity:.85;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+    text-align:right;
+  }
+
+  .grid2{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:8px;
+  }
+  .btn{
+    border:0;
+    border-radius: 14px;
+    padding: 10px 10px;
+    font-weight: 1000;
+    letter-spacing:.06em;
+    cursor:pointer;
+    background: rgba(255,255,255,0.10);
+    color:#fff;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .btn.primary{
+    background:#fff;
+    color:#000;
+    border-color: rgba(255,255,255,0.38);
+  }
+  .btn[disabled]{ opacity:.45; cursor:not-allowed; }
+  .btn.flashBtn{ animation: flash 0.8s infinite; }
 
   .historyWrap{
     display:flex;
     flex-wrap:wrap;
     gap:6px;
-    justify-content:flex-start;
   }
   .hist{
     font-size: 12px;
@@ -419,106 +252,205 @@
     opacity:.95;
   }
 
-  .stickyGrid{ display:flex; flex-direction:column; gap:8px; }
-  .stickyRow{
-    padding: 10px 10px;
-    border-radius: 14px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.06);
-    display:flex;
+  /* Card + players area (desktop uses a neat grid too, no overlap) */
+  .boardGrid{
+    width: 100%;
+    max-width: 680px;
+    height: 100%;
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 14px;
     align-items:center;
-    justify-content:space-between;
-    gap:10px;
-  }
-  .stickyLabel{
-    font-size: 12px;
-    font-weight: 1000;
-    letter-spacing:.02em;
-    opacity:.9;
-  }
-  .stickyValue{
-    font-size: 12px;
-    font-weight: 1000;
-    opacity:.85;
-    text-align:right;
-    max-width: 112px;
-    overflow:hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .stickyOn{
-    background: rgba(255,255,255,0.14);
-    border-color: rgba(255,255,255,0.16);
+    justify-items:center;
   }
 
-  .miniGrid{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:8px;
+  .centerWrap{
+    grid-column: 2;
+    grid-row: 2;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
   }
-  .powerBtn{
-    border:0;
-    border-radius: 14px;
-    padding: 10px 10px;
-    font-weight: 1000;
-    letter-spacing: .06em;
-    cursor:pointer;
-    background: rgba(255,255,255,0.10);
-    color:#fff;
-    border: 1px solid rgba(255,255,255,0.12);
-  }
-  .powerBtn.primary{
+
+  .card{
+    width: var(--cardW);
+    height: var(--cardH);
     background:#fff;
     color:#000;
-    border-color: rgba(255,255,255,0.40);
-  }
-  .powerBtn[disabled]{ opacity:.45; cursor:not-allowed; }
-
-  .rulesList{ display:flex; flex-direction:column; gap:8px; overflow:hidden; }
-  .ruleItem{
-    padding: 10px 10px;
-    border-radius: 14px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.06);
-    font-size: 13px;
-    line-height: 1.2;
-    font-weight: 800;
-  }
-  .ruleMeta{
-    margin-top: 6px;
-    font-size: 11px;
-    opacity: .7;
+    border-radius: 22px;
+    box-shadow: 0 18px 52px rgba(0,0,0,.55);
+    display:flex;
+    flex-direction:column;
+    padding: 14px 16px 12px;
+    text-align:center;
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     font-weight: 900;
-    letter-spacing: .02em;
+    line-height: 1.15;
+  }
+  .cardTop{
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    gap:10px;
+    min-height: 52px;
+  }
+  .cardFace{
+    font-size: 28px;
+    font-weight: 1000;
+    line-height: 1;
+  }
+  .cardRule{
+    font-size: 12px;
+    font-weight: 1000;
+    font-family: system-ui;
+    opacity:.86;
+    line-height: 1.15;
+    text-align:left;
+    max-width: 110px;
+  }
+  .cardMid{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 18px;
+    padding: 8px 8px;
+  }
+  .cardFooter{
+    font-family: system-ui;
+    font-size: 11px;
+    font-weight: 1000;
+    opacity:.65;
+    min-height: 16px;
   }
 
-  .btnRow{ display:flex; gap:8px; }
-  .miniBtn{
-    flex:1;
+  .drawBtn{
+    background:#fff;
+    color:#000;
     border:0;
-    border-radius: 12px;
-    padding: 8px 10px;
+    border-radius: 14px;
     font-weight: 1000;
+    letter-spacing:.10em;
+    padding: var(--btnY) var(--btnX);
+    box-shadow: 0 14px 34px rgba(0,0,0,.50);
     cursor:pointer;
   }
-  .miniBtn.light{ background:#fff; color:#000; }
-  .miniBtn.dark{ background: rgba(255,255,255,0.10); color:#fff; border: 1px solid rgba(255,255,255,0.12); }
+  .drawBtn:active{ transform: scale(.99); }
 
+  /* Player tile */
+  .tile{
+    width: var(--tileW);
+    height: var(--tileH);
+    border-radius: 22px;
+    background: rgba(11,11,11,.96);
+    border: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 18px 44px rgba(0,0,0,0.72);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    padding: 14px 14px 12px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  /* Turn highlight without scaling */
+  .tile.turn{
+    border-color: rgba(255,255,255,0.30);
+    box-shadow:
+      0 0 0 2px rgba(255,255,255,0.10),
+      0 26px 70px rgba(0,0,0,0.82),
+      0 0 60px rgba(255,255,255,0.10);
+  }
+  .turnTag{
+    position:absolute;
+    top:10px; right:10px;
+    font-size: 11px;
+    font-weight: 1000;
+    letter-spacing:.10em;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.18);
+    opacity:.95;
+    display:none;
+  }
+  .tile.turn .turnTag{ display:block; }
+
+  .avatar{
+    width: var(--avatar);
+    height: var(--avatar);
+    border-radius: 999px;
+    background: rgba(255,255,255,.35);
+  }
+  .name{
+    margin-top:-6px;
+    font-weight: 1000;
+    font-size: 17px;
+    text-align:center;
+  }
+  .stats{
+    margin-top:6px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+    justify-content:center;
+    font-size: 14px;
+    opacity:.92;
+    font-weight: 900;
+  }
+
+  .plusBtn{
+    width: 100%;
+    border:0;
+    border-radius: 12px;
+    padding: 9px 10px;
+    font-weight: 1000;
+    background:#fff;
+    color:#000;
+    cursor:pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,.35);
+  }
+  .plusBtn:active{ transform: scale(.99); }
+
+  /* Round reaction button (shows only during round) */
+  .reactBtn{
+    width: 100%;
+    border:0;
+    border-radius: 12px;
+    padding: 10px 10px;
+    font-weight: 1000;
+    letter-spacing:.10em;
+    background: rgba(255,255,255,0.12);
+    color:#fff;
+    border: 1px solid rgba(255,255,255,0.14);
+    cursor:pointer;
+    display:none;
+  }
+  .reactBtn.flashBtn{ animation: flash 0.8s infinite; }
+  .reactBtn:active{ transform: scale(.99); }
+
+  body.roundActive .plusBtn{ display:none; }
+  body.roundActive .reactBtn{ display:block; }
+
+  /* Toast */
   #toast{
     position:fixed;
     left:50%;
-    bottom: calc(22px + env(safe-area-inset-bottom, 0px) + 14px);
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
     transform:translateX(-50%);
     padding:10px 12px;
     border-radius:999px;
-    background:rgba(11,11,11,.92);
+    background:rgba(12,12,12,.92);
     border:1px solid rgba(255,255,255,0.12);
     color:#fff;
     font-weight:1000;
     letter-spacing:.06em;
     font-size:12px;
     box-shadow:0 16px 42px rgba(0,0,0,.65);
-    z-index:80;
+    z-index:200;
     max-width:92vw;
     white-space:nowrap;
     overflow:hidden;
@@ -528,50 +460,65 @@
     pointer-events:none;
   }
 
-  /* Bottom sheet */
+  /* Mobile: hide side panel, use bottom sheet */
+  .hudBtn{
+    display:none;
+    position:fixed;
+    right: 12px;
+    bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+    width: 56px; height: 56px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(12,12,12,.92);
+    box-shadow: 0 18px 46px rgba(0,0,0,.70);
+    color:#fff;
+    font-weight: 1000;
+    font-size: 22px;
+    cursor:pointer;
+    z-index: 150;
+  }
+
   .sheetOverlay{
     position:fixed; inset:0;
     background: rgba(0,0,0,0.55);
     opacity:0;
     pointer-events:none;
     transition: opacity .18s ease;
-    z-index: 90;
+    z-index: 180;
   }
   .sheet{
     position:fixed;
-    left: 0;
-    right: 0;
+    left: 0; right: 0;
     bottom: -100%;
     padding: 12px 12px calc(18px + env(safe-area-inset-bottom, 0px));
-    transition: transform .22s ease, bottom .22s ease;
-    z-index: 100;
+    transition: bottom .22s ease;
+    z-index: 190;
   }
   .sheetInner{
     margin: 0 auto;
     width: min(520px, 96vw);
-    background: rgba(11,11,11,.96);
+    background: rgba(12,12,12,.96);
     border: 1px solid rgba(255,255,255,0.10);
     border-radius: 22px;
     box-shadow: 0 26px 70px rgba(0,0,0,0.80);
     padding: 12px;
-    max-height: 74vh;
+    max-height: 72vh;
     overflow:auto;
   }
-  .sheetTopbar{
+  .grabber{
+    height: 5px; width: 44px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.18);
+    margin: 0 auto 10px;
+  }
+  .sheetTop{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    margin-bottom: 10px;
     gap:10px;
+    margin-bottom: 10px;
   }
-  .grabber{
-    height: 5px;
-    width: 44px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.18);
-    margin: 0 auto;
-  }
-  .sheetClose{
+  .closeBtn{
     border:0;
     background: rgba(255,255,255,0.10);
     color:#fff;
@@ -582,261 +529,259 @@
     cursor:pointer;
   }
 
-  body.sheetOpen .sheetOverlay{
-    opacity:1;
-    pointer-events:auto;
-  }
-  body.sheetOpen .sheet{
-    bottom: 10px;
-  }
+  body.sheetOpen .sheetOverlay{ opacity:1; pointer-events:auto; }
+  body.sheetOpen .sheet{ bottom: 10px; }
 
-  @media (max-width: 480px){
+  @media (max-width: 600px){
     :root{
-      --tileW: 112px;
-      --tileH: 142px;
-      --avatar: 36px;
+      --title: 38px;
 
-      --cardW: 130px;
-      --cardH: 170px;
+      --tileW: 122px;
+      --tileH: 150px;
+      --avatar: 38px;
 
-      --titleSize: 34px;
-      --btnPadY: 9px;
-      --btnPadX: 14px;
+      --cardW: 150px;
+      --cardH: 190px;
+
+      --btnY: 9px;
+      --btnX: 14px;
     }
 
-    .turnSmall{ display:none; }
+    .stage{ width: 96vw; gap:0; }
+    .side{ display:none; }
+    .hudBtn{ display:block; }
 
-    .p-top-mid{   left:50%; top:14%; }
-    .p-top-left{  left:22%; top:18%; }
-    .p-top-right{ left:74%; top:18%; }
-    .p-mid-left{  left:14%; top:56%; }
-    .p-mid-right{ left:70%; top:56%; }
-    .p-bot-left{  left:30%; top:88%; }
-    .center{ left:50%; top:58%; }
+    /* Mobile grid (no overlap possible) */
+    .boardGrid{
+      max-width: 460px;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 12px;
+      align-content: center;
+      padding-bottom: 58px; /* breathing room above toast/hud */
+    }
 
-    .cardFace{ font-size: 26px; }
-    .cardRule{ font-size: 12px; max-width: 86px; }
-    .cardMid{ font-size: 17px; }
+    /* Place players by row */
+    #slot-top-left{ grid-column:1; grid-row:1; }
+    #slot-top-mid{  grid-column:2; grid-row:1; }
+    #slot-top-right{grid-column:3; grid-row:1; }
+
+    #slot-mid-left{ grid-column:1; grid-row:2; }
+    #slot-center{   grid-column:2; grid-row:2; }
+    #slot-mid-right{grid-column:3; grid-row:2; }
+
+    #slot-bot-left{ grid-column:1; grid-row:3; }
+    #slot-bot-mid{  grid-column:2; grid-row:3; } /* unused spacer */
+    #slot-bot-right{grid-column:3; grid-row:3; } /* unused spacer */
+
     .name{ font-size: 14px; }
-
-    /* HUD button */
-    .panel{
-      position: fixed;
-      right: 10px;
-      bottom: calc(180px + env(safe-area-inset-bottom, 0px));
-      top: auto;
-      transform: none;
-      width: 56px;
-      height: 56px;
-      padding: 0;
-      border-radius: 999px;
-      overflow: hidden;
-      z-index: 70;
-      cursor:pointer;
-      display:block;
-    }
-    .panel > *{ display:none; }
-    .panel::after{
-      content: "☰";
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      height:100%;
-      font-size:24px;
-      font-weight:900;
-      color:white;
-    }
-  }
-
-  @media (min-width: 481px){
-    .sheetOverlay, .sheet{ display:none; }
+    .stats{ font-size: 13px; }
+    .cardFace{ font-size: 24px; }
+    .cardRule{ font-size: 11px; max-width: 86px; }
+    .cardMid{ font-size: 16px; }
   }
 </style>
 </head>
 
 <body>
-  <div class="bg1"></div>
-  <div class="bg2"></div>
+<div class="bg1"></div>
+<div class="bg2"></div>
 
-  <div class="app">
-    <h1>KAD Kings</h1>
+<div class="app">
+  <h1>KAD Kings</h1>
 
-    <div class="turnBanner">
-      <span class="turnDot"></span>
-      <span class="turnText" id="turnBannerText">BEAU’S TURN</span>
-      <span class="turnSmall">tap a player to set turn</span>
+  <div class="statusBar">
+    <div class="pill" id="turnPill">
+      <span class="dot"></span>
+      <span id="turnText">BEAU’S TURN</span>
+      <span style="opacity:.7; font-weight:900; letter-spacing:.06em; text-transform:none;" id="turnHint">tap a player to set turn</span>
     </div>
 
-    <div class="stage" id="stage">
-      <div class="scaleWrap" id="scaleWrap">
+    <div class="roundPill flash" id="roundPill">
+      <span style="width:9px;height:9px;border-radius:999px;background:rgba(255,255,255,.92);"></span>
+      <span id="roundText">THUMBS! REACT</span>
+      <span style="opacity:.75; font-weight:900; letter-spacing:.06em;" id="roundSub">everyone tap REACT</span>
+    </div>
+  </div>
 
-        <div class="pos center">
+  <div class="stage">
+    <div class="board">
+      <div class="boardGrid" id="boardGrid">
+
+        <!-- TOP -->
+        <div id="slot-top-left"></div>
+        <div id="slot-top-mid"></div>
+        <div id="slot-top-right"></div>
+
+        <!-- MID -->
+        <div id="slot-mid-left"></div>
+
+        <div id="slot-center" class="centerWrap">
           <div class="card" id="centerCard">
             <div class="cardMid">Draw a card<br/>No mercy</div>
             <div class="cardFooter" style="visibility:hidden"></div>
           </div>
+          <button class="drawBtn" id="drawBtn">DRAW CARD</button>
         </div>
 
-        <div class="panel" id="panelHud" aria-label="Open panel"></div>
+        <div id="slot-mid-right"></div>
 
-        <button class="drawBtn" id="drawBtn">DRAW CARD</button>
-        <button class="ghostBtn" id="restartBtn">RESTART DECK</button>
+        <!-- BOT -->
+        <div id="slot-bot-left"></div>
+        <div id="slot-bot-mid"></div>
+        <div id="slot-bot-right"></div>
+
       </div>
     </div>
+
+    <!-- Desktop side panel -->
+    <aside class="side" id="sidePanel">
+      <div class="sectionTitle">Progress <span class="chip" id="progressChip">0 / 52</span></div>
+      <div class="sectionTitle">History <span class="chip" id="leftChip">52 left</span></div>
+      <div class="historyWrap" id="historyWrap"></div>
+
+      <div class="sectionTitle" style="margin-top:4px;">Sticky Powers</div>
+      <div class="row" id="thumbRow"><strong>Thumbmaster (J)</strong><span id="thumbVal">None</span></div>
+      <div class="row" id="heavenRow"><strong>Heaven (7)</strong><span id="heavenVal">None</span></div>
+
+      <div class="grid2">
+        <button class="btn" id="startJBtn" disabled>START J</button>
+        <button class="btn" id="start7Btn" disabled>START 7</button>
+      </div>
+
+      <div class="grid2">
+        <button class="btn" id="clearRoundBtn">CLEAR</button>
+        <button class="btn primary" id="restartDeckBtn">RESTART</button>
+      </div>
+    </aside>
   </div>
+</div>
 
-  <div class="sheetOverlay" id="sheetOverlay"></div>
-  <div class="sheet" id="sheet">
-    <div class="sheetInner">
-      <div class="grabber"></div>
-      <div class="sheetTopbar">
-        <div style="font-weight:1000; letter-spacing:.06em; text-transform:uppercase; opacity:.9;">Game Panel</div>
-        <button class="sheetClose" id="sheetClose">Close</button>
-      </div>
+<button class="hudBtn" id="hudBtn">☰</button>
 
-      <div class="sectionTitle">
-        Progress <span class="chip" id="progressChip">0 / 52</span>
-      </div>
+<div class="sheetOverlay" id="sheetOverlay"></div>
+<div class="sheet" id="sheet">
+  <div class="sheetInner">
+    <div class="grabber"></div>
+    <div class="sheetTop">
+      <div style="font-weight:1000;letter-spacing:.08em;text-transform:uppercase;opacity:.9;">Game Panel</div>
+      <button class="closeBtn" id="sheetClose">Close</button>
+    </div>
 
-      <div class="sectionTitle" style="margin-top:10px;">
-        History <span class="chip" id="leftChip">52 left</span>
-      </div>
-      <div class="historyWrap" id="historyWrap" style="margin-top:8px;"></div>
+    <div class="sectionTitle">Progress <span class="chip" id="mProgressChip">0 / 52</span></div>
+    <div class="sectionTitle">History <span class="chip" id="mLeftChip">52 left</span></div>
+    <div class="historyWrap" id="mHistoryWrap" style="margin-top:8px;"></div>
 
-      <div class="sectionTitle" style="margin-top:14px;">
-        Sticky Powers <span class="chip" id="roundChip">READY</span>
-      </div>
+    <div class="sectionTitle" style="margin-top:14px;">Sticky Powers</div>
+    <div class="row" id="mThumbRow"><strong>Thumbmaster (J)</strong><span id="mThumbVal">None</span></div>
+    <div class="row" id="mHeavenRow"><strong>Heaven (7)</strong><span id="mHeavenVal">None</span></div>
 
-      <div class="stickyGrid" style="margin-top:8px;">
-        <div class="stickyRow" id="thumbRow">
-          <div class="stickyLabel">Thumbmaster (J)</div>
-          <div class="stickyValue" id="thumbVal">None</div>
-        </div>
+    <div class="grid2" style="margin-top:10px;">
+      <button class="btn" id="mStartJBtn" disabled>START J</button>
+      <button class="btn" id="mStart7Btn" disabled>START 7</button>
+    </div>
 
-        <div class="stickyRow" id="heavenRow">
-          <div class="stickyLabel">Heaven (7)</div>
-          <div class="stickyValue" id="heavenVal">None</div>
-        </div>
-      </div>
+    <div class="grid2" style="margin-top:10px;">
+      <button class="btn" id="mClearRoundBtn">CLEAR</button>
+      <button class="btn primary" id="mRestartDeckBtn">RESTART</button>
+    </div>
 
-      <div class="miniGrid" style="margin-top:10px;">
-        <button class="powerBtn" id="thumbStartBtn" disabled>START J</button>
-        <button class="powerBtn" id="heavenStartBtn" disabled>START 7</button>
-        <button class="powerBtn" id="clearRoundBtn">CLEAR</button>
-        <button class="powerBtn primary" id="restartRoundBtn" disabled>RESTART</button>
-      </div>
-
-      <div class="sectionTitle" style="margin-top:14px;">
-        Active Rules <span class="chip" id="rulesCount">0</span>
-      </div>
-
-      <div class="rulesList" id="rulesList" style="margin-top:8px;">
-        <div class="ruleItem" style="opacity:.75">
-          No rules yet.
-          <div class="ruleMeta">Draw a King to add one.</div>
-        </div>
-      </div>
-
-      <div class="btnRow" style="margin-top:10px;">
-        <button class="miniBtn dark" id="addRuleBtn">+ Rule</button>
-        <button class="miniBtn light" id="clearRulesBtn">Clear</button>
-      </div>
+    <div style="margin-top:12px;opacity:.75;font-weight:900;font-size:12px;line-height:1.2;">
+      J / 7 flow: power owner hits START (flashes). Everyone puts thumb down / finger up, then taps REACT.
+      Last REACT gets +1 drink.
     </div>
   </div>
+</div>
 
-  <div id="toast"></div>
+<div id="toast"></div>
 
 <script>
   const players = [
-    {id:"beau",  name:"Beau",  drinks:0, pos:"p-top-left"},
-    {id:"mike",  name:"Mike",  drinks:0, pos:"p-top-mid"},
-    {id:"jess",  name:"Jess",  drinks:0, pos:"p-top-right"},
-    {id:"alex",  name:"Alex",  drinks:0, pos:"p-mid-left"},
-    {id:"emily", name:"Emily", drinks:0, pos:"p-mid-right"},
-    {id:"sean",  name:"Sean",  drinks:0, pos:"p-bot-left"},
+    {id:"beau",  name:"Beau",  drinks:0, slot:"slot-top-left"},
+    {id:"mike",  name:"Mike",  drinks:0, slot:"slot-top-mid"},
+    {id:"jess",  name:"Jess",  drinks:0, slot:"slot-top-right"},
+    {id:"alex",  name:"Alex",  drinks:0, slot:"slot-mid-left"},
+    {id:"emily", name:"Emily", drinks:0, slot:"slot-mid-right"},
+    {id:"sean",  name:"Sean",  drinks:0, slot:"slot-bot-left"},
   ];
 
-  const kingsRules = {
-    A: "Waterfall – everyone drinks, no stopping",
-    "2": "You – choose someone to drink",
-    "3": "Me – you drink",
-    "4": "For whores – everyone drinks",
-    "5": "Guys – all guys drink",
-    "6": "For dicks – everyone drinks",
+  // Your rules
+  const rules = {
+    "4": "4 for whores – we all drink",
+    "6": "6 for dicks – we all drink",
     "7": "Heaven – last to react drinks",
-    "8": "Mate – pick a drinking buddy",
-    "9": "Rhyme – say a word, others rhyme",
-    "10": "Categories – pick a category",
-    J: "Thumbmaster – last to react drinks",
-    Q: "Question master – answer questions or drink",
-    K: "King – make a rule"
+    "J": "Thumbmaster – last to react drinks",
+    "K": "King – make a rule"
   };
 
-  const stage = document.getElementById("stage");
-  const wrap = document.getElementById("scaleWrap");
+  const turnText = document.getElementById("turnText");
+  const turnHint = document.getElementById("turnHint");
+
+  const roundPill = document.getElementById("roundPill");
+  const roundText = document.getElementById("roundText");
+  const roundSub  = document.getElementById("roundSub");
+
   const centerCard = document.getElementById("centerCard");
   const drawBtn = document.getElementById("drawBtn");
-  const restartBtn = document.getElementById("restartBtn");
-  const turnBannerText = document.getElementById("turnBannerText");
-
-  const progressChip = document.getElementById("progressChip");
-  const leftChip = document.getElementById("leftChip");
-  const historyWrap = document.getElementById("historyWrap");
-
-  const thumbRow = document.getElementById("thumbRow");
-  const heavenRow = document.getElementById("heavenRow");
-  const thumbVal = document.getElementById("thumbVal");
-  const heavenVal = document.getElementById("heavenVal");
-
-  const rulesCount = document.getElementById("rulesCount");
-  const rulesList = document.getElementById("rulesList");
-  const addRuleBtn = document.getElementById("addRuleBtn");
-  const clearRulesBtn = document.getElementById("clearRulesBtn");
-
-  const roundChip = document.getElementById("roundChip");
-  const thumbStartBtn = document.getElementById("thumbStartBtn");
-  const heavenStartBtn = document.getElementById("heavenStartBtn");
-  const clearRoundBtn = document.getElementById("clearRoundBtn");
-  const restartRoundBtn = document.getElementById("restartRoundBtn");
 
   const toast = document.getElementById("toast");
 
-  // Mobile sheet controls
-  const panelHud = document.getElementById("panelHud");
+  // Desktop panel
+  const progressChip = document.getElementById("progressChip");
+  const leftChip = document.getElementById("leftChip");
+  const historyWrap = document.getElementById("historyWrap");
+  const thumbVal = document.getElementById("thumbVal");
+  const heavenVal = document.getElementById("heavenVal");
+  const startJBtn = document.getElementById("startJBtn");
+  const start7Btn = document.getElementById("start7Btn");
+  const clearRoundBtn = document.getElementById("clearRoundBtn");
+  const restartDeckBtn = document.getElementById("restartDeckBtn");
+
+  // Mobile sheet
+  const hudBtn = document.getElementById("hudBtn");
   const sheetOverlay = document.getElementById("sheetOverlay");
   const sheetClose = document.getElementById("sheetClose");
+  const mProgressChip = document.getElementById("mProgressChip");
+  const mLeftChip = document.getElementById("mLeftChip");
+  const mHistoryWrap = document.getElementById("mHistoryWrap");
+  const mThumbVal = document.getElementById("mThumbVal");
+  const mHeavenVal = document.getElementById("mHeavenVal");
+  const mStartJBtn = document.getElementById("mStartJBtn");
+  const mStart7Btn = document.getElementById("mStart7Btn");
+  const mClearRoundBtn = document.getElementById("mClearRoundBtn");
+  const mRestartDeckBtn = document.getElementById("mRestartDeckBtn");
 
-  function isMobile(){
-    return window.matchMedia && window.matchMedia("(max-width: 480px)").matches;
-  }
-  function openSheet(){
-    if (!isMobile()) return;
-    document.body.classList.add("sheetOpen");
-  }
-  function closeSheet(){
-    document.body.classList.remove("sheetOpen");
-  }
+  function openSheet(){ document.body.classList.add("sheetOpen"); }
+  function closeSheet(){ document.body.classList.remove("sheetOpen"); }
 
-  panelHud.addEventListener("click", () => { if (isMobile()) openSheet(); });
+  hudBtn.addEventListener("click", openSheet);
   sheetOverlay.addEventListener("click", closeSheet);
   sheetClose.addEventListener("click", closeSheet);
 
-  const activeRules = [];
-  const sticky = { thumbmaster:null, heavenMaster:null };
-
+  // Game state
   let turnIdx = 0;
-  let history = [];
   let deck = [];
   let idx = 0;
+  let history = [];
 
-  const ROUND_MS = 4500;
-  let round = {
-    active: false,
-    type: null,
-    startedBy: null,
-    timerId: null,
-    lastReact: null,
+  // Sticky owners
+  const sticky = { J:null, "7":null };
+
+  // Round state (NO TIMER)
+  const round = {
+    active:false,
+    type:null,        // "J" or "7"
+    startedBy:null,
+    reacted: new Set(),   // playerIds
+    lastReactor:null      // playerId
   };
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.style.opacity = "1";
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.style.opacity = "0", 1400);
+  }
 
   function escapeHtml(str){
     return String(str)
@@ -847,371 +792,325 @@
       .replaceAll("'","&#039;");
   }
 
-  function showToast(text){
-    toast.textContent = text;
-    toast.style.opacity = "1";
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => toast.style.opacity = "0", 1400);
-  }
-
   function buildDeck(){
     const suits = ["♠","♥","♦","♣"];
     const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
     const d = [];
     for (const r of ranks) for (const s of suits) d.push(`${r}${s}`);
-    d.sort(() => Math.random() - 0.5);
+    // shuffle
+    for (let i = d.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [d[i], d[j]] = [d[j], d[i]];
+    }
     return d;
   }
 
-  function addDrink(playerId, amount){
+  function addDrink(playerId, amt=1){
     const p = players.find(x => x.id === playerId);
     if (!p) return;
-    p.drinks += amount;
-    const el = document.getElementById(`tile-${p.id}`);
+    p.drinks += amt;
+    const el = document.getElementById(`tile-${playerId}`);
     if (el) el.querySelector(".drinkCount").textContent = p.drinks;
   }
 
-  function setTurn(newTurnIdx){
-    turnIdx = (newTurnIdx + players.length) % players.length;
-    const who = players[turnIdx].name;
-    turnBannerText.textContent = `${who.toUpperCase()}’S TURN`;
-
-    players.forEach(p => {
-      const el = document.getElementById(`tile-${p.id}`);
-      if (!el) return;
-      el.classList.toggle("turn", p === players[turnIdx]);
-    });
-    fitToScreen();
+  function addAllDrinks(amt=1){
+    players.forEach(p => addDrink(p.id, amt));
   }
 
-  function renderHistory(){
-    historyWrap.innerHTML = history.slice(0, 6).map(h => `<div class="hist">${escapeHtml(h.card)}</div>`).join("");
-    progressChip.textContent = `${idx} / 52`;
-    leftChip.textContent = `${52 - idx} left`;
-  }
-
-  function renderSticky(){
-    thumbVal.textContent = sticky.thumbmaster || "None";
-    heavenVal.textContent = sticky.heavenMaster || "None";
-
-    thumbRow.classList.toggle("stickyOn", !!sticky.thumbmaster);
-    heavenRow.classList.toggle("stickyOn", !!sticky.heavenMaster);
-
-    thumbStartBtn.disabled = !sticky.thumbmaster;
-    heavenStartBtn.disabled = !sticky.heavenMaster;
-  }
-
-  function renderRules(){
-    rulesCount.textContent = String(activeRules.length);
-    const shown = activeRules.slice(-6).reverse();
-
-    if (shown.length === 0){
-      rulesList.innerHTML = `
-        <div class="ruleItem" style="opacity:.75">
-          No rules yet.
-          <div class="ruleMeta">Draw a King to add one.</div>
-        </div>
-      `;
-      return;
-    }
-
-    rulesList.innerHTML = shown.map((r, i) => {
-      const n = activeRules.length - i;
-      return `
-        <div class="ruleItem">
-          ${escapeHtml(r.text)}
-          <div class="ruleMeta">Rule #${n}${r.by ? " • by " + escapeHtml(r.by) : ""}</div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  function promptForRule(who){
-    const text = prompt("New rule (King):", "");
-    if (!text) return;
-    activeRules.push({ text: text.trim(), by: who || "" });
-    renderRules();
-    fitToScreen();
-  }
-
-  addRuleBtn.addEventListener("click", () => promptForRule("manual"));
-  clearRulesBtn.addEventListener("click", () => {
-    if (!activeRules.length) return;
-    if (!confirm("Clear all active rules?")) return;
-    activeRules.length = 0;
-    renderRules();
-    fitToScreen();
-  });
-
-  function tileHTML(p){
-    return `
-      <div class="pos ${p.pos}" data-id="${p.id}">
-        <div class="tile" id="tile-${p.id}">
-          <div class="turnTag">TURN</div>
-          <div class="avatar"></div>
-          <div>
-            <div class="name">${p.name}</div>
-            <div class="stats"><span>🍺</span><span class="drinkCount">${p.drinks}</span></div>
-          </div>
-          <button class="pill">+1 Beer</button>
-          <button class="reactBtn" data-react="${p.id}">REACT</button>
-        </div>
-      </div>
-    `;
-  }
-
-  wrap.insertAdjacentHTML("afterbegin", players.map(tileHTML).join(""));
-
-  wrap.querySelectorAll(".pos[data-id] .pill").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const root = e.target.closest(".pos[data-id]");
-      addDrink(root.getAttribute("data-id"), 1);
-    });
-  });
-
-  wrap.querySelectorAll(".pos[data-id] .tile").forEach((tile) => {
-    tile.addEventListener("click", (e) => {
-      if (round.active) return;
-      const id = e.currentTarget.closest(".pos[data-id]").getAttribute("data-id");
-      const i = players.findIndex(p => p.id === id);
-      if (i >= 0) setTurn(i);
-    });
-  });
-
-  wrap.querySelectorAll(".reactBtn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (!round.active) return;
-
-      const playerId = e.currentTarget.getAttribute("data-react");
-      round.lastReact = { playerId, t: Date.now() };
-
-      const tile = document.getElementById(`tile-${playerId}`);
-      if (tile){
-        tile.style.filter = "brightness(1.12)";
-        clearTimeout(tile._b);
-        tile._b = setTimeout(() => tile.style.filter = "", 120);
-      }
-    });
-  });
-
-  function updateRoundChip(){
-    if (!round.active){
-      roundChip.textContent = "READY";
-      restartRoundBtn.disabled = true;
-      document.body.classList.remove("roundActive");
-      return;
-    }
-    roundChip.textContent = `${round.type} LIVE`;
-    restartRoundBtn.disabled = false;
-    document.body.classList.add("roundActive");
-  }
-
-  function clearRound(){
-    round.active = false;
-    round.type = null;
-    round.startedBy = null;
-    round.lastReact = null;
-    if (round.timerId) clearTimeout(round.timerId);
-    round.timerId = null;
-    updateRoundChip();
-  }
-
-  function setCenterCardIdle(){
+  function setCenterIdle(){
     centerCard.innerHTML = `
       <div class="cardMid">Draw a card<br/>No mercy</div>
       <div class="cardFooter" style="visibility:hidden"></div>
     `;
   }
 
-  function setCenterCardResult({face, rule, by}){
+  function setCenterCard({face, rule, by}){
     centerCard.innerHTML = `
       <div class="cardTop">
         <div class="cardFace">${escapeHtml(face)}</div>
         <div class="cardRule">${escapeHtml(rule || "")}</div>
       </div>
       <div class="cardMid"></div>
-      <div class="cardFooter" style="visibility:visible">
-        <span>${escapeHtml(by || "")}</span>
-      </div>
+      <div class="cardFooter" style="visibility:visible">${escapeHtml(by || "")}</div>
     `;
+  }
+
+  function renderPanels(){
+    const prog = `${idx} / 52`;
+    const left = `${52 - idx} left`;
+    progressChip.textContent = prog;
+    leftChip.textContent = left;
+    mProgressChip.textContent = prog;
+    mLeftChip.textContent = left;
+
+    const h = history.slice(0, 6).map(x => `<div class="hist">${escapeHtml(x)}</div>`).join("");
+    historyWrap.innerHTML = h;
+    mHistoryWrap.innerHTML = h;
+
+    thumbVal.textContent = sticky.J || "None";
+    heavenVal.textContent = sticky["7"] || "None";
+    mThumbVal.textContent = sticky.J || "None";
+    mHeavenVal.textContent = sticky["7"] || "None";
+
+    // enable start buttons only if there is an owner AND round not active
+    const canStartJ = !!sticky.J && !round.active;
+    const canStart7 = !!sticky["7"] && !round.active;
+
+    startJBtn.disabled = !canStartJ;
+    start7Btn.disabled = !canStart7;
+    mStartJBtn.disabled = !canStartJ;
+    mStart7Btn.disabled = !canStart7;
+
+    // flash the start button when it’s available
+    startJBtn.classList.toggle("flashBtn", canStartJ);
+    start7Btn.classList.toggle("flashBtn", canStart7);
+    mStartJBtn.classList.toggle("flashBtn", canStartJ);
+    mStart7Btn.classList.toggle("flashBtn", canStart7);
+  }
+
+  function setTurn(i){
+    turnIdx = (i + players.length) % players.length;
+    const who = players[turnIdx].name;
+    turnText.textContent = `${who.toUpperCase()}’S TURN`;
+    turnHint.style.display = round.active ? "none" : "inline";
+    players.forEach(p => {
+      const el = document.getElementById(`tile-${p.id}`);
+      if (!el) return;
+      el.classList.toggle("turn", p === players[turnIdx]);
+    });
+  }
+
+  function tileEl(p){
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <div class="tile" id="tile-${p.id}">
+        <div class="turnTag">TURN</div>
+        <div class="avatar"></div>
+        <div>
+          <div class="name">${p.name}</div>
+          <div class="stats"><span>🍺</span><span class="drinkCount">${p.drinks}</span></div>
+        </div>
+        <button class="plusBtn">+1 Beer</button>
+        <button class="reactBtn" data-react="${p.id}">REACT</button>
+      </div>
+    `.trim();
+
+    const tile = div.firstChild;
+
+    // set turn by tapping tile (disabled during round)
+    tile.addEventListener("click", () => {
+      if (round.active) return;
+      const idx = players.findIndex(x => x.id === p.id);
+      setTurn(idx);
+    });
+
+    tile.querySelector(".plusBtn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      addDrink(p.id, 1);
+    });
+
+    tile.querySelector(".reactBtn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      react(p.id);
+    });
+
+    return tile;
+  }
+
+  function mountPlayers(){
+    players.forEach(p => {
+      const slot = document.getElementById(p.slot);
+      slot.innerHTML = "";
+      slot.appendChild(tileEl(p));
+    });
   }
 
   function startRound(type){
-    clearRound();
+    if (round.active) return;
+
+    const owner = sticky[type];
+    if (!owner) return;
+
     round.active = true;
     round.type = type;
+    round.startedBy = owner;
+    round.reacted = new Set();
+    round.lastReactor = null;
 
-    if (type === "J") round.startedBy = sticky.thumbmaster;
-    if (type === "7") round.startedBy = sticky.heavenMaster;
+    document.body.classList.add("roundActive");
 
-    updateRoundChip();
-    round.timerId = setTimeout(finishRound, ROUND_MS);
+    // flashing “START” indicator for everyone
+    const label = (type === "J") ? "THUMBS DOWN" : "FINGER IN AIR";
+    roundText.textContent = (type === "J") ? "THUMBS! REACT" : "HEAVEN! REACT";
+    roundSub.textContent = label;
 
-    setCenterCardResult({
+    // make every REACT button flash until pressed
+    document.querySelectorAll(".reactBtn").forEach(btn => btn.classList.add("flashBtn"));
+
+    showToast(`${owner} started ${type === "J" ? "Thumbmaster" : "Heaven"}`);
+
+    // show center card hint (small and clear)
+    setCenterCard({
       face: type,
-      rule: "REACT NOW",
-      by: `${round.startedBy || "Someone"} started`
+      rule: (type === "J") ? "Thumbs down. Tap REACT." : "Finger up. Tap REACT.",
+      by: `Started by: ${owner}`
     });
 
+    renderPanels();
     closeSheet();
   }
 
-  function finishRound(){
+  function endRoundIfDone(){
     if (!round.active) return;
+    if (round.reacted.size < players.length) return;
 
-    const label = (round.type === "J") ? "Thumb (J)" : "Heaven (7)";
-
-    if (!round.lastReact){
-      showToast("No one reacted 🤫");
-      clearRound();
-      setCenterCardIdle();
-      return;
-    }
-
-    const loserId = round.lastReact.playerId;
+    // lastReactor loses
+    const loserId = round.lastReactor;
     const loserName = players.find(p => p.id === loserId)?.name || "Someone";
 
     addDrink(loserId, 1);
-    showToast(`${loserName} drinks 🥴 (${label})`);
+    showToast(`${loserName} drinks (+1)`);
 
-    setCenterCardResult({
+    setCenterCard({
       face: "LAST",
-      rule: `${loserName} +1 drink`,
-      by: label
+      rule: `${loserName} loses`,
+      by: round.type === "J" ? "Thumbmaster (J)" : "Heaven (7)"
     });
 
-    clearRound();
-    fitToScreen();
+    clearRound(false);
   }
 
-  thumbStartBtn.addEventListener("click", () => {
-    if (!sticky.thumbmaster) return;
-    startRound("J");
-  });
+  function react(playerId){
+    if (!round.active) return;
 
-  heavenStartBtn.addEventListener("click", () => {
-    if (!sticky.heavenMaster) return;
-    startRound("7");
-  });
+    // one reaction per person per round
+    if (round.reacted.has(playerId)) return;
 
-  clearRoundBtn.addEventListener("click", () => {
-    clearRound();
-    showToast("CLEARED");
-    setCenterCardIdle();
-  });
+    round.reacted.add(playerId);
+    round.lastReactor = playerId;
 
-  restartRoundBtn.addEventListener("click", () => {
-    if (!round.active || !round.type) return;
-    startRound(round.type);
-  });
+    // stop flashing for that player's button + lock it visually
+    const tile = document.getElementById(`tile-${playerId}`);
+    if (tile){
+      const btn = tile.querySelector(".reactBtn");
+      btn.classList.remove("flashBtn");
+      btn.textContent = "LOCKED";
+      btn.style.opacity = ".55";
+      btn.disabled = true;
+    }
 
-  function endState(){
-    centerCard.innerHTML = `
-      <div class="cardMid" style="font-size:18px;font-weight:900">
-        All 52 cards drawn<br/>
-        <span style="font-size:13px;opacity:.8;font-family:system-ui">Restart?</span>
-      </div>
-      <div class="cardFooter" style="visibility:hidden"></div>
-    `;
-    drawBtn.style.display = "none";
-    restartBtn.style.display = "block";
+    // when everyone reacted, punish the last
+    endRoundIfDone();
   }
 
-  function normalState(){
-    drawBtn.style.display = "block";
-    restartBtn.style.display = "none";
+  function clearRound(resetCenter=true){
+    round.active = false;
+    round.type = null;
+    round.startedBy = null;
+    round.reacted = new Set();
+    round.lastReactor = null;
+
+    document.body.classList.remove("roundActive");
+
+    // reset react buttons
+    document.querySelectorAll(".reactBtn").forEach(btn => {
+      btn.classList.remove("flashBtn");
+      btn.textContent = "REACT";
+      btn.style.opacity = "";
+      btn.disabled = false;
+    });
+
+    if (resetCenter) setCenterIdle();
+    renderPanels();
   }
 
-  function restartGame(){
+  function restartDeck(){
     deck = buildDeck();
     idx = 0;
     history = [];
-    sticky.thumbmaster = null;
-    sticky.heavenMaster = null;
-    clearRound();
-    normalState();
-    renderSticky();
-    renderHistory();
-    renderRules();
+    sticky.J = null;
+    sticky["7"] = null;
+
+    players.forEach(p => p.drinks = 0);
+    mountPlayers();
+
+    clearRound(true);
     setTurn(0);
-    setCenterCardIdle();
-    fitToScreen();
+    renderPanels();
+    setCenterIdle();
+    showToast("Restarted");
   }
 
-  restartBtn.addEventListener("click", restartGame);
-
   function drawCard(){
-    if (idx >= deck.length){
-      endState();
+    if (round.active){
+      showToast("Finish the round first");
+      return;
+    }
+    if (idx >= 52){
+      showToast("Deck empty. Restart.");
       return;
     }
 
     const drawer = players[turnIdx].name;
     const card = deck[idx++];
     const rank = card.slice(0, -1);
-    const rule = kingsRules[rank] || "";
 
-    if (rank === "J") sticky.thumbmaster = drawer;
-    if (rank === "7") sticky.heavenMaster = drawer;
+    history.unshift(card);
 
-    if (rank === "K") setTimeout(() => promptForRule(drawer), 20);
+    // Sticky owners
+    if (rank === "J") sticky.J = drawer;
+    if (rank === "7") sticky["7"] = drawer;
 
-    history.unshift({ card, by: drawer, rank });
-    renderSticky();
-    renderHistory();
+    // Auto rules you specified
+    if (rank === "4" || rank === "6"){
+      addAllDrinks(1);
+      showToast("Everyone drinks 🍻");
+    }
 
-    setCenterCardResult({
+    if (rank === "K"){
+      // Game continues until all 52, but king still makes a rule (you can expand this later)
+      setTimeout(() => {
+        const text = prompt("King rule:", "");
+        if (text) showToast(`Rule added: ${text.trim()}`);
+      }, 30);
+    }
+
+    setCenterCard({
       face: card,
-      rule,
+      rule: rules[rank] || "",
       by: `Drew: ${drawer}`
     });
 
     setTurn(turnIdx + 1);
-    if (idx >= 52) setTimeout(endState, 80);
-    fitToScreen();
+    renderPanels();
+
+    if (idx >= 52){
+      showToast("All 52 drawn ✅");
+    }
   }
 
+  // Button wiring
   drawBtn.addEventListener("click", drawCard);
 
-  function fitToScreen(){
-    if (!stage || !wrap) return;
+  startJBtn.addEventListener("click", () => startRound("J"));
+  start7Btn.addEventListener("click", () => startRound("7"));
+  mStartJBtn.addEventListener("click", () => startRound("J"));
+  mStart7Btn.addEventListener("click", () => startRound("7"));
 
-    wrap.style.transform = "scale(1)";
+  clearRoundBtn.addEventListener("click", () => { clearRound(true); showToast("Cleared"); });
+  mClearRoundBtn.addEventListener("click", () => { clearRound(true); showToast("Cleared"); });
 
-    const stageRect = stage.getBoundingClientRect();
-    const wrapRect = wrap.getBoundingClientRect();
+  restartDeckBtn.addEventListener("click", restartDeck);
+  mRestartDeckBtn.addEventListener("click", restartDeck);
 
-    const margin = 0.98;
-    const scaleX = (stageRect.width / wrapRect.width) * margin;
-    const scaleY = (stageRect.height / wrapRect.height) * margin;
-
-    wrap.style.transform = `scale(${Math.min(1, scaleX, scaleY)})`;
-  }
-
+  // Init
   window.addEventListener("load", () => {
     deck = buildDeck();
-    renderSticky();
-    renderRules();
-    renderHistory();
+    mountPlayers();
     setTurn(0);
-    updateRoundChip();
-    setCenterCardIdle();
-    fitToScreen();
-  });
-
-  window.addEventListener("resize", () => {
-    closeSheet();
-    requestAnimationFrame(fitToScreen);
-  });
-
-  window.addEventListener("orientationchange", () => setTimeout(() => { closeSheet(); fitToScreen(); }, 80));
-
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeSheet();
+    setCenterIdle();
+    renderPanels();
   });
 </script>
-
 </body>
 </html>
