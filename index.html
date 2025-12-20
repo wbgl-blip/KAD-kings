@@ -29,7 +29,7 @@
   html, body{
     margin:0;
     height:100%;
-    overflow:hidden; /* never scroll */
+    overflow:hidden;
     background: var(--bg);
     color: var(--white);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -150,7 +150,6 @@
     cursor:pointer;
   }
 
-  /* Turn highlight: subtle */
   .tile.turn{
     border-color: rgba(255,255,255,0.22);
     box-shadow:
@@ -229,7 +228,6 @@
   }
   .pill:active{ transform:scale(.99); }
 
-  /* Center card */
   .card{
     width: var(--cardW);
     height: var(--cardH);
@@ -487,7 +485,7 @@
     letter-spacing:.06em;
     font-size:12px;
     box-shadow:0 16px 42px rgba(0,0,0,.65);
-    z-index:60;
+    z-index:80;
     max-width:92vw;
     white-space:nowrap;
     overflow:hidden;
@@ -497,14 +495,75 @@
     pointer-events:none;
   }
 
-  /* ✅ Mobile portrait (S24 Ultra friendly) */
+  /* ✅ Bottom sheet for mobile panel */
+  .sheetOverlay{
+    position:fixed; inset:0;
+    background: rgba(0,0,0,0.55);
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .18s ease;
+    z-index: 90;
+  }
+  .sheet{
+    position:fixed;
+    left: 0;
+    right: 0;
+    bottom: -100%;
+    padding: 12px 12px 18px;
+    transition: transform .22s ease, bottom .22s ease;
+    z-index: 100;
+  }
+  .sheetInner{
+    margin: 0 auto;
+    width: min(520px, 96vw);
+    background: rgba(11,11,11,.96);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 22px;
+    box-shadow: 0 26px 70px rgba(0,0,0,0.80);
+    padding: 12px;
+    max-height: 74vh;
+    overflow:auto;
+  }
+  .sheetTopbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 10px;
+    gap:10px;
+  }
+  .grabber{
+    height: 5px;
+    width: 44px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.18);
+    margin: 0 auto;
+  }
+  .sheetClose{
+    border:0;
+    background: rgba(255,255,255,0.10);
+    color:#fff;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-weight:1000;
+    cursor:pointer;
+  }
+
+  body.sheetOpen .sheetOverlay{
+    opacity:1;
+    pointer-events:auto;
+  }
+  body.sheetOpen .sheet{
+    bottom: 10px;
+  }
+
+  /* ✅ Mobile portrait */
   @media (max-width: 480px){
     :root{
       --tileW: 112px;
       --tileH: 142px;
       --avatar: 36px;
 
-      /* ✅ smaller card so it stops dominating + colliding */
       --cardW: 130px;
       --cardH: 170px;
 
@@ -515,17 +574,12 @@
 
     .turnSmall{ display:none; }
 
-    /* ✅ push players outward */
     .p-top-mid{   left:50%; top:14%; }
     .p-top-left{  left:22%; top:18%; }
     .p-top-right{ left:74%; top:18%; }
-
     .p-mid-left{  left:14%; top:56%; }
     .p-mid-right{ left:70%; top:56%; }
-
     .p-bot-left{  left:30%; top:88%; }
-
-    /* ✅ center back to true center */
     .center{ left:50%; top:58%; }
 
     .cardFace{ font-size: 26px; }
@@ -533,11 +587,11 @@
     .cardMid{ font-size: 17px; }
     .name{ font-size: 14px; }
 
-    /* ✅ CRITICAL: collapse right panel into a HUD button to avoid overlap */
+    /* ✅ Convert panel into floating HUD button */
     .panel{
       position: fixed;
       right: 10px;
-      bottom: 80px;
+      bottom: 90px;
       top: auto;
       transform: none;
       width: 56px;
@@ -545,11 +599,10 @@
       padding: 0;
       border-radius: 999px;
       overflow: hidden;
-      z-index: 50;
+      z-index: 70;
+      cursor:pointer;
     }
-    .panel > *{
-      display:none;
-    }
+    .panel > *{ display:none; }
     .panel::after{
       content: "☰";
       display:flex;
@@ -560,6 +613,14 @@
       font-weight:900;
       color:white;
     }
+
+    /* sheet only matters on mobile */
+    .sheet{ display:block; }
+  }
+
+  /* Desktop: hide sheet UI */
+  @media (min-width: 481px){
+    .sheetOverlay, .sheet{ display:none; }
   }
 </style>
 </head>
@@ -587,63 +648,76 @@
           </div>
         </div>
 
-        <div class="panel">
-          <div class="sectionTitle">
-            Progress <span class="chip" id="progressChip">0 / 52</span>
-          </div>
-
-          <div class="sectionTitle">
-            History <span class="chip" id="leftChip">52 left</span>
-          </div>
-          <div class="historyWrap" id="historyWrap"></div>
-
-          <div class="sectionTitle" style="margin-top:6px;">
-            Sticky Powers <span class="chip" id="roundChip">READY</span>
-          </div>
-
-          <div class="stickyGrid">
-            <div class="stickyRow" id="thumbRow">
-              <div class="stickyLabel">Thumbmaster (J)</div>
-              <div class="stickyValue" id="thumbVal">None</div>
-            </div>
-
-            <div class="stickyRow" id="questionRow">
-              <div class="stickyLabel">Question Master (Q)</div>
-              <div class="stickyValue" id="questionVal">None</div>
-            </div>
-
-            <div class="stickyRow" id="heavenRow">
-              <div class="stickyLabel">Heaven (7)</div>
-              <div class="stickyValue" id="heavenVal">None</div>
-            </div>
-          </div>
-
-          <div class="miniGrid">
-            <button class="powerBtn" id="thumbStartBtn" disabled>START J</button>
-            <button class="powerBtn" id="heavenStartBtn" disabled>START 7</button>
-            <button class="powerBtn" id="clearRoundBtn">CLEAR</button>
-            <button class="powerBtn primary" id="restartRoundBtn" disabled>RESTART</button>
-          </div>
-
-          <div class="sectionTitle">
-            Active Rules <span class="chip" id="rulesCount">0</span>
-          </div>
-
-          <div class="rulesList" id="rulesList">
-            <div class="ruleItem" style="opacity:.75">
-              No rules yet.
-              <div class="ruleMeta">Draw a King to add one.</div>
-            </div>
-          </div>
-
-          <div class="btnRow">
-            <button class="miniBtn dark" id="addRuleBtn">+ Rule</button>
-            <button class="miniBtn light" id="clearRulesBtn">Clear</button>
-          </div>
-        </div>
+        <!-- Desktop panel / Mobile HUD -->
+        <div class="panel" id="panelHud" aria-label="Open panel"></div>
 
         <button class="drawBtn" id="drawBtn">DRAW CARD</button>
         <button class="ghostBtn" id="restartBtn">RESTART DECK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile bottom sheet -->
+  <div class="sheetOverlay" id="sheetOverlay"></div>
+  <div class="sheet" id="sheet">
+    <div class="sheetInner">
+      <div class="grabber"></div>
+      <div class="sheetTopbar">
+        <div style="font-weight:1000; letter-spacing:.06em; text-transform:uppercase; opacity:.9;">Game Panel</div>
+        <button class="sheetClose" id="sheetClose">Close</button>
+      </div>
+
+      <div class="sectionTitle">
+        Progress <span class="chip" id="progressChip">0 / 52</span>
+      </div>
+
+      <div class="sectionTitle" style="margin-top:10px;">
+        History <span class="chip" id="leftChip">52 left</span>
+      </div>
+      <div class="historyWrap" id="historyWrap" style="margin-top:8px;"></div>
+
+      <div class="sectionTitle" style="margin-top:14px;">
+        Sticky Powers <span class="chip" id="roundChip">READY</span>
+      </div>
+
+      <div class="stickyGrid" style="margin-top:8px;">
+        <div class="stickyRow" id="thumbRow">
+          <div class="stickyLabel">Thumbmaster (J)</div>
+          <div class="stickyValue" id="thumbVal">None</div>
+        </div>
+
+        <div class="stickyRow" id="questionRow">
+          <div class="stickyLabel">Question Master (Q)</div>
+          <div class="stickyValue" id="questionVal">None</div>
+        </div>
+
+        <div class="stickyRow" id="heavenRow">
+          <div class="stickyLabel">Heaven (7)</div>
+          <div class="stickyValue" id="heavenVal">None</div>
+        </div>
+      </div>
+
+      <div class="miniGrid" style="margin-top:10px;">
+        <button class="powerBtn" id="thumbStartBtn" disabled>START J</button>
+        <button class="powerBtn" id="heavenStartBtn" disabled>START 7</button>
+        <button class="powerBtn" id="clearRoundBtn">CLEAR</button>
+        <button class="powerBtn primary" id="restartRoundBtn" disabled>RESTART</button>
+      </div>
+
+      <div class="sectionTitle" style="margin-top:14px;">
+        Active Rules <span class="chip" id="rulesCount">0</span>
+      </div>
+
+      <div class="rulesList" id="rulesList" style="margin-top:8px;">
+        <div class="ruleItem" style="opacity:.75">
+          No rules yet.
+          <div class="ruleMeta">Draw a King to add one.</div>
+        </div>
+      </div>
+
+      <div class="btnRow" style="margin-top:10px;">
+        <button class="miniBtn dark" id="addRuleBtn">+ Rule</button>
+        <button class="miniBtn light" id="clearRulesBtn">Clear</button>
       </div>
     </div>
   </div>
@@ -681,11 +755,11 @@
   const centerCard = document.getElementById("centerCard");
   const drawBtn = document.getElementById("drawBtn");
   const restartBtn = document.getElementById("restartBtn");
+  const turnBannerText = document.getElementById("turnBannerText");
 
   const progressChip = document.getElementById("progressChip");
   const leftChip = document.getElementById("leftChip");
   const historyWrap = document.getElementById("historyWrap");
-  const turnBannerText = document.getElementById("turnBannerText");
 
   const thumbRow = document.getElementById("thumbRow");
   const questionRow = document.getElementById("questionRow");
@@ -707,6 +781,29 @@
 
   const toast = document.getElementById("toast");
 
+  // Mobile sheet controls
+  const panelHud = document.getElementById("panelHud");
+  const sheetOverlay = document.getElementById("sheetOverlay");
+  const sheetClose = document.getElementById("sheetClose");
+
+  function isMobile(){
+    return window.matchMedia && window.matchMedia("(max-width: 480px)").matches;
+  }
+
+  function openSheet(){
+    if (!isMobile()) return;
+    document.body.classList.add("sheetOpen");
+  }
+  function closeSheet(){
+    document.body.classList.remove("sheetOpen");
+  }
+
+  panelHud.addEventListener("click", () => {
+    if (isMobile()) openSheet();
+  });
+  sheetOverlay.addEventListener("click", closeSheet);
+  sheetClose.addEventListener("click", closeSheet);
+
   const activeRules = [];
   const sticky = { thumbmaster:null, questionMaster:null, heavenMaster:null };
 
@@ -715,7 +812,6 @@
   let deck = [];
   let idx = 0;
 
-  // Sneaky window length (no visible countdown)
   const ROUND_MS = 4500;
 
   let round = {
@@ -1006,6 +1102,7 @@
     normalState();
     renderSticky();
     renderHistory();
+    renderRules();
     setTurn(0);
     setCenterCardIdle();
     fitToScreen();
@@ -1074,8 +1171,16 @@
     fitToScreen();
   });
 
-  window.addEventListener("resize", () => requestAnimationFrame(fitToScreen));
-  window.addEventListener("orientationchange", () => setTimeout(fitToScreen, 60));
+  window.addEventListener("resize", () => {
+    closeSheet();
+    requestAnimationFrame(fitToScreen);
+  });
+  window.addEventListener("orientationchange", () => setTimeout(() => { closeSheet(); fitToScreen(); }, 80));
+
+  // ESC to close sheet on desktop keyboards (safe)
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeSheet();
+  });
 </script>
 </body>
 </html>
