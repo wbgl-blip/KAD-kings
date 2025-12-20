@@ -11,12 +11,10 @@
     --tileBorder: rgba(255,255,255,0.06);
     --white:#fff;
 
-    /* Players: slightly larger */
     --tileW: 170px;
     --tileH: 206px;
     --avatar: 56px;
 
-    /* Center card: smaller (less star) */
     --cardW: 190px;
     --cardH: 255px;
 
@@ -66,7 +64,7 @@
   }
 
   h1{
-    margin: 12px 0 6px;
+    margin: 10px 0 4px; /* tighter */
     font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     font-size: var(--titleSize);
     font-weight: 700;
@@ -75,9 +73,10 @@
     line-height:1;
   }
 
+  /* ✅ Banner tightened + lifted so it never collides */
   .turnBanner{
-    margin: 0 0 10px;
-    padding: 8px 12px;
+    margin: 0 0 14px;        /* more gap below */
+    padding: 6px 10px;       /* slimmer */
     border-radius: 999px;
     background: rgba(255,255,255,0.10);
     border: 1px solid rgba(255,255,255,0.12);
@@ -85,14 +84,16 @@
     font-weight: 1000;
     letter-spacing: .12em;
     text-transform: uppercase;
-    font-size: 12px;
+    font-size: 11px;         /* slightly smaller */
     display:flex;
     align-items:center;
     gap:10px;
-    max-width: min(92vw, 720px);
+    max-width: min(92vw, 680px);
+    position: relative;
+    z-index: 30;             /* ensure above tiles */
   }
   .turnDot{
-    width:10px; height:10px; border-radius:999px;
+    width:9px; height:9px; border-radius:999px;
     background: rgba(255,255,255,0.95);
     box-shadow: 0 0 0 0 rgba(255,255,255,0.35);
     animation: pulse 1.2s infinite;
@@ -112,7 +113,7 @@
     opacity:.70;
     font-weight: 900;
     letter-spacing: .06em;
-    font-size: 11px;
+    font-size: 10px;
     text-transform:none;
     margin-left:auto;
     white-space: nowrap;
@@ -121,7 +122,8 @@
   .stage{
     position:relative;
     width:min(1040px, 98vw);
-    height: calc(100% - 118px);
+    /* ✅ more room reserved for title+banner */
+    height: calc(100% - 122px);
     max-height: 900px;
   }
 
@@ -230,6 +232,7 @@
   }
   .pill:active{ transform:scale(.99); }
 
+  /* ✅ Card now has internal layout: top / middle / footer */
   .card{
     width: var(--cardW);
     height: var(--cardH);
@@ -238,14 +241,57 @@
     border-radius: 22px;
     box-shadow: 0 18px 46px rgba(0,0,0,.55);
     display:flex;
-    align-items:center;
-    justify-content:center;
-    padding: 0 18px;
+    flex-direction:column;
+    padding: 14px 16px 12px;
     text-align:center;
     font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     font-weight: 800;
-    font-size: 20px;
     line-height: 1.15;
+  }
+  .cardTop{
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    gap:10px;
+    min-height: 60px;
+  }
+  .cardFace{
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .cardRule{
+    font-size: 14px;
+    font-weight: 900;
+    font-family: system-ui;
+    opacity:.88;
+    line-height: 1.15;
+    text-align:left;
+    max-width: 110px;
+  }
+  .cardMid{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 20px;
+    padding: 6px 8px;
+  }
+  .cardFooter{
+    font-family: system-ui;
+    font-size: 11px;
+    font-weight: 900;
+    opacity:.65;
+    letter-spacing: .02em;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    min-height: 18px;
+  }
+  .cardFooter .dot{
+    width:4px;height:4px;border-radius:999px;background:rgba(0,0,0,.35);
   }
 
   .drawBtn{
@@ -285,15 +331,12 @@
   }
   .ghostBtn:active{ transform: translateX(-50%) scale(.99); }
 
-  /* ✅ SAFER POSITIONS: more spacing, less overlap */
   .p-top-mid{   left:50%; top:13%; }
   .p-top-left{  left:26%; top:19%; }
   .p-top-right{ left:74%; top:19%; }
   .p-mid-left{  left:20%; top:56%; }
-  .p-mid-right{ left:64%; top:56%; }  /* shifted left to avoid panel */
+  .p-mid-right{ left:64%; top:56%; }
   .p-bot-left{  left:30%; top:89%; }
-
-  /* Center card moved slightly left and up to balance with right panel */
   .center{ left:46%; top:58%; }
 
   .panel{
@@ -301,7 +344,7 @@
     right: 0px;
     top: 56%;
     transform: translateY(-50%);
-    width: 196px;            /* slimmer */
+    width: 196px;
     padding: 12px;
     border-radius: 18px;
     background: rgba(11,11,11,.92);
@@ -462,7 +505,6 @@
     pointer-events:none;
   }
 
-  /* ✅ Mobile portrait tuning */
   @media (max-width: 480px){
     :root{
       --tileW: 112px;
@@ -478,8 +520,8 @@
     }
 
     .turnSmall{ display:none; }
+    .turnBanner{ margin-bottom: 16px; } /* extra gap */
 
-    /* tighter but safe */
     .p-top-mid{   left:50%; top:14%; }
     .p-top-left{  left:28%; top:18%; }
     .p-top-right{ left:72%; top:18%; }
@@ -496,19 +538,10 @@
       gap:10px;
     }
 
-    .card{ font-size: 18px; }
+    .cardFace{ font-size: 30px; }
+    .cardRule{ font-size: 12px; max-width: 96px; }
+    .cardMid{ font-size: 18px; }
     .name{ font-size: 14px; }
-  }
-
-  /* If height is tight, shrink a bit */
-  @media (max-height: 760px){
-    :root{
-      --tileW: 156px;
-      --tileH: 192px;
-      --cardW: 180px;
-      --cardH: 240px;
-      --titleSize: 40px;
-    }
   }
 </style>
 </head>
@@ -530,7 +563,12 @@
       <div class="scaleWrap" id="scaleWrap">
 
         <div class="pos center">
-          <div class="card" id="centerCard">Draw a card<br/>No mercy</div>
+          <div class="card" id="centerCard">
+            <div class="cardMid">Draw a card<br/>No mercy</div>
+            <div class="cardFooter" id="cardFooter" style="visibility:hidden">
+              <span id="cardFooterBy">Drew: Mike</span>
+            </div>
+          </div>
         </div>
 
         <div class="panel">
@@ -628,17 +666,17 @@
   const drawBtn = document.getElementById("drawBtn");
   const restartBtn = document.getElementById("restartBtn");
 
+  const progressChip = document.getElementById("progressChip");
+  const leftChip = document.getElementById("leftChip");
+  const historyWrap = document.getElementById("historyWrap");
+  const turnBannerText = document.getElementById("turnBannerText");
+
   const thumbRow = document.getElementById("thumbRow");
   const questionRow = document.getElementById("questionRow");
   const heavenRow = document.getElementById("heavenRow");
   const thumbVal = document.getElementById("thumbVal");
   const questionVal = document.getElementById("questionVal");
   const heavenVal = document.getElementById("heavenVal");
-
-  const progressChip = document.getElementById("progressChip");
-  const leftChip = document.getElementById("leftChip");
-  const historyWrap = document.getElementById("historyWrap");
-  const turnBannerText = document.getElementById("turnBannerText");
 
   const rulesCount = document.getElementById("rulesCount");
   const rulesList = document.getElementById("rulesList");
@@ -653,6 +691,9 @@
 
   const toast = document.getElementById("toast");
 
+  const cardFooter = document.getElementById("cardFooter");
+  const cardFooterBy = document.getElementById("cardFooterBy");
+
   const activeRules = [];
   const sticky = { thumbmaster:null, questionMaster:null, heavenMaster:null };
 
@@ -661,14 +702,13 @@
   let deck = [];
   let idx = 0;
 
-  // Sneaky round length (no visible countdown)
   const ROUND_MS = 4500;
 
   let round = {
     active: false,
-    type: null,           // "J" | "7"
+    type: null,
     timerId: null,
-    lastTap: null,        // {playerId, t}
+    lastTap: null,
   };
 
   function escapeHtml(str){
@@ -810,13 +850,11 @@
       const id = e.currentTarget.closest(".pos[data-id]").getAttribute("data-id");
 
       if (round.active){
-        // Sneaky round reaction
         round.lastTap = { playerId: id, t: Date.now() };
         flashTap(id);
         return;
       }
 
-      // Normal: set turn
       const i = players.findIndex(p => p.id === id);
       if (i >= 0) setTurn(i);
     });
@@ -831,7 +869,6 @@
     flashTap._t[playerId] = setTimeout(() => el.classList.remove("tapping"), 220);
   }
 
-  // ---- Sneaky rounds: no countdown displayed ----
   function updateRoundChip(){
     if (!round.active){
       roundChip.textContent = "READY";
@@ -856,7 +893,6 @@
     round.active = true;
     round.type = type;
     round.lastTap = null;
-
     updateRoundChip();
     round.timerId = setTimeout(() => finishRound(), ROUND_MS);
   }
@@ -876,19 +912,13 @@
     const loserName = players.find(p => p.id === loserId)?.name || "Someone";
 
     addDrink(loserId, 1);
-
     showToast(`${loserName} drinks 🥴 (${label})`);
-    centerCard.innerHTML = `
-      <div style="font-size:16px;font-weight:900;line-height:1.1">
-        LAST TAP
-      </div>
-      <div style="margin-top:10px;font-size:32px;font-weight:900">
-        ${escapeHtml(loserName)}
-      </div>
-      <div style="margin-top:8px;font-size:13px;font-weight:900;opacity:.85;font-family:system-ui">
-        +1 drink • ${label}
-      </div>
-    `;
+
+    setCenterCardResult({
+      face: "LAST TAP",
+      rule: `${loserName} +1 drink`,
+      by: label
+    });
 
     clearRound();
     fitToScreen();
@@ -914,13 +944,36 @@
     startRound(round.type);
   });
 
+  function setCenterCardIdle(){
+    centerCard.innerHTML = `
+      <div class="cardMid">Draw a card<br/>No mercy</div>
+      <div class="cardFooter" id="cardFooter" style="visibility:hidden">
+        <span id="cardFooterBy">Drew: Mike</span>
+      </div>
+    `;
+  }
+
+  function setCenterCardResult({face, rule, by}){
+    centerCard.innerHTML = `
+      <div class="cardTop">
+        <div class="cardFace">${escapeHtml(face)}</div>
+        <div class="cardRule">${escapeHtml(rule || "")}</div>
+      </div>
+      <div class="cardMid"></div>
+      <div class="cardFooter" style="visibility:visible">
+        <span>${escapeHtml(by || "")}</span>
+      </div>
+    `;
+  }
+
   // ---- Cards ----
   function endState(){
     centerCard.innerHTML = `
-      <div style="font-size:18px;font-weight:900;line-height:1.15">
+      <div class="cardMid" style="font-size:18px;font-weight:900">
         All 52 cards drawn<br/>
         <span style="font-size:13px;opacity:.8;font-family:system-ui">Restart?</span>
       </div>
+      <div class="cardFooter" style="visibility:hidden"></div>
     `;
     drawBtn.style.display = "none";
     restartBtn.style.display = "block";
@@ -943,7 +996,7 @@
     renderSticky();
     renderHistory();
     setTurn(0);
-    centerCard.innerHTML = "Draw a card<br/>No mercy";
+    setCenterCardIdle();
     fitToScreen();
   }
 
@@ -971,17 +1024,12 @@
     renderSticky();
     renderHistory();
 
-    centerCard.innerHTML = `
-      <div style="font-size:34px;font-weight:900;margin-bottom:6px">
-        ${card}
-      </div>
-      <div style="font-size:13px;font-weight:900;opacity:.92;line-height:1.2;font-family:system-ui">
-        ${escapeHtml(rule)}
-      </div>
-      <div style="margin-top:8px;font-size:11px;opacity:.65;font-family:system-ui;font-weight:900">
-        Drew: ${escapeHtml(drawer)}
-      </div>
-    `;
+    // ✅ Clean card layout (no weird "Drew:" wrapping)
+    setCenterCardResult({
+      face: card,
+      rule,
+      by: `Drew: ${drawer}`
+    });
 
     setTurn(turnIdx + 1);
     if (idx >= 52) setTimeout(endState, 80);
@@ -994,13 +1042,11 @@
   function fitToScreen(){
     if (!stage || !wrap) return;
 
-    // Reset before measuring
     wrap.style.transform = "scale(1)";
 
     const stageRect = stage.getBoundingClientRect();
     const wrapRect = wrap.getBoundingClientRect();
 
-    // Add a small safety margin so nothing kisses edges
     const margin = 0.98;
     const scaleX = (stageRect.width / wrapRect.width) * margin;
     const scaleY = (stageRect.height / wrapRect.height) * margin;
@@ -1015,6 +1061,7 @@
     renderHistory();
     setTurn(0);
     updateRoundChip();
+    setCenterCardIdle();
     fitToScreen();
   });
 
