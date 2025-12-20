@@ -31,7 +31,7 @@
   html, body{
     margin:0;
     height:100%;
-    overflow:hidden;              /* never scroll */
+    overflow:hidden;
     background: var(--bg);
     color: var(--white);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -83,7 +83,7 @@
     max-height: 820px;
   }
 
-  /* Auto-scale container (shrinks if needed) */
+  /* Auto-scale container */
   .scaleWrap{
     position:relative;
     width:100%;
@@ -180,32 +180,31 @@
     padding: var(--btnPadY) var(--btnPadX);
     box-shadow: 0 14px 34px rgba(0,0,0,.50);
     cursor:pointer;
-    z-index: 5;
+    z-index: 6;
   }
   .drawBtn:active{ transform: translateX(-50%) scale(.99); }
 
-  /* ✅ Positions (adjusted so panel DOES NOT overlap Emily) */
-  .p-top-mid{ left:50%; top:12%; }
-  .p-top-left{ left:28%; top:17%; }
-  .p-top-right{ left:72%; top:17%; }
+  /* ✅ Balanced “ring” positions (centered group) */
+  .p-top-mid{   left:50%; top:13%; }
+  .p-top-left{  left:30%; top:18%; }
+  .p-top-right{ left:70%; top:18%; }
 
-  .p-mid-left{ left:15%; top:54%; }
+  .p-mid-left{  left:23%; top:56%; }
+  /* right side is a touch left to make room for panel */
+  .p-mid-right{ left:67%; top:56%; }
 
-  /* key fix: move mid-right player left + slightly down */
-  .p-mid-right{ left:68%; top:60%; }
-
-  .p-bot-left{ left:28%; top:90%; }
+  .p-bot-left{  left:30%; top:88%; }
 
   /* Card slightly lower */
   .center{ left:50%; top:58%; }
 
-  /* Side panel */
+  /* Side panel (kept tight, right aligned) */
   .panel{
     position:absolute;
-    right: 6px;          /* a touch closer to edge */
-    top: 54%;
+    right: 6px;
+    top: 56%;
     transform: translateY(-50%);
-    width: 212px;        /* slightly narrower */
+    width: 212px;
     padding: 12px;
     border-radius: 18px;
     background: rgba(11,11,11,.92);
@@ -214,7 +213,7 @@
     display:flex;
     flex-direction:column;
     gap:12px;
-    z-index: 4;          /* stays above background, but no longer covering Emily */
+    z-index: 5;
   }
 
   .sectionTitle{
@@ -341,14 +340,13 @@
     .pill{ font-size: 11px; padding: 6px 9px; border-radius: 10px; }
     .card{ font-size: 19px; }
 
-    .p-top-left{ left:25%; top:16%; }
-    .p-top-right{ left:75%; top:16%; }
-    .p-mid-left{ left:14%; top:52%; }
-
-    /* keep right-mid away from panel on small screens too */
-    .p-mid-right{ left:66%; top:62%; }
-
-    .p-bot-left{ left:25%; top:88%; }
+    /* balanced mini ring */
+    .p-top-mid{   left:50%; top:14%; }
+    .p-top-left{  left:28%; top:18%; }
+    .p-top-right{ left:72%; top:18%; }
+    .p-mid-left{  left:16%; top:54%; }
+    .p-mid-right{ left:66%; top:54%; }
+    .p-bot-left{  left:28%; top:88%; }
     .center{ left:50%; top:58%; }
 
     .panel{
@@ -481,11 +479,7 @@
   const clearRulesBtn = document.getElementById("clearRulesBtn");
 
   const activeRules = [];
-  const sticky = {
-    thumbmaster: null,
-    questionMaster: null,
-    heavenMaster: null
-  };
+  const sticky = { thumbmaster:null, questionMaster:null, heavenMaster:null };
 
   function escapeHtml(str){
     return String(str)
@@ -575,6 +569,7 @@
     });
   });
 
+  /* Full 52 card deck */
   const suits = ["♠","♥","♦","♣"];
   const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
   const deck = [];
