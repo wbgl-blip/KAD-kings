@@ -19,7 +19,6 @@
     --cardH: 300px;
 
     --titleSize: 48px;
-    --subSize: 13px;
 
     --btnPadY: 12px;
     --btnPadX: 22px;
@@ -111,7 +110,7 @@
   .stage{
     position:relative;
     width:min(980px, 96vw);
-    height: calc(100% - 118px); /* title + banner */
+    height: calc(100% - 118px);
     max-height: 820px;
   }
 
@@ -137,7 +136,7 @@
     justify-content:space-between;
     padding: 16px 16px 14px;
     position:relative;
-    cursor:pointer; /* tap to set turn */
+    cursor:pointer;
   }
 
   .tile.turn{
@@ -165,7 +164,7 @@
   }
   .tile.turn .turnTag{ display:block; }
 
-  .targetTag{
+  .tapBadge{
     position:absolute;
     left: 10px;
     top: 10px;
@@ -174,12 +173,12 @@
     letter-spacing: .10em;
     padding: 4px 8px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.14);
-    opacity:.92;
+    opacity:.95;
     display:none;
   }
-  .tile.targeting .targetTag{ display:block; }
+  .tile.tapping .tapBadge{ display:block; }
 
   .avatar{
     width: var(--avatar);
@@ -268,14 +267,13 @@
     font-weight: 1000;
     letter-spacing: .09em;
     padding: var(--btnPadY) var(--btnPadX);
-    box-shadow: 0 14px 34px rgba(0,0,0,.40);
+    box-shadow: 0 14px 34px rgba(0,0,0,0.40);
     cursor:pointer;
     z-index: 6;
     display:none;
   }
   .ghostBtn:active{ transform: translateX(-50%) scale(.99); }
 
-  /* Layout positions */
   .p-top-mid{   left:52%; top:13%; }
   .p-top-left{  left:32%; top:18%; }
   .p-top-right{ left:72%; top:18%; }
@@ -324,8 +322,23 @@
     opacity:.9;
   }
 
-  .stickyGrid{ display:flex; flex-direction:column; gap:8px; }
+  .historyWrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    justify-content:flex-start;
+  }
+  .hist{
+    font-size: 12px;
+    font-weight: 1000;
+    padding: 6px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.10);
+    opacity:.95;
+  }
 
+  .stickyGrid{ display:flex; flex-direction:column; gap:8px; }
   .stickyRow{
     padding: 10px 10px;
     border-radius: 14px;
@@ -336,14 +349,12 @@
     justify-content:space-between;
     gap:10px;
   }
-
   .stickyLabel{
     font-size: 12px;
     font-weight: 1000;
     letter-spacing:.02em;
     opacity:.9;
   }
-
   .stickyValue{
     font-size: 12px;
     font-weight: 1000;
@@ -354,7 +365,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-
   .stickyOn{
     background: rgba(255,255,255,0.14);
     border-color: rgba(255,255,255,0.16);
@@ -382,17 +392,9 @@
     color:#000;
     border-color: rgba(255,255,255,0.40);
   }
-  .powerBtn.warn{
-    background: rgba(255,255,255,0.16);
-    border-color: rgba(255,255,255,0.18);
-  }
-  .powerBtn[disabled]{
-    opacity:.45;
-    cursor:not-allowed;
-  }
+  .powerBtn[disabled]{ opacity:.45; cursor:not-allowed; }
 
   .rulesList{ display:flex; flex-direction:column; gap:8px; overflow:hidden; }
-
   .ruleItem{
     padding: 10px 10px;
     border-radius: 14px;
@@ -402,7 +404,6 @@
     line-height: 1.2;
     font-weight: 800;
   }
-
   .ruleMeta{
     margin-top: 6px;
     font-size: 11px;
@@ -412,7 +413,6 @@
   }
 
   .btnRow{ display:flex; gap:8px; }
-
   .miniBtn{
     flex:1;
     border:0;
@@ -425,73 +425,30 @@
   .miniBtn.dark{ background: rgba(255,255,255,0.10); color:#fff; border: 1px solid rgba(255,255,255,0.12); }
   .miniBtn:active{ transform: scale(.99); }
 
-  .historyWrap{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    justify-content:flex-start;
+  /* Toast */
+  #toast{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%);
+    padding:10px 12px;
+    border-radius:999px;
+    background:rgba(11,11,11,.92);
+    border:1px solid rgba(255,255,255,0.12);
+    color:#fff;
+    font-weight:1000;
+    letter-spacing:.06em;
+    font-size:12px;
+    box-shadow:0 16px 42px rgba(0,0,0,.65);
+    z-index:60;
+    max-width:92vw;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    opacity:0;
+    transition: opacity .15s ease;
+    pointer-events:none;
   }
-  .hist{
-    font-size: 12px;
-    font-weight: 1000;
-    padding: 6px 8px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.10);
-    opacity:.95;
-  }
-
-  /* Small modal */
-  .modalBack{
-    position:fixed; inset:0;
-    background: rgba(0,0,0,0.55);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index: 50;
-    padding: 16px;
-  }
-  .modal{
-    width:min(420px, 92vw);
-    border-radius: 18px;
-    background: rgba(11,11,11,.96);
-    border: 1px solid rgba(255,255,255,0.10);
-    box-shadow: 0 30px 90px rgba(0,0,0,.75);
-    padding: 14px;
-  }
-  .modalTitle{
-    font-weight: 1000;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    font-size: 12px;
-    opacity:.92;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-  }
-  .modalBody{
-    margin-top: 10px;
-    font-size: 14px;
-    font-weight: 800;
-    opacity:.92;
-    line-height:1.25;
-  }
-  .modalBtns{
-    margin-top: 12px;
-    display:flex;
-    gap:10px;
-  }
-  .modalBtns button{
-    flex:1;
-    border:0;
-    border-radius: 12px;
-    padding: 10px 10px;
-    font-weight: 1000;
-    cursor:pointer;
-  }
-  .modalBtns .ok{ background:#fff; color:#000; }
-  .modalBtns .cancel{ background: rgba(255,255,255,0.10); color:#fff; border: 1px solid rgba(255,255,255,0.12); }
 
   @media (max-width: 480px){
     :root{
@@ -505,13 +462,7 @@
       --btnPadX: 14px;
     }
 
-    .turnBanner{ font-size: 11px; padding: 7px 10px; }
     .turnSmall{ display:none; }
-
-    .name{ font-size: 13px; }
-    .stats{ font-size: 12px; gap:6px; }
-    .pill{ font-size: 11px; padding: 6px 9px; border-radius: 10px; }
-    .card{ font-size: 19px; }
 
     .p-top-mid{   left:52%; top:14%; }
     .p-top-left{  left:30%; top:18%; }
@@ -521,8 +472,6 @@
     .p-bot-left{  left:30%; top:88%; }
     .center{ left:50%; top:58%; }
 
-    .stage{ height: calc(100% - 108px); }
-
     .panel{
       right: 6px;
       top: 69%;
@@ -531,21 +480,8 @@
       gap:10px;
     }
 
-    .ruleItem{ font-size: 12px; padding: 8px 8px; }
     .hist{ font-size: 11px; padding: 5px 7px; }
-
     .powerBtn{ padding: 9px 8px; font-size: 12px; }
-  }
-
-  @media (max-height: 740px){
-    :root{
-      --tileW: 132px;
-      --tileH: 162px;
-      --avatar: 46px;
-      --cardW: 210px;
-      --cardH: 280px;
-      --titleSize: 40px;
-    }
   }
 </style>
 </head>
@@ -570,7 +506,7 @@
           <div class="card" id="centerCard">Draw a card<br/>No mercy</div>
         </div>
 
-        <div class="panel" id="panel">
+        <div class="panel">
           <div class="sectionTitle">
             Progress <span class="chip" id="progressChip">0 / 52</span>
           </div>
@@ -581,7 +517,7 @@
           <div class="historyWrap" id="historyWrap"></div>
 
           <div class="sectionTitle" style="margin-top:6px;">
-            Sticky Powers <span class="chip">LIVE</span>
+            Sticky Powers <span class="chip" id="roundChip">READY</span>
           </div>
 
           <div class="stickyGrid">
@@ -602,10 +538,10 @@
           </div>
 
           <div class="miniGrid">
-            <button class="powerBtn warn" id="thumbActionBtn" disabled>THUMB (J)</button>
-            <button class="powerBtn warn" id="heavenActionBtn" disabled>HEAVEN (7)</button>
-            <button class="powerBtn warn" id="questionActionBtn" disabled>QUESTION (Q)</button>
-            <button class="powerBtn primary" id="clearModesBtn">CLEAR</button>
+            <button class="powerBtn" id="thumbStartBtn" disabled>START J</button>
+            <button class="powerBtn" id="heavenStartBtn" disabled>START 7</button>
+            <button class="powerBtn" id="clearRoundBtn">CLEAR</button>
+            <button class="powerBtn primary" id="restartRoundBtn" disabled>RESTART</button>
           </div>
 
           <div class="sectionTitle">
@@ -631,20 +567,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
-  <div class="modalBack" id="modalBack">
-    <div class="modal">
-      <div class="modalTitle">
-        <span id="modalTitle">INFO</span>
-        <span class="chip" id="modalChip">LIVE</span>
-      </div>
-      <div class="modalBody" id="modalBody"></div>
-      <div class="modalBtns">
-        <button class="cancel" id="modalCancel">Close</button>
-        <button class="ok" id="modalOk">OK</button>
-      </div>
-    </div>
-  </div>
+  <div id="toast"></div>
 
 <script>
   const players = [
@@ -685,28 +608,23 @@
   const questionVal = document.getElementById("questionVal");
   const heavenVal = document.getElementById("heavenVal");
 
+  const progressChip = document.getElementById("progressChip");
+  const leftChip = document.getElementById("leftChip");
+  const historyWrap = document.getElementById("historyWrap");
+  const turnBannerText = document.getElementById("turnBannerText");
+
   const rulesCount = document.getElementById("rulesCount");
   const rulesList = document.getElementById("rulesList");
   const addRuleBtn = document.getElementById("addRuleBtn");
   const clearRulesBtn = document.getElementById("clearRulesBtn");
 
-  const progressChip = document.getElementById("progressChip");
-  const leftChip = document.getElementById("leftChip");
-  const historyWrap = document.getElementById("historyWrap");
+  const roundChip = document.getElementById("roundChip");
+  const thumbStartBtn = document.getElementById("thumbStartBtn");
+  const heavenStartBtn = document.getElementById("heavenStartBtn");
+  const clearRoundBtn = document.getElementById("clearRoundBtn");
+  const restartRoundBtn = document.getElementById("restartRoundBtn");
 
-  const turnBannerText = document.getElementById("turnBannerText");
-
-  const thumbActionBtn = document.getElementById("thumbActionBtn");
-  const heavenActionBtn = document.getElementById("heavenActionBtn");
-  const questionActionBtn = document.getElementById("questionActionBtn");
-  const clearModesBtn = document.getElementById("clearModesBtn");
-
-  const modalBack = document.getElementById("modalBack");
-  const modalTitle = document.getElementById("modalTitle");
-  const modalChip = document.getElementById("modalChip");
-  const modalBody = document.getElementById("modalBody");
-  const modalCancel = document.getElementById("modalCancel");
-  const modalOk = document.getElementById("modalOk");
+  const toast = document.getElementById("toast");
 
   const activeRules = [];
   const sticky = { thumbmaster:null, questionMaster:null, heavenMaster:null };
@@ -716,9 +634,17 @@
   let deck = [];
   let idx = 0;
 
-  // Action modes for sticky gameplay
-  let mode = "none"; // none | heaven_pick | thumb_arm | thumb_pick
-  let modeLabel = "";
+  // Sneaky round: no countdown shown anywhere.
+  // Change this number if you want it more/less evil.
+  const ROUND_MS = 4500;
+
+  let round = {
+    active: false,
+    type: null,           // "J" | "7"
+    timerId: null,
+    endAt: 0,
+    lastTap: null,        // {playerId, t}
+  };
 
   function escapeHtml(str){
     return String(str)
@@ -727,6 +653,13 @@
       .replaceAll(">","&gt;")
       .replaceAll('"',"&quot;")
       .replaceAll("'","&#039;");
+  }
+
+  function showToast(text){
+    toast.textContent = text;
+    toast.style.opacity = "1";
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.style.opacity = "0", 1400);
   }
 
   function buildDeck(){
@@ -738,15 +671,32 @@
     return d;
   }
 
-  function showModal(title, body, chip="LIVE", okText="OK"){
-    modalTitle.textContent = title;
-    modalChip.textContent = chip;
-    modalBody.innerHTML = body;
-    modalOk.textContent = okText;
-    modalBack.style.display = "flex";
+  function addDrink(playerId, amount){
+    const p = players.find(x => x.id === playerId);
+    if (!p) return;
+    p.drinks += amount;
+    const el = document.getElementById(`tile-${p.id}`);
+    if (el) el.querySelector(".drinkCount").textContent = p.drinks;
   }
-  function closeModal(){ modalBack.style.display = "none"; }
-  modalCancel.addEventListener("click", closeModal);
+
+  function setTurn(newTurnIdx){
+    turnIdx = (newTurnIdx + players.length) % players.length;
+    const who = players[turnIdx].name;
+    turnBannerText.textContent = `${who.toUpperCase()}’S TURN`;
+
+    players.forEach(p => {
+      const el = document.getElementById(`tile-${p.id}`);
+      if (!el) return;
+      el.classList.toggle("turn", p === players[turnIdx]);
+    });
+    fitToScreen();
+  }
+
+  function renderHistory(){
+    historyWrap.innerHTML = history.slice(0, 6).map(h => `<div class="hist">${escapeHtml(h.card)}</div>`).join("");
+    progressChip.textContent = `${idx} / 52`;
+    leftChip.textContent = `${52 - idx} left`;
+  }
 
   function renderSticky(){
     thumbVal.textContent = sticky.thumbmaster || "None";
@@ -757,10 +707,8 @@
     questionRow.classList.toggle("stickyOn", !!sticky.questionMaster);
     heavenRow.classList.toggle("stickyOn", !!sticky.heavenMaster);
 
-    // enable action buttons if the sticky exists
-    thumbActionBtn.disabled = !sticky.thumbmaster;
-    questionActionBtn.disabled = !sticky.questionMaster;
-    heavenActionBtn.disabled = !sticky.heavenMaster;
+    thumbStartBtn.disabled = !sticky.thumbmaster;
+    heavenStartBtn.disabled = !sticky.heavenMaster;
   }
 
   function renderRules(){
@@ -810,13 +758,13 @@
       <div class="pos ${p.pos}" data-id="${p.id}">
         <div class="tile" id="tile-${p.id}">
           <div class="turnTag">TURN</div>
-          <div class="targetTag">PICK</div>
+          <div class="tapBadge">TAP!</div>
           <div class="avatar"></div>
           <div>
             <div class="name">${p.name}</div>
             <div class="stats"><span>🍺</span><span class="drinkCount">${p.drinks}</span></div>
           </div>
-          <button class="pill" data-plus="1">+1 Beer</button>
+          <button class="pill">+1 Beer</button>
         </div>
       </div>
     `;
@@ -824,78 +772,133 @@
 
   wrap.insertAdjacentHTML("afterbegin", players.map(tileHTML).join(""));
 
-  // +1 Beer button
   wrap.querySelectorAll(".pos[data-id] .pill").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const root = e.target.closest(".pos[data-id]");
-      const id = root.getAttribute("data-id");
-      addDrink(id, 1);
+      addDrink(root.getAttribute("data-id"), 1);
     });
   });
 
-  // Tap player tile (set turn OR use pick mode)
   wrap.querySelectorAll(".pos[data-id] .tile").forEach((tile) => {
     tile.addEventListener("click", (e) => {
-      const root = e.currentTarget.closest(".pos[data-id]");
-      const id = root.getAttribute("data-id");
+      const id = e.currentTarget.closest(".pos[data-id]").getAttribute("data-id");
 
-      if (mode === "heaven_pick"){
-        // Heaven: pick loser
-        addDrink(id, 1);
-        showToast(`${players.find(p=>p.id===id).name} drinks (Heaven 7)`);
-        clearModes();
+      if (round.active){
+        // Sneaky round reaction
+        round.lastTap = { playerId: id, t: Date.now() };
+        flashTap(id);
         return;
       }
 
-      if (mode === "thumb_pick"){
-        // Thumb: pick loser (manual)
-        addDrink(id, 1);
-        showToast(`${players.find(p=>p.id===id).name} drinks (Thumb J)`);
-        clearModes();
-        return;
-      }
-
-      // default: set turn
-      const idx = players.findIndex(p => p.id === id);
-      if (idx >= 0) setTurn(idx);
+      // Normal: set turn
+      const i = players.findIndex(p => p.id === id);
+      if (i >= 0) setTurn(i);
     });
   });
 
-  function addDrink(playerId, amount){
-    const p = players.find(x => x.id === playerId);
-    if (!p) return;
-    p.drinks += amount;
-    const tile = document.getElementById(`tile-${p.id}`);
-    tile.querySelector(".drinkCount").textContent = p.drinks;
+  function flashTap(playerId){
+    const el = document.getElementById(`tile-${playerId}`);
+    if (!el) return;
+    el.classList.add("tapping");
+    flashTap._t = flashTap._t || {};
+    clearTimeout(flashTap._t[playerId]);
+    flashTap._t[playerId] = setTimeout(() => el.classList.remove("tapping"), 220);
   }
 
-  function setTurn(newTurnIdx){
-    turnIdx = (newTurnIdx + players.length) % players.length;
-    const who = players[turnIdx].name;
+  // ---- Sneaky rounds: no countdown displayed ----
+  function updateRoundChip(){
+    if (!round.active){
+      roundChip.textContent = "READY";
+      restartRoundBtn.disabled = true;
+      return;
+    }
+    // No timer, no seconds, just "LIVE"
+    roundChip.textContent = `${round.type} LIVE`;
+    restartRoundBtn.disabled = false;
+  }
 
-    // Banner text
-    turnBannerText.textContent = `${who.toUpperCase()}’S TURN`;
+  function clearRound(){
+    round.active = false;
+    round.type = null;
+    round.lastTap = null;
+    round.endAt = 0;
+    if (round.timerId) clearTimeout(round.timerId);
+    round.timerId = null;
+    updateRoundChip();
+  }
 
-    // Tile highlight
-    players.forEach(p => {
-      const el = document.getElementById(`tile-${p.id}`);
-      if (!el) return;
-      el.classList.toggle("turn", p === players[turnIdx]);
-    });
+  function startRound(type){
+    // type = "J" or "7"
+    clearRound();
+    round.active = true;
+    round.type = type;
+    round.lastTap = null;
+    round.endAt = Date.now() + ROUND_MS;
 
+    // Sneaky: don’t announce start loudly. Tiny cue only:
+    updateRoundChip();
+
+    // End after fixed time, no visible countdown
+    round.timerId = setTimeout(() => finishRound(), ROUND_MS);
+  }
+
+  function finishRound(){
+    if (!round.active) return;
+
+    const type = round.type;
+    const label = (type === "J") ? "Thumb (J)" : "Heaven (7)";
+
+    if (!round.lastTap){
+      // If nobody taps, nothing happens (still sneaky)
+      clearRound();
+      return;
+    }
+
+    const loserId = round.lastTap.playerId;
+    const loserName = players.find(p => p.id === loserId)?.name || "Someone";
+
+    addDrink(loserId, 1);
+
+    // Small result, not a whole countdown show
+    showToast(`${loserName} drinks 🥴 (${label})`);
+    centerCard.innerHTML = `
+      <div style="font-size:18px;font-weight:900;line-height:1.1">
+        LAST TAP
+      </div>
+      <div style="margin-top:10px;font-size:36px;font-weight:900">
+        ${escapeHtml(loserName)}
+      </div>
+      <div style="margin-top:8px;font-size:14px;font-weight:900;opacity:.85;font-family:system-ui">
+        +1 drink • ${label}
+      </div>
+    `;
+
+    clearRound();
     fitToScreen();
   }
 
-  function renderHistory(){
-    historyWrap.innerHTML = history.slice(0, 6).map(h => {
-      return `<div class="hist">${escapeHtml(h.card)}</div>`;
-    }).join("");
+  thumbStartBtn.addEventListener("click", () => {
+    if (!sticky.thumbmaster) return;
+    startRound("J");
+  });
 
-    progressChip.textContent = `${idx} / 52`;
-    leftChip.textContent = `${52 - idx} left`;
-  }
+  heavenStartBtn.addEventListener("click", () => {
+    if (!sticky.heavenMaster) return;
+    startRound("7");
+  });
 
+  clearRoundBtn.addEventListener("click", () => {
+    clearRound();
+    showToast("CLEARED");
+  });
+
+  restartRoundBtn.addEventListener("click", () => {
+    if (!round.active || !round.type) return;
+    startRound(round.type);
+  });
+
+  // ---- Cards ----
   function endState(){
     centerCard.innerHTML = `
       <div style="font-size:20px;font-weight:900;line-height:1.15">
@@ -919,7 +922,7 @@
     sticky.thumbmaster = null;
     sticky.questionMaster = null;
     sticky.heavenMaster = null;
-    clearModes();
+    clearRound();
     normalState();
     renderSticky();
     renderHistory();
@@ -952,11 +955,6 @@
     renderSticky();
     renderHistory();
 
-    let stickyHint = "";
-    if (rank === "J") stickyHint = `<div style="margin-top:8px;font-size:12px;opacity:.78;font-family:system-ui;font-weight:900">Thumbmaster: ${escapeHtml(drawer)} (tap THUMB to play)</div>`;
-    if (rank === "Q") stickyHint = `<div style="margin-top:8px;font-size:12px;opacity:.78;font-family:system-ui;font-weight:900">Question Master: ${escapeHtml(drawer)} (tap QUESTION)</div>`;
-    if (rank === "7") stickyHint = `<div style="margin-top:8px;font-size:12px;opacity:.78;font-family:system-ui;font-weight:900">Heaven: ${escapeHtml(drawer)} (tap HEAVEN to pick)</div>`;
-
     centerCard.innerHTML = `
       <div style="font-size:40px;font-weight:900;margin-bottom:6px">
         ${card}
@@ -964,142 +962,19 @@
       <div style="font-size:14px;font-weight:900;opacity:.92;line-height:1.2;font-family:system-ui">
         ${escapeHtml(rule)}
       </div>
-      ${stickyHint}
       <div style="margin-top:8px;font-size:12px;opacity:.65;font-family:system-ui;font-weight:900">
         Drew: ${escapeHtml(drawer)}
       </div>
     `;
 
-    // Advance turn after draw
     setTurn(turnIdx + 1);
-
-    if (idx >= 52){
-      setTimeout(endState, 80);
-    }
-
+    if (idx >= 52) setTimeout(endState, 80);
     fitToScreen();
   }
 
   drawBtn.addEventListener("click", drawCard);
 
-  // ---------- Sticky Actions (Playable) ----------
-  function setMode(nextMode, label){
-    mode = nextMode;
-    modeLabel = label || "";
-
-    // mark tiles as targeting if we need a player pick
-    const needsPick = (mode === "heaven_pick" || mode === "thumb_pick");
-    players.forEach(p => {
-      const el = document.getElementById(`tile-${p.id}`);
-      if (!el) return;
-      el.classList.toggle("targeting", needsPick);
-    });
-
-    if (needsPick){
-      showToast(modeLabel);
-    }
-  }
-
-  function clearModes(){
-    mode = "none";
-    modeLabel = "";
-    players.forEach(p => {
-      const el = document.getElementById(`tile-${p.id}`);
-      if (!el) return;
-      el.classList.remove("targeting");
-    });
-  }
-
-  thumbActionBtn.addEventListener("click", () => {
-    if (!sticky.thumbmaster) return;
-
-    // 2-step: arm -> pick loser
-    if (mode !== "thumb_pick"){
-      setMode("thumb_pick", "THUMB ROUND: tap the loser (last thumb down)");
-      showModal("Thumbmaster (J)", `
-        <div style="opacity:.9;font-weight:900">
-          ${escapeHtml(sticky.thumbmaster)} is Thumbmaster.
-        </div>
-        <div style="margin-top:8px;opacity:.85">
-          Tap <b>THUMB (J)</b>, then tap the player who drank.
-        </div>
-      `, "J", "Got it");
-      modalOk.onclick = () => { closeModal(); };
-    }
-  });
-
-  heavenActionBtn.addEventListener("click", () => {
-    if (!sticky.heavenMaster) return;
-    setMode("heaven_pick", "HEAVEN (7): tap the loser (last to point up)");
-    showModal("Heaven (7)", `
-      <div style="opacity:.9;font-weight:900">
-        ${escapeHtml(sticky.heavenMaster)} owns Heaven.
-      </div>
-      <div style="margin-top:8px;opacity:.85">
-        Tap <b>HEAVEN (7)</b>, then tap the player who drank.
-      </div>
-    `, "7", "Start");
-    modalOk.onclick = () => { closeModal(); };
-  });
-
-  questionActionBtn.addEventListener("click", () => {
-    if (!sticky.questionMaster) return;
-    showModal("Question Master (Q)", `
-      <div style="opacity:.9;font-weight:900">
-        ${escapeHtml(sticky.questionMaster)} is Question Master.
-      </div>
-      <div style="margin-top:8px;opacity:.85">
-        If you answer their questions, you drink.
-      </div>
-      <div style="margin-top:10px;opacity:.75;font-size:12px">
-        Tip: tap a player tile anytime to set the next turn.
-      </div>
-    `, "Q", "OK");
-    modalOk.onclick = () => { closeModal(); };
-  });
-
-  clearModesBtn.addEventListener("click", () => {
-    clearModes();
-    showToast("CLEARED");
-  });
-
-  // ---------- Tiny Toast ----------
-  let toastTimer = null;
-  function showToast(text){
-    let el = document.getElementById("toast");
-    if (!el){
-      el = document.createElement("div");
-      el.id = "toast";
-      el.style.position = "fixed";
-      el.style.left = "50%";
-      el.style.bottom = "22px";
-      el.style.transform = "translateX(-50%)";
-      el.style.padding = "10px 12px";
-      el.style.borderRadius = "999px";
-      el.style.background = "rgba(11,11,11,.92)";
-      el.style.border = "1px solid rgba(255,255,255,0.12)";
-      el.style.color = "#fff";
-      el.style.fontWeight = "1000";
-      el.style.letterSpacing = ".06em";
-      el.style.fontSize = "12px";
-      el.style.boxShadow = "0 16px 42px rgba(0,0,0,.65)";
-      el.style.zIndex = "60";
-      el.style.maxWidth = "92vw";
-      el.style.whiteSpace = "nowrap";
-      el.style.overflow = "hidden";
-      el.style.textOverflow = "ellipsis";
-      document.body.appendChild(el);
-    }
-    el.textContent = text;
-
-    clearTimeout(toastTimer);
-    el.style.opacity = "1";
-    toastTimer = setTimeout(() => {
-      el.style.opacity = "0";
-    }, 1600);
-  }
-
-  // ---------- Fit-to-screen ----------
+  // ---- Fit ----
   function fitToScreen(){
     if (!stage || !wrap) return;
     wrap.style.transform = "scale(1)";
@@ -1116,6 +991,7 @@
     renderRules();
     renderHistory();
     setTurn(0);
+    updateRoundChip();
     fitToScreen();
   });
 
