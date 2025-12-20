@@ -1,14 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./styles.css";
 
 const PLAYERS = ["Beau", "Mike", "Jess", "Alex", "Emily"];
 
+const CARD_RULES = {
+  A: "Waterfall",
+  2: "You",
+  3: "Me",
+  4: "Whores drink",
+  5: "Never have I ever",
+  6: "Dicks drink",
+  7: "Heaven (last to react drinks)",
+  8: "Mate",
+  9: "Rhyme",
+  10: "Categories",
+  J: "Thumbmaster (last to react drinks)",
+  Q: "Question Master",
+  K: "Make a rule"
+};
+
+function buildDeck() {
+  const suits = ["♠", "♥", "♦", "♣"];
+  const values = Object.keys(CARD_RULES);
+  let deck = [];
+
+  for (let v of values) {
+    for (let s of suits) {
+      deck.push({ value: v, suit: s });
+    }
+  }
+
+  return deck.sort(() => Math.random() - 0.5);
+}
+
 export default function App() {
+  const [deck, setDeck] = useState(buildDeck());
+  const [card, setCard] = useState(null);
+
   const [drinks, setDrinks] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
+
   const [turn, setTurn] = useState("Beau");
-  const [mode, setMode] = useState("auto"); // auto | mobile | desktop
+
   const [reactionActive, setReactionActive] = useState(false);
   const [reacted, setReacted] = useState([]);
 
@@ -16,9 +50,17 @@ export default function App() {
     setDrinks(d => ({ ...d, [player]: d[player] + 1 }));
   }
 
-  function startReaction() {
-    setReactionActive(true);
-    setReacted([]);
+  function drawCard() {
+    if (!deck.length) return;
+
+    const next = deck[0];
+    setDeck(d => d.slice(1));
+    setCard(next);
+
+    if (next.value === "7" || next.value === "J") {
+      setReactionActive(true);
+      setReacted([]);
+    }
   }
 
   function react(player) {
@@ -26,7 +68,7 @@ export default function App() {
     setReacted(r => [...r, player]);
   }
 
-  function finishReaction() {
+  function endReaction() {
     const loser = PLAYERS.find(p => !reacted.includes(p));
     if (loser) addDrink(loser);
     setReactionActive(false);
@@ -34,18 +76,13 @@ export default function App() {
   }
 
   return (
-    <div className={`app ${mode}`}>
+    <div className="app">
       <header>
         <h1>KAD Kings</h1>
-        <div className="mode-toggle">
-          <button onClick={() => setMode("auto")}>AUTO</button>
-          <button onClick={() => setMode("mobile")}>📱</button>
-          <button onClick={() => setMode("desktop")}>🖥️</button>
-        </div>
       </header>
 
       <div className="turn-indicator">
-        <span>{turn.toUpperCase()}’S TURN</span>
+        {turn.toUpperCase()}’S TURN
       </div>
 
       <main>
@@ -86,20 +123,26 @@ export default function App() {
 
         <section className="card">
           <div className="card-face">
-            <p>Draw a card<br />No mercy</p>
+            {card ? (
+              <>
+                <h2>{card.value}{card.suit}</h2>
+                <p>{CARD_RULES[card.value]}</p>
+              </>
+            ) : (
+              <p>Draw a card<br />No mercy</p>
+            )}
           </div>
-          <button className="draw">DRAW CARD</button>
-        </section>
 
-        <aside className="sidebar">
-          <h4>Sticky Powers</h4>
-          <button onClick={startReaction}>START J / 7</button>
+          <button className="draw" onClick={drawCard}>
+            DRAW CARD
+          </button>
+
           {reactionActive && (
-            <button className="end" onClick={finishReaction}>
+            <button className="draw end" onClick={endReaction}>
               END REACTION
             </button>
           )}
-        </aside>
+        </section>
       </main>
     </div>
   );
