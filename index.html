@@ -10,17 +10,17 @@
     --bg:#000;
     --white:#fff;
     --panel: rgba(12,12,12,.92);
-    --line: rgba(255,255,255,.10);
-    --soft: rgba(255,255,255,.06);
 
-    --title: 44px;
+    --title: 54px;
 
-    --tileW: 150px;
-    --tileH: 180px;
-    --avatar: 50px;
+    /* players slightly bigger than card */
+    --tileW: 170px;
+    --tileH: 200px;
+    --avatar: 56px;
 
-    --cardW: 180px;
-    --cardH: 240px;
+    /* card smaller */
+    --cardW: 160px;
+    --cardH: 215px;
 
     --btnY: 10px;
     --btnX: 18px;
@@ -78,7 +78,7 @@
 
   /* Top status / round banner */
   .statusBar{
-    width: min(860px, 96vw);
+    width: min(980px, 96vw);
     display:flex;
     gap:10px;
     align-items:center;
@@ -128,39 +128,219 @@
     font-size: 11px;
   }
   body.roundActive .roundPill{ display:flex; align-items:center; gap:10px; }
-  .flash{
-    animation: flash 0.8s infinite;
-  }
+  .flash{ animation: flash 0.8s infinite; }
   @keyframes flash{
     0%, 100%{ filter: brightness(1); }
     50%{ filter: brightness(1.35); }
   }
 
-  /* Main stage */
+  /* Stage */
   .stage{
-    width: min(980px, 96vw);
+    width: min(1080px, 96vw);
     flex: 1;
-    display:flex;
-    align-items:stretch;
-    justify-content:center;
+    display:grid;
+    grid-template-columns: 1fr 260px;  /* board + compact panel */
     gap: 14px;
-    position: relative;
-    z-index: 10;
     min-height: 0;
+    align-items: center;
   }
 
-  /* Desktop layout: board + side panel */
+  /* Board */
   .board{
-    flex: 1;
     min-width: 0;
+    height: 100%;
     display:flex;
     align-items:center;
     justify-content:center;
-    position:relative;
   }
 
+  /* ✅ grid that always fits 6 players (no clipping) */
+  .boardGrid{
+    width: 100%;
+    max-width: 720px;
+    height: 100%;
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 14px;
+    align-content: center;
+    justify-items: center;
+  }
+
+  .slot{ display:flex; justify-content:center; width:100%; }
+
+  /* Center block */
+  .centerWrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+  }
+
+  /* Card */
+  .card{
+    width: var(--cardW);
+    height: var(--cardH);
+    background:#fff;
+    color:#000;
+    border-radius: 22px;
+    box-shadow: 0 18px 52px rgba(0,0,0,.55);
+    display:flex;
+    flex-direction:column;
+    padding: 14px 16px 12px;
+    text-align:center;
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    font-weight: 900;
+    line-height: 1.15;
+  }
+  .cardTop{
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    gap:10px;
+    min-height: 50px;
+  }
+  .cardFace{
+    font-size: 26px;
+    font-weight: 1000;
+    line-height: 1;
+  }
+  .cardRule{
+    font-size: 12px;
+    font-weight: 1000;
+    font-family: system-ui;
+    opacity:.86;
+    line-height: 1.15;
+    text-align:left;
+    max-width: 100px;
+  }
+  .cardMid{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 17px;
+    padding: 8px 8px;
+  }
+  .cardFooter{
+    font-family: system-ui;
+    font-size: 11px;
+    font-weight: 1000;
+    opacity:.65;
+    min-height: 16px;
+  }
+
+  .drawBtn{
+    background:#fff;
+    color:#000;
+    border:0;
+    border-radius: 14px;
+    font-weight: 1000;
+    letter-spacing:.10em;
+    padding: var(--btnY) var(--btnX);
+    box-shadow: 0 14px 34px rgba(0,0,0,.50);
+    cursor:pointer;
+  }
+  .drawBtn:active{ transform: scale(.99); }
+
+  /* Player tile */
+  .tile{
+    width: var(--tileW);
+    height: var(--tileH);
+    border-radius: 22px;
+    background: rgba(11,11,11,.96);
+    border: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 18px 44px rgba(0,0,0,0.72);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    padding: 14px 14px 12px;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
+  }
+
+  /* Turn highlight without scaling */
+  .tile.turn{
+    border-color: rgba(255,255,255,0.30);
+    box-shadow:
+      0 0 0 2px rgba(255,255,255,0.10),
+      0 26px 70px rgba(0,0,0,0.82),
+      0 0 60px rgba(255,255,255,0.10);
+  }
+  .turnTag{
+    position:absolute;
+    top:10px; right:10px;
+    font-size: 11px;
+    font-weight: 1000;
+    letter-spacing:.10em;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.18);
+    opacity:.95;
+    display:none;
+  }
+  .tile.turn .turnTag{ display:block; }
+
+  .avatar{
+    width: var(--avatar);
+    height: var(--avatar);
+    border-radius: 999px;
+    background: rgba(255,255,255,.35);
+  }
+  .name{
+    margin-top:-6px;
+    font-weight: 1000;
+    font-size: 18px;
+    text-align:center;
+  }
+  .stats{
+    margin-top:6px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+    justify-content:center;
+    font-size: 14px;
+    opacity:.92;
+    font-weight: 900;
+  }
+
+  .plusBtn{
+    width: 100%;
+    border:0;
+    border-radius: 12px;
+    padding: 9px 10px;
+    font-weight: 1000;
+    background:#fff;
+    color:#000;
+    cursor:pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,.35);
+  }
+  .plusBtn:active{ transform: scale(.99); }
+
+  /* Round reaction */
+  .reactBtn{
+    width: 100%;
+    border:0;
+    border-radius: 12px;
+    padding: 10px 10px;
+    font-weight: 1000;
+    letter-spacing:.10em;
+    background: rgba(255,255,255,0.12);
+    color:#fff;
+    border: 1px solid rgba(255,255,255,0.14);
+    cursor:pointer;
+    display:none;
+  }
+  body.roundActive .plusBtn{ display:none; }
+  body.roundActive .reactBtn{ display:block; }
+
+  /* Compact Panel (no giant empty slab) */
   .side{
     width: 260px;
+    align-self: center;
     background: var(--panel);
     border: 1px solid rgba(255,255,255,.10);
     border-radius: 20px;
@@ -169,6 +349,8 @@
     display:flex;
     flex-direction:column;
     gap:12px;
+    max-height: 78vh;           /* ✅ stops it becoming a skyscraper */
+    overflow:auto;              /* ✅ if stuff grows later */
   }
 
   .sectionTitle{
@@ -190,7 +372,6 @@
     border: 1px solid rgba(255,255,255,0.10);
     opacity:.95;
   }
-
   .row{
     padding: 10px 10px;
     border-radius: 14px;
@@ -212,7 +393,6 @@
     max-width: 120px;
     text-align:right;
   }
-
   .grid2{
     display:grid;
     grid-template-columns: 1fr 1fr;
@@ -252,189 +432,6 @@
     opacity:.95;
   }
 
-  /* Card + players area (desktop uses a neat grid too, no overlap) */
-  .boardGrid{
-    width: 100%;
-    max-width: 680px;
-    height: 100%;
-    display:grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto 1fr auto;
-    gap: 14px;
-    align-items:center;
-    justify-items:center;
-  }
-
-  .centerWrap{
-    grid-column: 2;
-    grid-row: 2;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:12px;
-  }
-
-  .card{
-    width: var(--cardW);
-    height: var(--cardH);
-    background:#fff;
-    color:#000;
-    border-radius: 22px;
-    box-shadow: 0 18px 52px rgba(0,0,0,.55);
-    display:flex;
-    flex-direction:column;
-    padding: 14px 16px 12px;
-    text-align:center;
-    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-    font-weight: 900;
-    line-height: 1.15;
-  }
-  .cardTop{
-    display:flex;
-    align-items:flex-start;
-    justify-content:center;
-    gap:10px;
-    min-height: 52px;
-  }
-  .cardFace{
-    font-size: 28px;
-    font-weight: 1000;
-    line-height: 1;
-  }
-  .cardRule{
-    font-size: 12px;
-    font-weight: 1000;
-    font-family: system-ui;
-    opacity:.86;
-    line-height: 1.15;
-    text-align:left;
-    max-width: 110px;
-  }
-  .cardMid{
-    flex:1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size: 18px;
-    padding: 8px 8px;
-  }
-  .cardFooter{
-    font-family: system-ui;
-    font-size: 11px;
-    font-weight: 1000;
-    opacity:.65;
-    min-height: 16px;
-  }
-
-  .drawBtn{
-    background:#fff;
-    color:#000;
-    border:0;
-    border-radius: 14px;
-    font-weight: 1000;
-    letter-spacing:.10em;
-    padding: var(--btnY) var(--btnX);
-    box-shadow: 0 14px 34px rgba(0,0,0,.50);
-    cursor:pointer;
-  }
-  .drawBtn:active{ transform: scale(.99); }
-
-  /* Player tile */
-  .tile{
-    width: var(--tileW);
-    height: var(--tileH);
-    border-radius: 22px;
-    background: rgba(11,11,11,.96);
-    border: 1px solid rgba(255,255,255,.08);
-    box-shadow: 0 18px 44px rgba(0,0,0,0.72);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:space-between;
-    padding: 14px 14px 12px;
-    position:relative;
-    overflow:hidden;
-  }
-
-  /* Turn highlight without scaling */
-  .tile.turn{
-    border-color: rgba(255,255,255,0.30);
-    box-shadow:
-      0 0 0 2px rgba(255,255,255,0.10),
-      0 26px 70px rgba(0,0,0,0.82),
-      0 0 60px rgba(255,255,255,0.10);
-  }
-  .turnTag{
-    position:absolute;
-    top:10px; right:10px;
-    font-size: 11px;
-    font-weight: 1000;
-    letter-spacing:.10em;
-    padding: 4px 8px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.16);
-    border: 1px solid rgba(255,255,255,0.18);
-    opacity:.95;
-    display:none;
-  }
-  .tile.turn .turnTag{ display:block; }
-
-  .avatar{
-    width: var(--avatar);
-    height: var(--avatar);
-    border-radius: 999px;
-    background: rgba(255,255,255,.35);
-  }
-  .name{
-    margin-top:-6px;
-    font-weight: 1000;
-    font-size: 17px;
-    text-align:center;
-  }
-  .stats{
-    margin-top:6px;
-    display:flex;
-    gap:8px;
-    align-items:center;
-    justify-content:center;
-    font-size: 14px;
-    opacity:.92;
-    font-weight: 900;
-  }
-
-  .plusBtn{
-    width: 100%;
-    border:0;
-    border-radius: 12px;
-    padding: 9px 10px;
-    font-weight: 1000;
-    background:#fff;
-    color:#000;
-    cursor:pointer;
-    box-shadow: 0 8px 20px rgba(0,0,0,.35);
-  }
-  .plusBtn:active{ transform: scale(.99); }
-
-  /* Round reaction button (shows only during round) */
-  .reactBtn{
-    width: 100%;
-    border:0;
-    border-radius: 12px;
-    padding: 10px 10px;
-    font-weight: 1000;
-    letter-spacing:.10em;
-    background: rgba(255,255,255,0.12);
-    color:#fff;
-    border: 1px solid rgba(255,255,255,0.14);
-    cursor:pointer;
-    display:none;
-  }
-  .reactBtn.flashBtn{ animation: flash 0.8s infinite; }
-  .reactBtn:active{ transform: scale(.99); }
-
-  body.roundActive .plusBtn{ display:none; }
-  body.roundActive .reactBtn{ display:block; }
-
   /* Toast */
   #toast{
     position:fixed;
@@ -460,119 +457,33 @@
     pointer-events:none;
   }
 
-  /* Mobile: hide side panel, use bottom sheet */
-  .hudBtn{
-    display:none;
-    position:fixed;
-    right: 12px;
-    bottom: calc(92px + env(safe-area-inset-bottom, 0px));
-    width: 56px; height: 56px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: rgba(12,12,12,.92);
-    box-shadow: 0 18px 46px rgba(0,0,0,.70);
-    color:#fff;
-    font-weight: 1000;
-    font-size: 22px;
-    cursor:pointer;
-    z-index: 150;
-  }
-
-  .sheetOverlay{
-    position:fixed; inset:0;
-    background: rgba(0,0,0,0.55);
-    opacity:0;
-    pointer-events:none;
-    transition: opacity .18s ease;
-    z-index: 180;
-  }
-  .sheet{
-    position:fixed;
-    left: 0; right: 0;
-    bottom: -100%;
-    padding: 12px 12px calc(18px + env(safe-area-inset-bottom, 0px));
-    transition: bottom .22s ease;
-    z-index: 190;
-  }
-  .sheetInner{
-    margin: 0 auto;
-    width: min(520px, 96vw);
-    background: rgba(12,12,12,.96);
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 22px;
-    box-shadow: 0 26px 70px rgba(0,0,0,0.80);
-    padding: 12px;
-    max-height: 72vh;
-    overflow:auto;
-  }
-  .grabber{
-    height: 5px; width: 44px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.18);
-    margin: 0 auto 10px;
-  }
-  .sheetTop{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin-bottom: 10px;
-  }
-  .closeBtn{
-    border:0;
-    background: rgba(255,255,255,0.10);
-    color:#fff;
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 12px;
-    padding: 8px 10px;
-    font-weight:1000;
-    cursor:pointer;
-  }
-
-  body.sheetOpen .sheetOverlay{ opacity:1; pointer-events:auto; }
-  body.sheetOpen .sheet{ bottom: 10px; }
-
+  /* --- Mobile: no side panel, still no overlap --- */
   @media (max-width: 600px){
     :root{
       --title: 38px;
 
-      --tileW: 122px;
+      --tileW: 124px;
       --tileH: 150px;
       --avatar: 38px;
 
-      --cardW: 150px;
-      --cardH: 190px;
+      --cardW: 145px;
+      --cardH: 185px;
 
       --btnY: 9px;
       --btnX: 14px;
     }
 
-    .stage{ width: 96vw; gap:0; }
+    .stage{
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
     .side{ display:none; }
-    .hudBtn{ display:block; }
 
-    /* Mobile grid (no overlap possible) */
     .boardGrid{
       max-width: 460px;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-template-rows: auto auto auto;
       gap: 12px;
-      align-content: center;
-      padding-bottom: 58px; /* breathing room above toast/hud */
+      padding-bottom: 44px;
     }
-
-    /* Place players by row */
-    #slot-top-left{ grid-column:1; grid-row:1; }
-    #slot-top-mid{  grid-column:2; grid-row:1; }
-    #slot-top-right{grid-column:3; grid-row:1; }
-
-    #slot-mid-left{ grid-column:1; grid-row:2; }
-    #slot-center{   grid-column:2; grid-row:2; }
-    #slot-mid-right{grid-column:3; grid-row:2; }
-
-    #slot-bot-left{ grid-column:1; grid-row:3; }
-    #slot-bot-mid{  grid-column:2; grid-row:3; } /* unused spacer */
-    #slot-bot-right{grid-column:3; grid-row:3; } /* unused spacer */
 
     .name{ font-size: 14px; }
     .stats{ font-size: 13px; }
@@ -591,7 +502,7 @@
   <h1>KAD Kings</h1>
 
   <div class="statusBar">
-    <div class="pill" id="turnPill">
+    <div class="pill">
       <span class="dot"></span>
       <span id="turnText">BEAU’S TURN</span>
       <span style="opacity:.7; font-weight:900; letter-spacing:.06em; text-transform:none;" id="turnHint">tap a player to set turn</span>
@@ -606,17 +517,16 @@
 
   <div class="stage">
     <div class="board">
-      <div class="boardGrid" id="boardGrid">
+      <div class="boardGrid">
+        <!-- Row 1 -->
+        <div class="slot" id="slot-top-left"></div>
+        <div class="slot" id="slot-top-mid"></div>
+        <div class="slot" id="slot-top-right"></div>
 
-        <!-- TOP -->
-        <div id="slot-top-left"></div>
-        <div id="slot-top-mid"></div>
-        <div id="slot-top-right"></div>
+        <!-- Row 2 -->
+        <div class="slot" id="slot-mid-left"></div>
 
-        <!-- MID -->
-        <div id="slot-mid-left"></div>
-
-        <div id="slot-center" class="centerWrap">
+        <div class="centerWrap">
           <div class="card" id="centerCard">
             <div class="cardMid">Draw a card<br/>No mercy</div>
             <div class="cardFooter" style="visibility:hidden"></div>
@@ -624,25 +534,23 @@
           <button class="drawBtn" id="drawBtn">DRAW CARD</button>
         </div>
 
-        <div id="slot-mid-right"></div>
+        <div class="slot" id="slot-mid-right"></div>
 
-        <!-- BOT -->
-        <div id="slot-bot-left"></div>
-        <div id="slot-bot-mid"></div>
-        <div id="slot-bot-right"></div>
-
+        <!-- Row 3 (Sean is bottom-center now, always visible) -->
+        <div class="slot"></div>
+        <div class="slot" id="slot-bot-mid"></div>
+        <div class="slot"></div>
       </div>
     </div>
 
-    <!-- Desktop side panel -->
-    <aside class="side" id="sidePanel">
+    <aside class="side">
       <div class="sectionTitle">Progress <span class="chip" id="progressChip">0 / 52</span></div>
       <div class="sectionTitle">History <span class="chip" id="leftChip">52 left</span></div>
       <div class="historyWrap" id="historyWrap"></div>
 
       <div class="sectionTitle" style="margin-top:4px;">Sticky Powers</div>
-      <div class="row" id="thumbRow"><strong>Thumbmaster (J)</strong><span id="thumbVal">None</span></div>
-      <div class="row" id="heavenRow"><strong>Heaven (7)</strong><span id="heavenVal">None</span></div>
+      <div class="row"><strong>Thumbmaster (J)</strong><span id="thumbVal">None</span></div>
+      <div class="row"><strong>Heaven (7)</strong><span id="heavenVal">None</span></div>
 
       <div class="grid2">
         <button class="btn" id="startJBtn" disabled>START J</button>
@@ -657,42 +565,6 @@
   </div>
 </div>
 
-<button class="hudBtn" id="hudBtn">☰</button>
-
-<div class="sheetOverlay" id="sheetOverlay"></div>
-<div class="sheet" id="sheet">
-  <div class="sheetInner">
-    <div class="grabber"></div>
-    <div class="sheetTop">
-      <div style="font-weight:1000;letter-spacing:.08em;text-transform:uppercase;opacity:.9;">Game Panel</div>
-      <button class="closeBtn" id="sheetClose">Close</button>
-    </div>
-
-    <div class="sectionTitle">Progress <span class="chip" id="mProgressChip">0 / 52</span></div>
-    <div class="sectionTitle">History <span class="chip" id="mLeftChip">52 left</span></div>
-    <div class="historyWrap" id="mHistoryWrap" style="margin-top:8px;"></div>
-
-    <div class="sectionTitle" style="margin-top:14px;">Sticky Powers</div>
-    <div class="row" id="mThumbRow"><strong>Thumbmaster (J)</strong><span id="mThumbVal">None</span></div>
-    <div class="row" id="mHeavenRow"><strong>Heaven (7)</strong><span id="mHeavenVal">None</span></div>
-
-    <div class="grid2" style="margin-top:10px;">
-      <button class="btn" id="mStartJBtn" disabled>START J</button>
-      <button class="btn" id="mStart7Btn" disabled>START 7</button>
-    </div>
-
-    <div class="grid2" style="margin-top:10px;">
-      <button class="btn" id="mClearRoundBtn">CLEAR</button>
-      <button class="btn primary" id="mRestartDeckBtn">RESTART</button>
-    </div>
-
-    <div style="margin-top:12px;opacity:.75;font-weight:900;font-size:12px;line-height:1.2;">
-      J / 7 flow: power owner hits START (flashes). Everyone puts thumb down / finger up, then taps REACT.
-      Last REACT gets +1 drink.
-    </div>
-  </div>
-</div>
-
 <div id="toast"></div>
 
 <script>
@@ -702,11 +574,11 @@
     {id:"jess",  name:"Jess",  drinks:0, slot:"slot-top-right"},
     {id:"alex",  name:"Alex",  drinks:0, slot:"slot-mid-left"},
     {id:"emily", name:"Emily", drinks:0, slot:"slot-mid-right"},
-    {id:"sean",  name:"Sean",  drinks:0, slot:"slot-bot-left"},
+    {id:"sean",  name:"Sean",  drinks:0, slot:"slot-bot-mid"},
   ];
 
-  // Your rules
-  const rules = {
+  // your custom rules (game continues until 52)
+  const kingsRules = {
     "4": "4 for whores – we all drink",
     "6": "6 for dicks – we all drink",
     "7": "Heaven – last to react drinks",
@@ -726,7 +598,6 @@
 
   const toast = document.getElementById("toast");
 
-  // Desktop panel
   const progressChip = document.getElementById("progressChip");
   const leftChip = document.getElementById("leftChip");
   const historyWrap = document.getElementById("historyWrap");
@@ -737,52 +608,12 @@
   const clearRoundBtn = document.getElementById("clearRoundBtn");
   const restartDeckBtn = document.getElementById("restartDeckBtn");
 
-  // Mobile sheet
-  const hudBtn = document.getElementById("hudBtn");
-  const sheetOverlay = document.getElementById("sheetOverlay");
-  const sheetClose = document.getElementById("sheetClose");
-  const mProgressChip = document.getElementById("mProgressChip");
-  const mLeftChip = document.getElementById("mLeftChip");
-  const mHistoryWrap = document.getElementById("mHistoryWrap");
-  const mThumbVal = document.getElementById("mThumbVal");
-  const mHeavenVal = document.getElementById("mHeavenVal");
-  const mStartJBtn = document.getElementById("mStartJBtn");
-  const mStart7Btn = document.getElementById("mStart7Btn");
-  const mClearRoundBtn = document.getElementById("mClearRoundBtn");
-  const mRestartDeckBtn = document.getElementById("mRestartDeckBtn");
-
-  function openSheet(){ document.body.classList.add("sheetOpen"); }
-  function closeSheet(){ document.body.classList.remove("sheetOpen"); }
-
-  hudBtn.addEventListener("click", openSheet);
-  sheetOverlay.addEventListener("click", closeSheet);
-  sheetClose.addEventListener("click", closeSheet);
-
-  // Game state
-  let turnIdx = 0;
-  let deck = [];
-  let idx = 0;
-  let history = [];
-
-  // Sticky owners
-  const sticky = { J:null, "7":null };
-
-  // Round state (NO TIMER)
-  const round = {
-    active:false,
-    type:null,        // "J" or "7"
-    startedBy:null,
-    reacted: new Set(),   // playerIds
-    lastReactor:null      // playerId
-  };
-
   function showToast(msg){
     toast.textContent = msg;
     toast.style.opacity = "1";
     clearTimeout(showToast._t);
     showToast._t = setTimeout(() => toast.style.opacity = "0", 1400);
   }
-
   function escapeHtml(str){
     return String(str)
       .replaceAll("&","&amp;")
@@ -792,12 +623,16 @@
       .replaceAll("'","&#039;");
   }
 
+  // deck
+  let deck = [];
+  let idx = 0;
+  let history = [];
+
   function buildDeck(){
     const suits = ["♠","♥","♦","♣"];
     const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
     const d = [];
     for (const r of ranks) for (const s of suits) d.push(`${r}${s}`);
-    // shuffle
     for (let i = d.length - 1; i > 0; i--){
       const j = Math.floor(Math.random() * (i + 1));
       [d[i], d[j]] = [d[j], d[i]];
@@ -812,7 +647,6 @@
     const el = document.getElementById(`tile-${playerId}`);
     if (el) el.querySelector(".drinkCount").textContent = p.drinks;
   }
-
   function addAllDrinks(amt=1){
     players.forEach(p => addDrink(p.id, amt));
   }
@@ -835,44 +669,14 @@
     `;
   }
 
-  function renderPanels(){
-    const prog = `${idx} / 52`;
-    const left = `${52 - idx} left`;
-    progressChip.textContent = prog;
-    leftChip.textContent = left;
-    mProgressChip.textContent = prog;
-    mLeftChip.textContent = left;
-
-    const h = history.slice(0, 6).map(x => `<div class="hist">${escapeHtml(x)}</div>`).join("");
-    historyWrap.innerHTML = h;
-    mHistoryWrap.innerHTML = h;
-
-    thumbVal.textContent = sticky.J || "None";
-    heavenVal.textContent = sticky["7"] || "None";
-    mThumbVal.textContent = sticky.J || "None";
-    mHeavenVal.textContent = sticky["7"] || "None";
-
-    // enable start buttons only if there is an owner AND round not active
-    const canStartJ = !!sticky.J && !round.active;
-    const canStart7 = !!sticky["7"] && !round.active;
-
-    startJBtn.disabled = !canStartJ;
-    start7Btn.disabled = !canStart7;
-    mStartJBtn.disabled = !canStartJ;
-    mStart7Btn.disabled = !canStart7;
-
-    // flash the start button when it’s available
-    startJBtn.classList.toggle("flashBtn", canStartJ);
-    start7Btn.classList.toggle("flashBtn", canStart7);
-    mStartJBtn.classList.toggle("flashBtn", canStartJ);
-    mStart7Btn.classList.toggle("flashBtn", canStart7);
-  }
-
+  // turn
+  let turnIdx = 0;
   function setTurn(i){
     turnIdx = (i + players.length) % players.length;
     const who = players[turnIdx].name;
     turnText.textContent = `${who.toUpperCase()}’S TURN`;
     turnHint.style.display = round.active ? "none" : "inline";
+
     players.forEach(p => {
       const el = document.getElementById(`tile-${p.id}`);
       if (!el) return;
@@ -880,9 +684,36 @@
     });
   }
 
+  // sticky owners
+  const sticky = { J:null, "7":null };
+
+  // round state (no countdown; ends when everyone reacts)
+  const round = { active:false, type:null, startedBy:null, reacted:new Set(), lastReactor:null };
+
+  function renderPanel(){
+    progressChip.textContent = `${idx} / 52`;
+    leftChip.textContent = `${52 - idx} left`;
+
+    historyWrap.innerHTML = history.slice(0,6)
+      .map(c => `<div class="hist">${escapeHtml(c)}</div>`).join("");
+
+    thumbVal.textContent = sticky.J || "None";
+    heavenVal.textContent = sticky["7"] || "None";
+
+    const canStartJ = !!sticky.J && !round.active;
+    const canStart7 = !!sticky["7"] && !round.active;
+
+    startJBtn.disabled = !canStartJ;
+    start7Btn.disabled = !canStart7;
+
+    startJBtn.classList.toggle("flashBtn", canStartJ);
+    start7Btn.classList.toggle("flashBtn", canStart7);
+  }
+
+  // UI tiles
   function tileEl(p){
-    const div = document.createElement("div");
-    div.innerHTML = `
+    const wrap = document.createElement("div");
+    wrap.innerHTML = `
       <div class="tile" id="tile-${p.id}">
         <div class="turnTag">TURN</div>
         <div class="avatar"></div>
@@ -895,13 +726,12 @@
       </div>
     `.trim();
 
-    const tile = div.firstChild;
+    const tile = wrap.firstChild;
 
-    // set turn by tapping tile (disabled during round)
     tile.addEventListener("click", () => {
       if (round.active) return;
-      const idx = players.findIndex(x => x.id === p.id);
-      setTurn(idx);
+      const i = players.findIndex(x => x.id === p.id);
+      setTurn(i);
     });
 
     tile.querySelector(".plusBtn").addEventListener("click", (e) => {
@@ -925,9 +755,9 @@
     });
   }
 
+  // Round logic: owner starts, everyone reacts once, last reactor drinks
   function startRound(type){
     if (round.active) return;
-
     const owner = sticky[type];
     if (!owner) return;
 
@@ -938,69 +768,60 @@
     round.lastReactor = null;
 
     document.body.classList.add("roundActive");
+    roundPill.style.display = "flex";
 
-    // flashing “START” indicator for everyone
-    const label = (type === "J") ? "THUMBS DOWN" : "FINGER IN AIR";
-    roundText.textContent = (type === "J") ? "THUMBS! REACT" : "HEAVEN! REACT";
-    roundSub.textContent = label;
+    if (type === "J"){
+      roundText.textContent = "THUMBS! REACT";
+      roundSub.textContent = "thumbs down, then tap REACT";
+    } else {
+      roundText.textContent = "HEAVEN! REACT";
+      roundSub.textContent = "finger up, then tap REACT";
+    }
 
-    // make every REACT button flash until pressed
-    document.querySelectorAll(".reactBtn").forEach(btn => btn.classList.add("flashBtn"));
+    // flash all react buttons until pressed
+    document.querySelectorAll(".reactBtn").forEach(btn => btn.classList.add("flash"));
 
-    showToast(`${owner} started ${type === "J" ? "Thumbmaster" : "Heaven"}`);
-
-    // show center card hint (small and clear)
     setCenterCard({
       face: type,
-      rule: (type === "J") ? "Thumbs down. Tap REACT." : "Finger up. Tap REACT.",
+      rule: type === "J" ? "Thumbs down. Tap REACT." : "Finger up. Tap REACT.",
       by: `Started by: ${owner}`
     });
 
-    renderPanels();
-    closeSheet();
-  }
-
-  function endRoundIfDone(){
-    if (!round.active) return;
-    if (round.reacted.size < players.length) return;
-
-    // lastReactor loses
-    const loserId = round.lastReactor;
-    const loserName = players.find(p => p.id === loserId)?.name || "Someone";
-
-    addDrink(loserId, 1);
-    showToast(`${loserName} drinks (+1)`);
-
-    setCenterCard({
-      face: "LAST",
-      rule: `${loserName} loses`,
-      by: round.type === "J" ? "Thumbmaster (J)" : "Heaven (7)"
-    });
-
-    clearRound(false);
+    showToast(`${owner} started ${type === "J" ? "Thumbmaster" : "Heaven"}`);
+    renderPanel();
   }
 
   function react(playerId){
     if (!round.active) return;
-
-    // one reaction per person per round
     if (round.reacted.has(playerId)) return;
 
     round.reacted.add(playerId);
     round.lastReactor = playerId;
 
-    // stop flashing for that player's button + lock it visually
     const tile = document.getElementById(`tile-${playerId}`);
     if (tile){
       const btn = tile.querySelector(".reactBtn");
-      btn.classList.remove("flashBtn");
+      btn.classList.remove("flash");
       btn.textContent = "LOCKED";
       btn.style.opacity = ".55";
       btn.disabled = true;
     }
 
-    // when everyone reacted, punish the last
-    endRoundIfDone();
+    if (round.reacted.size === players.length){
+      const loserId = round.lastReactor;
+      const loserName = players.find(p => p.id === loserId)?.name || "Someone";
+      addDrink(loserId, 1);
+
+      showToast(`${loserName} drinks (+1)`);
+
+      setCenterCard({
+        face: "LAST",
+        rule: `${loserName} loses`,
+        by: round.type === "J" ? "Thumbmaster (J)" : "Heaven (7)"
+      });
+
+      clearRound(false);
+    }
   }
 
   function clearRound(resetCenter=true){
@@ -1011,19 +832,63 @@
     round.lastReactor = null;
 
     document.body.classList.remove("roundActive");
+    roundPill.style.display = "none";
 
     // reset react buttons
     document.querySelectorAll(".reactBtn").forEach(btn => {
-      btn.classList.remove("flashBtn");
+      btn.classList.remove("flash");
       btn.textContent = "REACT";
       btn.style.opacity = "";
       btn.disabled = false;
     });
 
     if (resetCenter) setCenterIdle();
-    renderPanels();
+    renderPanel();
   }
 
+  // draw card
+  function drawCard(){
+    if (round.active){
+      showToast("Finish the round first");
+      return;
+    }
+    if (idx >= 52){
+      showToast("All 52 drawn. Restart.");
+      return;
+    }
+
+    const drawer = players[turnIdx].name;
+    const card = deck[idx++];
+    const rank = card.slice(0, -1);
+
+    history.unshift(card);
+
+    if (rank === "J") sticky.J = drawer;
+    if (rank === "7") sticky["7"] = drawer;
+
+    if (rank === "4" || rank === "6"){
+      addAllDrinks(1);
+      showToast("Everyone drinks 🍻");
+    }
+
+    if (rank === "K"){
+      setTimeout(() => {
+        const text = prompt("King rule:", "");
+        if (text) showToast(`Rule added: ${text.trim()}`);
+      }, 30);
+    }
+
+    setCenterCard({
+      face: card,
+      rule: kingsRules[rank] || "",
+      by: `Drew: ${drawer}`
+    });
+
+    setTurn(turnIdx + 1);
+    renderPanel();
+  }
+
+  // restart
   function restartDeck(){
     deck = buildDeck();
     idx = 0;
@@ -1036,80 +901,25 @@
 
     clearRound(true);
     setTurn(0);
-    renderPanels();
+    renderPanel();
     setCenterIdle();
     showToast("Restarted");
   }
 
-  function drawCard(){
-    if (round.active){
-      showToast("Finish the round first");
-      return;
-    }
-    if (idx >= 52){
-      showToast("Deck empty. Restart.");
-      return;
-    }
-
-    const drawer = players[turnIdx].name;
-    const card = deck[idx++];
-    const rank = card.slice(0, -1);
-
-    history.unshift(card);
-
-    // Sticky owners
-    if (rank === "J") sticky.J = drawer;
-    if (rank === "7") sticky["7"] = drawer;
-
-    // Auto rules you specified
-    if (rank === "4" || rank === "6"){
-      addAllDrinks(1);
-      showToast("Everyone drinks 🍻");
-    }
-
-    if (rank === "K"){
-      // Game continues until all 52, but king still makes a rule (you can expand this later)
-      setTimeout(() => {
-        const text = prompt("King rule:", "");
-        if (text) showToast(`Rule added: ${text.trim()}`);
-      }, 30);
-    }
-
-    setCenterCard({
-      face: card,
-      rule: rules[rank] || "",
-      by: `Drew: ${drawer}`
-    });
-
-    setTurn(turnIdx + 1);
-    renderPanels();
-
-    if (idx >= 52){
-      showToast("All 52 drawn ✅");
-    }
-  }
-
-  // Button wiring
+  // wire buttons
   drawBtn.addEventListener("click", drawCard);
-
   startJBtn.addEventListener("click", () => startRound("J"));
   start7Btn.addEventListener("click", () => startRound("7"));
-  mStartJBtn.addEventListener("click", () => startRound("J"));
-  mStart7Btn.addEventListener("click", () => startRound("7"));
-
   clearRoundBtn.addEventListener("click", () => { clearRound(true); showToast("Cleared"); });
-  mClearRoundBtn.addEventListener("click", () => { clearRound(true); showToast("Cleared"); });
-
   restartDeckBtn.addEventListener("click", restartDeck);
-  mRestartDeckBtn.addEventListener("click", restartDeck);
 
-  // Init
+  // init
   window.addEventListener("load", () => {
     deck = buildDeck();
     mountPlayers();
     setTurn(0);
     setCenterIdle();
-    renderPanels();
+    renderPanel();
   });
 </script>
 </body>
