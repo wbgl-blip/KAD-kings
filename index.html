@@ -11,12 +11,11 @@
     --tileBorder: rgba(255,255,255,0.06);
     --white:#fff;
 
-    /* ✅ Players are the stars */
+    /* Desktop-ish */
     --tileW: 160px;
     --tileH: 196px;
     --avatar: 54px;
 
-    /* ✅ Card smaller, secondary */
     --cardW: 165px;
     --cardH: 225px;
 
@@ -30,7 +29,7 @@
   html, body{
     margin:0;
     height:100%;
-    overflow:hidden;
+    overflow:hidden; /* never scroll */
     background: var(--bg);
     color: var(--white);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -141,7 +140,7 @@
     border-radius: 22px;
     background: rgba(11,11,11,.96);
     border: 1px solid var(--tileBorder);
-    box-shadow: 0 18px 44px rgba(0,0,0,0.74); /* slightly softer */
+    box-shadow: 0 18px 44px rgba(0,0,0,0.74);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -151,7 +150,7 @@
     cursor:pointer;
   }
 
-  /* ✅ TURN highlight is now subtle, not “huge card” */
+  /* Turn highlight: subtle */
   .tile.turn{
     border-color: rgba(255,255,255,0.22);
     box-shadow:
@@ -230,7 +229,7 @@
   }
   .pill:active{ transform:scale(.99); }
 
-  /* ✅ Card internal layout (clean “Drew:” footer) */
+  /* Center card */
   .card{
     width: var(--cardW);
     height: var(--cardH);
@@ -285,7 +284,6 @@
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:8px;
     min-height: 18px;
   }
 
@@ -325,17 +323,16 @@
     display:none;
   }
 
-  /* ✅ More spacing so tiles never overlap */
+  /* Desktop positions */
   .p-top-mid{   left:46%; top:14%; }
   .p-top-left{  left:22%; top:22%; }
   .p-top-right{ left:68%; top:22%; }
   .p-mid-left{  left:16%; top:60%; }
   .p-mid-right{ left:58%; top:60%; }
   .p-bot-left{  left:26%; top:90%; }
-
-  /* Center moved a hair left so the panel feels balanced */
   .center{ left:41%; top:60%; }
 
+  /* Right panel (desktop) */
   .panel{
     position:absolute;
     right: 0px;
@@ -500,15 +497,16 @@
     pointer-events:none;
   }
 
-  /* ✅ Mobile portrait tuning (S24 Ultra-ish) */
+  /* ✅ Mobile portrait (S24 Ultra friendly) */
   @media (max-width: 480px){
     :root{
       --tileW: 112px;
       --tileH: 142px;
       --avatar: 36px;
 
-      --cardW: 150px;
-      --cardH: 200px;
+      /* ✅ smaller card so it stops dominating + colliding */
+      --cardW: 130px;
+      --cardH: 170px;
 
       --titleSize: 34px;
       --btnPadY: 9px;
@@ -517,26 +515,51 @@
 
     .turnSmall{ display:none; }
 
-    .p-top-mid{   left:46%; top:14%; }
-    .p-top-left{  left:26%; top:18%; }
-    .p-top-right{ left:68%; top:18%; }
-    .p-mid-left{  left:18%; top:55%; }
-    .p-mid-right{ left:58%; top:55%; }
+    /* ✅ push players outward */
+    .p-top-mid{   left:50%; top:14%; }
+    .p-top-left{  left:22%; top:18%; }
+    .p-top-right{ left:74%; top:18%; }
+
+    .p-mid-left{  left:14%; top:56%; }
+    .p-mid-right{ left:70%; top:56%; }
+
     .p-bot-left{  left:30%; top:88%; }
-    .center{ left:42%; top:58%; }
 
-    .panel{
-      right: 2px;
-      top: 70%;
-      width: 170px;
-      padding: 10px;
-      gap:10px;
-    }
+    /* ✅ center back to true center */
+    .center{ left:50%; top:58%; }
 
-    .cardFace{ font-size: 28px; }
-    .cardRule{ font-size: 12px; max-width: 92px; }
-    .cardMid{ font-size: 18px; }
+    .cardFace{ font-size: 26px; }
+    .cardRule{ font-size: 12px; max-width: 86px; }
+    .cardMid{ font-size: 17px; }
     .name{ font-size: 14px; }
+
+    /* ✅ CRITICAL: collapse right panel into a HUD button to avoid overlap */
+    .panel{
+      position: fixed;
+      right: 10px;
+      bottom: 80px;
+      top: auto;
+      transform: none;
+      width: 56px;
+      height: 56px;
+      padding: 0;
+      border-radius: 999px;
+      overflow: hidden;
+      z-index: 50;
+    }
+    .panel > *{
+      display:none;
+    }
+    .panel::after{
+      content: "☰";
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100%;
+      font-size:24px;
+      font-weight:900;
+      color:white;
+    }
   }
 </style>
 </head>
@@ -692,7 +715,7 @@
   let deck = [];
   let idx = 0;
 
-  // Sneaky round length (no visible countdown)
+  // Sneaky window length (no visible countdown)
   const ROUND_MS = 4500;
 
   let round = {
