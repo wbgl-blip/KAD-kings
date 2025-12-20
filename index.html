@@ -11,7 +11,6 @@
     --tileBorder: rgba(255,255,255,0.06);
     --white:#fff;
 
-    /* Desktop-ish */
     --tileW: 160px;
     --tileH: 196px;
     --avatar: 54px;
@@ -152,38 +151,39 @@
     position:relative;
     cursor:pointer;
     overflow:hidden;
+    transition: box-shadow .15s ease, border-color .15s ease;
   }
 
-  /* ✅ MUCH stronger turn highlight */
+  /* ✅ NO SCALE: highlight without layout collisions */
   .tile.turn{
-    border-color: rgba(255,255,255,0.32);
-    transform: translateZ(0) scale(1.04);
+    border-color: rgba(255,255,255,0.34);
     box-shadow:
-      0 0 0 2px rgba(255,255,255,0.10),
-      0 28px 70px rgba(0,0,0,0.80);
+      0 0 0 2px rgba(255,255,255,0.12),
+      0 26px 70px rgba(0,0,0,0.82),
+      0 0 60px rgba(255,255,255,0.10);
   }
   .tile.turn::before{
     content:"";
     position:absolute;
-    inset:-14px;
-    background: radial-gradient(circle at 50% 18%, rgba(255,255,255,0.28), transparent 55%);
-    filter: blur(6px);
-    opacity: .85;
+    inset:-18px;
+    background: radial-gradient(circle at 50% 18%, rgba(255,255,255,0.26), transparent 58%);
+    filter: blur(7px);
+    opacity: .9;
     pointer-events:none;
   }
   .tile.turn::after{
     content:"";
     position:absolute;
-    inset:-6px;
-    border-radius: 26px;
-    border: 1px solid rgba(255,255,255,0.22);
-    opacity:.85;
+    inset:-10px;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.18);
+    opacity:.75;
     animation: ring 1.25s infinite;
     pointer-events:none;
   }
   @keyframes ring{
-    0%{ transform: scale(1); opacity: .75; }
-    70%{ transform: scale(1.04); opacity: .05; }
+    0%{ transform: scale(1); opacity: .7; }
+    70%{ transform: scale(1.045); opacity: .0; }
     100%{ transform: scale(1); opacity: 0; }
   }
 
@@ -242,7 +242,7 @@
   }
   .pill:active{ transform:scale(.99); }
 
-  /* ✅ Round reaction button (only shows during 7/J rounds) */
+  /* Round reaction button */
   .reactBtn{
     display:none;
     width: 100%;
@@ -363,7 +363,7 @@
   .p-bot-left{  left:26%; top:90%; }
   .center{ left:41%; top:60%; }
 
-  /* HUD button (panel placeholder) */
+  /* Mobile HUD / Panel placeholder */
   .panel{
     position:absolute;
     right: 0px;
@@ -590,7 +590,6 @@
     bottom: 10px;
   }
 
-  /* Mobile */
   @media (max-width: 480px){
     :root{
       --tileW: 112px;
@@ -678,7 +677,6 @@
           </div>
         </div>
 
-        <!-- Mobile HUD -->
         <div class="panel" id="panelHud" aria-label="Open panel"></div>
 
         <button class="drawBtn" id="drawBtn">DRAW CARD</button>
@@ -687,7 +685,6 @@
     </div>
   </div>
 
-  <!-- Mobile bottom sheet -->
   <div class="sheetOverlay" id="sheetOverlay"></div>
   <div class="sheet" id="sheet">
     <div class="sheetInner">
@@ -714,11 +711,6 @@
         <div class="stickyRow" id="thumbRow">
           <div class="stickyLabel">Thumbmaster (J)</div>
           <div class="stickyValue" id="thumbVal">None</div>
-        </div>
-
-        <div class="stickyRow" id="questionRow">
-          <div class="stickyLabel">Question Master (Q)</div>
-          <div class="stickyValue" id="questionVal">None</div>
         </div>
 
         <div class="stickyRow" id="heavenRow">
@@ -792,10 +784,8 @@
   const historyWrap = document.getElementById("historyWrap");
 
   const thumbRow = document.getElementById("thumbRow");
-  const questionRow = document.getElementById("questionRow");
   const heavenRow = document.getElementById("heavenRow");
   const thumbVal = document.getElementById("thumbVal");
-  const questionVal = document.getElementById("questionVal");
   const heavenVal = document.getElementById("heavenVal");
 
   const rulesCount = document.getElementById("rulesCount");
@@ -832,23 +822,20 @@
   sheetClose.addEventListener("click", closeSheet);
 
   const activeRules = [];
-  const sticky = { thumbmaster:null, questionMaster:null, heavenMaster:null };
+  const sticky = { thumbmaster:null, heavenMaster:null };
 
   let turnIdx = 0;
   let history = [];
   let deck = [];
   let idx = 0;
 
-  // Sneaky window (no visible countdown)
   const ROUND_MS = 4500;
-
-  // Round state for J and 7
   let round = {
     active: false,
-    type: null,        // "J" or "7"
-    startedBy: null,   // name of power owner
+    type: null,
+    startedBy: null,
     timerId: null,
-    lastReact: null,   // {playerId, t}
+    lastReact: null,
   };
 
   function escapeHtml(str){
@@ -905,11 +892,9 @@
 
   function renderSticky(){
     thumbVal.textContent = sticky.thumbmaster || "None";
-    questionVal.textContent = sticky.questionMaster || "None";
     heavenVal.textContent = sticky.heavenMaster || "None";
 
     thumbRow.classList.toggle("stickyOn", !!sticky.thumbmaster);
-    questionRow.classList.toggle("stickyOn", !!sticky.questionMaster);
     heavenRow.classList.toggle("stickyOn", !!sticky.heavenMaster);
 
     thumbStartBtn.disabled = !sticky.thumbmaster;
@@ -977,7 +962,6 @@
 
   wrap.insertAdjacentHTML("afterbegin", players.map(tileHTML).join(""));
 
-  // +1 Beer (only when not roundActive; CSS hides it during rounds)
   wrap.querySelectorAll(".pos[data-id] .pill").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -986,17 +970,15 @@
     });
   });
 
-  // Tap tile to set turn (only when not in round)
   wrap.querySelectorAll(".pos[data-id] .tile").forEach((tile) => {
     tile.addEventListener("click", (e) => {
-      if (round.active) return; // during rounds, use REACT buttons only
+      if (round.active) return;
       const id = e.currentTarget.closest(".pos[data-id]").getAttribute("data-id");
       const i = players.findIndex(p => p.id === id);
       if (i >= 0) setTurn(i);
     });
   });
 
-  // ✅ REACT buttons for J/7 rounds
   wrap.querySelectorAll(".reactBtn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -1005,12 +987,11 @@
       const playerId = e.currentTarget.getAttribute("data-react");
       round.lastReact = { playerId, t: Date.now() };
 
-      // tiny feedback without “timer vibes”
       const tile = document.getElementById(`tile-${playerId}`);
       if (tile){
-        tile.style.transform = "scale(1.02)";
+        tile.style.filter = "brightness(1.12)";
         clearTimeout(tile._b);
-        tile._b = setTimeout(() => tile.style.transform = "", 120);
+        tile._b = setTimeout(() => tile.style.filter = "", 120);
       }
     });
   });
@@ -1037,29 +1018,43 @@
     updateRoundChip();
   }
 
+  function setCenterCardIdle(){
+    centerCard.innerHTML = `
+      <div class="cardMid">Draw a card<br/>No mercy</div>
+      <div class="cardFooter" style="visibility:hidden"></div>
+    `;
+  }
+
+  function setCenterCardResult({face, rule, by}){
+    centerCard.innerHTML = `
+      <div class="cardTop">
+        <div class="cardFace">${escapeHtml(face)}</div>
+        <div class="cardRule">${escapeHtml(rule || "")}</div>
+      </div>
+      <div class="cardMid"></div>
+      <div class="cardFooter" style="visibility:visible">
+        <span>${escapeHtml(by || "")}</span>
+      </div>
+    `;
+  }
+
   function startRound(type){
-    // only the power owner should start it (we enforce by enabling buttons only when owner exists)
     clearRound();
     round.active = true;
     round.type = type;
-    round.lastReact = null;
 
     if (type === "J") round.startedBy = sticky.thumbmaster;
     if (type === "7") round.startedBy = sticky.heavenMaster;
 
     updateRoundChip();
-
-    // No visible countdown, just ends after a short “sneaky” window
     round.timerId = setTimeout(finishRound, ROUND_MS);
 
-    // subtle cue in center card (not a timer)
     setCenterCardResult({
-      face: type === "J" ? "J" : "7",
+      face: type,
       rule: "REACT NOW",
       by: `${round.startedBy || "Someone"} started`
     });
 
-    // optionally close sheet so board is clear
     closeSheet();
   }
 
@@ -1068,7 +1063,6 @@
 
     const label = (round.type === "J") ? "Thumb (J)" : "Heaven (7)";
 
-    // If nobody reacted, no punishment
     if (!round.lastReact){
       showToast("No one reacted 🤫");
       clearRound();
@@ -1113,26 +1107,6 @@
     startRound(round.type);
   });
 
-  function setCenterCardIdle(){
-    centerCard.innerHTML = `
-      <div class="cardMid">Draw a card<br/>No mercy</div>
-      <div class="cardFooter" style="visibility:hidden"></div>
-    `;
-  }
-
-  function setCenterCardResult({face, rule, by}){
-    centerCard.innerHTML = `
-      <div class="cardTop">
-        <div class="cardFace">${escapeHtml(face)}</div>
-        <div class="cardRule">${escapeHtml(rule || "")}</div>
-      </div>
-      <div class="cardMid"></div>
-      <div class="cardFooter" style="visibility:visible">
-        <span>${escapeHtml(by || "")}</span>
-      </div>
-    `;
-  }
-
   function endState(){
     centerCard.innerHTML = `
       <div class="cardMid" style="font-size:18px;font-weight:900">
@@ -1155,7 +1129,6 @@
     idx = 0;
     history = [];
     sticky.thumbmaster = null;
-    sticky.questionMaster = null;
     sticky.heavenMaster = null;
     clearRound();
     normalState();
@@ -1180,16 +1153,12 @@
     const rank = card.slice(0, -1);
     const rule = kingsRules[rank] || "";
 
-    // sticky owners
     if (rank === "J") sticky.thumbmaster = drawer;
-    if (rank === "Q") sticky.questionMaster = drawer;
     if (rank === "7") sticky.heavenMaster = drawer;
 
-    // King adds rule (game continues until all 52)
     if (rank === "K") setTimeout(() => promptForRule(drawer), 20);
 
     history.unshift({ card, by: drawer, rank });
-
     renderSticky();
     renderHistory();
 
@@ -1221,11 +1190,6 @@
     wrap.style.transform = `scale(${Math.min(1, scaleX, scaleY)})`;
   }
 
-  // Sheet open/close
-  function closeSheet(){
-    document.body.classList.remove("sheetOpen");
-  }
-
   window.addEventListener("load", () => {
     deck = buildDeck();
     renderSticky();
@@ -1241,30 +1205,12 @@
     closeSheet();
     requestAnimationFrame(fitToScreen);
   });
+
   window.addEventListener("orientationchange", () => setTimeout(() => { closeSheet(); fitToScreen(); }, 80));
 
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeSheet();
   });
-</script>
-
-<script>
-  // Mobile sheet controls (needs to be after closeSheet definition)
-  const panelHud = document.getElementById("panelHud");
-  const sheetOverlay = document.getElementById("sheetOverlay");
-  const sheetClose = document.getElementById("sheetClose");
-
-  function isMobile(){
-    return window.matchMedia && window.matchMedia("(max-width: 480px)").matches;
-  }
-  function openSheet(){
-    if (!isMobile()) return;
-    document.body.classList.add("sheetOpen");
-  }
-
-  panelHud.addEventListener("click", () => { if (isMobile()) openSheet(); });
-  sheetOverlay.addEventListener("click", closeSheet);
-  sheetClose.addEventListener("click", closeSheet);
 </script>
 
 </body>
