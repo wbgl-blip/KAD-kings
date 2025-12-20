@@ -13,14 +13,14 @@
 
     --title: 54px;
 
-    /* players slightly bigger than card */
-    --tileW: 170px;
-    --tileH: 200px;
-    --avatar: 56px;
+    /* Players > card */
+    --tileW: 176px;
+    --tileH: 206px;
+    --avatar: 58px;
 
-    /* card smaller */
-    --cardW: 160px;
-    --cardH: 215px;
+    /* Card smaller + softer */
+    --cardW: 150px;
+    --cardH: 208px;
 
     --btnY: 10px;
     --btnX: 18px;
@@ -78,7 +78,7 @@
 
   /* Top status / round banner */
   .statusBar{
-    width: min(980px, 96vw);
+    width: min(1120px, 96vw);
     display:flex;
     gap:10px;
     align-items:center;
@@ -136,13 +136,13 @@
 
   /* Stage */
   .stage{
-    width: min(1080px, 96vw);
+    width: min(1240px, 96vw);
     flex: 1;
     display:grid;
-    grid-template-columns: 1fr 260px;  /* board + compact panel */
-    gap: 14px;
+    grid-template-columns: 1fr 280px;  /* board + panel */
+    gap: 18px;
     min-height: 0;
-    align-items: center;
+    align-items: start;               /* ✅ top align everything */
   }
 
   /* Board */
@@ -152,18 +152,18 @@
     display:flex;
     align-items:center;
     justify-content:center;
+    padding-top: 6px;                 /* tiny nudge */
   }
 
-  /* ✅ grid that always fits 6 players (no clipping) */
   .boardGrid{
     width: 100%;
-    max-width: 720px;
+    max-width: 760px;
     height: 100%;
     display:grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: auto auto auto;
-    gap: 14px;
-    align-content: center;
+    gap: 16px;
+    align-content: start;             /* ✅ board starts at top */
     justify-items: center;
   }
 
@@ -177,14 +177,14 @@
     gap:12px;
   }
 
-  /* Card */
+  /* Card (less spotlight) */
   .card{
     width: var(--cardW);
     height: var(--cardH);
-    background:#fff;
+    background: #f7f7f7;              /* softer than pure white */
     color:#000;
     border-radius: 22px;
-    box-shadow: 0 18px 52px rgba(0,0,0,.55);
+    box-shadow: 0 16px 44px rgba(0,0,0,.52);
     display:flex;
     flex-direction:column;
     padding: 14px 16px 12px;
@@ -192,16 +192,30 @@
     font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     font-weight: 900;
     line-height: 1.15;
+    position:relative;
+    overflow:hidden;
   }
+  /* subtle vignette inside card so it doesn’t scream */
+  .card:before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 50% 12%, rgba(0,0,0,.10), transparent 55%);
+    pointer-events:none;
+    mix-blend-mode:multiply;
+    opacity:.55;
+  }
+
+  .cardTop, .cardMid, .cardFooter{ position:relative; z-index:1; }
+
   .cardTop{
     display:flex;
     align-items:flex-start;
     justify-content:center;
     gap:10px;
-    min-height: 50px;
+    min-height: 48px;
   }
   .cardFace{
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 1000;
     line-height: 1;
   }
@@ -212,7 +226,7 @@
     opacity:.86;
     line-height: 1.15;
     text-align:left;
-    max-width: 100px;
+    max-width: 96px;
   }
   .cardMid{
     flex:1;
@@ -247,7 +261,7 @@
   .tile{
     width: var(--tileW);
     height: var(--tileH);
-    border-radius: 22px;
+    border-radius: 24px;
     background: rgba(11,11,11,.96);
     border: 1px solid rgba(255,255,255,.08);
     box-shadow: 0 18px 44px rgba(0,0,0,0.72);
@@ -255,19 +269,19 @@
     flex-direction:column;
     align-items:center;
     justify-content:space-between;
-    padding: 14px 14px 12px;
+    padding: 16px 14px 12px;
     position:relative;
     overflow:hidden;
     cursor:pointer;
   }
 
-  /* Turn highlight without scaling */
+  /* Turn highlight (stronger + clearer) */
   .tile.turn{
-    border-color: rgba(255,255,255,0.30);
+    border-color: rgba(255,255,255,0.40);
     box-shadow:
-      0 0 0 2px rgba(255,255,255,0.10),
+      0 0 0 2px rgba(255,255,255,0.12),
       0 26px 70px rgba(0,0,0,0.82),
-      0 0 60px rgba(255,255,255,0.10);
+      0 0 70px rgba(255,255,255,0.14);
   }
   .turnTag{
     position:absolute;
@@ -275,11 +289,11 @@
     font-size: 11px;
     font-weight: 1000;
     letter-spacing:.10em;
-    padding: 4px 8px;
+    padding: 4px 9px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.16);
-    border: 1px solid rgba(255,255,255,0.18);
-    opacity:.95;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.22);
+    opacity:.98;
     display:none;
   }
   .tile.turn .turnTag{ display:block; }
@@ -320,7 +334,6 @@
   }
   .plusBtn:active{ transform: scale(.99); }
 
-  /* Round reaction */
   .reactBtn{
     width: 100%;
     border:0;
@@ -337,20 +350,21 @@
   body.roundActive .plusBtn{ display:none; }
   body.roundActive .reactBtn{ display:block; }
 
-  /* Compact Panel (no giant empty slab) */
+  /* Panel */
   .side{
-    width: 260px;
-    align-self: center;
+    width: 280px;
     background: var(--panel);
     border: 1px solid rgba(255,255,255,.10);
-    border-radius: 20px;
+    border-radius: 22px;
     box-shadow: 0 22px 64px rgba(0,0,0,.72);
-    padding: 12px;
+    padding: 14px;
     display:flex;
     flex-direction:column;
-    gap:12px;
-    max-height: 78vh;           /* ✅ stops it becoming a skyscraper */
-    overflow:auto;              /* ✅ if stuff grows later */
+    gap:14px;
+    position: sticky;
+    top: 0;                          /* ✅ hugs top */
+    max-height: calc(100vh - 170px); /* ✅ stays proportional under header */
+    overflow:auto;
   }
 
   .sectionTitle{
@@ -373,7 +387,7 @@
     opacity:.95;
   }
   .row{
-    padding: 10px 10px;
+    padding: 11px 11px;
     border-radius: 14px;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.06);
@@ -390,18 +404,18 @@
     overflow:hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 120px;
+    max-width: 140px;
     text-align:right;
   }
   .grid2{
     display:grid;
     grid-template-columns: 1fr 1fr;
-    gap:8px;
+    gap:10px;
   }
   .btn{
     border:0;
     border-radius: 14px;
-    padding: 10px 10px;
+    padding: 11px 10px;
     font-weight: 1000;
     letter-spacing:.06em;
     cursor:pointer;
@@ -457,8 +471,8 @@
     pointer-events:none;
   }
 
-  /* --- Mobile: no side panel, still no overlap --- */
-  @media (max-width: 600px){
+  /* Mobile */
+  @media (max-width: 760px){
     :root{
       --title: 38px;
 
@@ -478,7 +492,6 @@
       gap: 0;
     }
     .side{ display:none; }
-
     .boardGrid{
       max-width: 460px;
       gap: 12px;
@@ -536,7 +549,7 @@
 
         <div class="slot" id="slot-mid-right"></div>
 
-        <!-- Row 3 (Sean is bottom-center now, always visible) -->
+        <!-- Row 3 -->
         <div class="slot"></div>
         <div class="slot" id="slot-bot-mid"></div>
         <div class="slot"></div>
@@ -577,7 +590,6 @@
     {id:"sean",  name:"Sean",  drinks:0, slot:"slot-bot-mid"},
   ];
 
-  // your custom rules (game continues until 52)
   const kingsRules = {
     "4": "4 for whores – we all drink",
     "6": "6 for dicks – we all drink",
@@ -778,9 +790,6 @@
       roundSub.textContent = "finger up, then tap REACT";
     }
 
-    // flash all react buttons until pressed
-    document.querySelectorAll(".reactBtn").forEach(btn => btn.classList.add("flash"));
-
     setCenterCard({
       face: type,
       rule: type === "J" ? "Thumbs down. Tap REACT." : "Finger up. Tap REACT.",
@@ -801,7 +810,6 @@
     const tile = document.getElementById(`tile-${playerId}`);
     if (tile){
       const btn = tile.querySelector(".reactBtn");
-      btn.classList.remove("flash");
       btn.textContent = "LOCKED";
       btn.style.opacity = ".55";
       btn.disabled = true;
@@ -834,9 +842,7 @@
     document.body.classList.remove("roundActive");
     roundPill.style.display = "none";
 
-    // reset react buttons
     document.querySelectorAll(".reactBtn").forEach(btn => {
-      btn.classList.remove("flash");
       btn.textContent = "REACT";
       btn.style.opacity = "";
       btn.disabled = false;
