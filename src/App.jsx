@@ -1,174 +1,106 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./styles.css";
 
 const PLAYERS = ["Beau", "Mike", "Jess", "Alex", "Emily"];
 
 export default function App() {
-  const [layoutMode, setLayoutMode] = useState("auto");
-  const [currentTurn, setCurrentTurn] = useState("Beau");
-
-  const [reactionType, setReactionType] = useState(null); // "J" | "7" | null
+  const [drinks, setDrinks] = useState(
+    Object.fromEntries(PLAYERS.map(p => [p, 0]))
+  );
+  const [turn, setTurn] = useState("Beau");
+  const [mode, setMode] = useState("auto"); // auto | mobile | desktop
+  const [reactionActive, setReactionActive] = useState(false);
   const [reacted, setReacted] = useState([]);
-  const [lastLoser, setLastLoser] = useState(null);
 
-  const isMobile =
-    layoutMode === "mobile" ||
-    (layoutMode === "auto" && window.innerWidth < 768);
+  function addDrink(player) {
+    setDrinks(d => ({ ...d, [player]: d[player] + 1 }));
+  }
 
-  function startReaction(type) {
-    setReactionType(type);
+  function startReaction() {
+    setReactionActive(true);
     setReacted([]);
-    setLastLoser(null);
   }
 
   function react(player) {
-    if (reacted.includes(player)) return;
+    if (!reactionActive || reacted.includes(player)) return;
+    setReacted(r => [...r, player]);
+  }
 
-    const next = [...reacted, player];
-    setReacted(next);
-
-    if (next.length === PLAYERS.length) {
-      const loser = next[next.length - 1];
-      setLastLoser(loser);
-      setTimeout(() => {
-        setReactionType(null);
-        setReacted([]);
-      }, 900);
-    }
+  function finishReaction() {
+    const loser = PLAYERS.find(p => !reacted.includes(p));
+    if (loser) addDrink(loser);
+    setReactionActive(false);
+    setReacted([]);
   }
 
   return (
-    <div className={`app ${isMobile ? "mobile" : "desktop"}`}>
-      <LayoutToggle layoutMode={layoutMode} setLayoutMode={setLayoutMode} />
+    <div className={`app ${mode}`}>
+      <header>
+        <h1>KAD Kings</h1>
+        <div className="mode-toggle">
+          <button onClick={() => setMode("auto")}>AUTO</button>
+          <button onClick={() => setMode("mobile")}>📱</button>
+          <button onClick={() => setMode("desktop")}>🖥️</button>
+        </div>
+      </header>
 
-      <h1 className="title">KAD Kings</h1>
+      <div className="turn-indicator">
+        <span>{turn.toUpperCase()}’S TURN</span>
+      </div>
 
-      <div className="table">
-        <div className="players">
-          {PLAYERS.map((p) => (
+      <main>
+        <section className="players">
+          {PLAYERS.map(player => (
             <div
-              key={p}
-              className={`player ${p === currentTurn ? "active" : ""}`}
-              onClick={() => setCurrentTurn(p)}
+              key={player}
+              className={`player ${turn === player ? "active" : ""}`}
+              onClick={() => setTurn(player)}
             >
               <div className="avatar" />
-              <div className="name">{p}</div>
-              <div className="drinks">🍺 0</div>
-              <button>+1 Beer</button>
+              <h3>{player}</h3>
+              <p>🍺 {drinks[player]}</p>
+
+              {reactionActive ? (
+                <button
+                  className={`react ${reacted.includes(player) ? "done" : ""}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    react(player);
+                  }}
+                >
+                  REACT
+                </button>
+              ) : (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addDrink(player);
+                  }}
+                >
+                  +1 Beer
+                </button>
+              )}
             </div>
           ))}
-        </div>
+        </section>
 
-        <div className="card-area">
-          <div className="card">
-            <p>Draw a card</p>
-            <p>No mercy</p>
+        <section className="card">
+          <div className="card-face">
+            <p>Draw a card<br />No mercy</p>
           </div>
           <button className="draw">DRAW CARD</button>
-        </div>
+        </section>
 
-        {!isMobile && (
-          <Sidebar
-            startReaction={startReaction}
-          />
-        )}
-      </div>
-
-      {isMobile && (
-        <Sidebar
-          startReaction={startReaction}
-        />
-      )}
-
-      {reactionType && (
-        <ReactionOverlay
-          type={reactionType}
-          reacted={reacted}
-          lastLoser={lastLoser}
-          onReact={react}
-        />
-      )}
-    </div>
-  );
-}
-
-function LayoutToggle({ layoutMode, setLayoutMode }) {
-  return (
-    <div className="layout-toggle">
-      <button
-        className={layoutMode === "auto" ? "active" : ""}
-        onClick={() => setLayoutMode("auto")}
-      >
-        AUTO
-      </button>
-      <button
-        className={layoutMode === "mobile" ? "active" : ""}
-        onClick={() => setLayoutMode("mobile")}
-      >
-        📱
-      </button>
-      <button
-        className={layoutMode === "desktop" ? "active" : ""}
-        onClick={() => setLayoutMode("desktop")}
-      >
-        🖥️
-      </button>
-    </div>
-  );
-}
-
-function Sidebar({ startReaction }) {
-  return (
-    <aside className="sidebar">
-      <div className="panel">
-        <h3>Progress</h3>
-        <p>0 / 52</p>
-      </div>
-
-      <div className="panel">
-        <h3>Sticky Powers</h3>
-        <p>Thumbmaster (J)</p>
-        <button onClick={() => startReaction("J")}>START J</button>
-        <p>Heaven (7)</p>
-        <button onClick={() => startReaction("7")}>START 7</button>
-      </div>
-
-      <button className="restart">RESTART</button>
-    </aside>
-  );
-}
-
-function ReactionOverlay({ type, reacted, lastLoser, onReact }) {
-  return (
-    <div className="reaction-overlay">
-      <div className="reaction-box">
-        <h2>
-          {type === "J" ? "THUMBMASTER" : "HEAVEN"}
-        </h2>
-        <p>
-          {type === "J"
-            ? "Thumb on the table"
-            : "Finger to the sky"}
-        </p>
-
-        <div className="reaction-buttons">
-          {PLAYERS.map((p) => (
-            <button
-              key={p}
-              disabled={reacted.includes(p)}
-              onClick={() => onReact(p)}
-            >
-              {p}
+        <aside className="sidebar">
+          <h4>Sticky Powers</h4>
+          <button onClick={startReaction}>START J / 7</button>
+          {reactionActive && (
+            <button className="end" onClick={finishReaction}>
+              END REACTION
             </button>
-          ))}
-        </div>
-
-        {lastLoser && (
-          <div className="loser">
-            {lastLoser} drinks 🍺
-          </div>
-        )}
-      </div>
+          )}
+        </aside>
+      </main>
     </div>
   );
 }
