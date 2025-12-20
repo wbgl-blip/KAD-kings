@@ -7,9 +7,35 @@ export default function App() {
   const [layoutMode, setLayoutMode] = useState("auto");
   const [currentTurn, setCurrentTurn] = useState("Beau");
 
+  const [reactionType, setReactionType] = useState(null); // "J" | "7" | null
+  const [reacted, setReacted] = useState([]);
+  const [lastLoser, setLastLoser] = useState(null);
+
   const isMobile =
     layoutMode === "mobile" ||
     (layoutMode === "auto" && window.innerWidth < 768);
+
+  function startReaction(type) {
+    setReactionType(type);
+    setReacted([]);
+    setLastLoser(null);
+  }
+
+  function react(player) {
+    if (reacted.includes(player)) return;
+
+    const next = [...reacted, player];
+    setReacted(next);
+
+    if (next.length === PLAYERS.length) {
+      const loser = next[next.length - 1];
+      setLastLoser(loser);
+      setTimeout(() => {
+        setReactionType(null);
+        setReacted([]);
+      }, 900);
+    }
+  }
 
   return (
     <div className={`app ${isMobile ? "mobile" : "desktop"}`}>
@@ -41,10 +67,27 @@ export default function App() {
           <button className="draw">DRAW CARD</button>
         </div>
 
-        {!isMobile && <Sidebar />}
+        {!isMobile && (
+          <Sidebar
+            startReaction={startReaction}
+          />
+        )}
       </div>
 
-      {isMobile && <Sidebar />}
+      {isMobile && (
+        <Sidebar
+          startReaction={startReaction}
+        />
+      )}
+
+      {reactionType && (
+        <ReactionOverlay
+          type={reactionType}
+          reacted={reacted}
+          lastLoser={lastLoser}
+          onReact={react}
+        />
+      )}
     </div>
   );
 }
@@ -74,7 +117,7 @@ function LayoutToggle({ layoutMode, setLayoutMode }) {
   );
 }
 
-function Sidebar() {
+function Sidebar({ startReaction }) {
   return (
     <aside className="sidebar">
       <div className="panel">
@@ -84,13 +127,48 @@ function Sidebar() {
 
       <div className="panel">
         <h3>Sticky Powers</h3>
-        <p>Thumbmaster (J): None</p>
-        <p>Heaven (7): None</p>
-        <button disabled>START J</button>
-        <button disabled>START 7</button>
+        <p>Thumbmaster (J)</p>
+        <button onClick={() => startReaction("J")}>START J</button>
+        <p>Heaven (7)</p>
+        <button onClick={() => startReaction("7")}>START 7</button>
       </div>
 
       <button className="restart">RESTART</button>
     </aside>
+  );
+}
+
+function ReactionOverlay({ type, reacted, lastLoser, onReact }) {
+  return (
+    <div className="reaction-overlay">
+      <div className="reaction-box">
+        <h2>
+          {type === "J" ? "THUMBMASTER" : "HEAVEN"}
+        </h2>
+        <p>
+          {type === "J"
+            ? "Thumb on the table"
+            : "Finger to the sky"}
+        </p>
+
+        <div className="reaction-buttons">
+          {PLAYERS.map((p) => (
+            <button
+              key={p}
+              disabled={reacted.includes(p)}
+              onClick={() => onReact(p)}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+
+        {lastLoser && (
+          <div className="loser">
+            {lastLoser} drinks 🍺
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
