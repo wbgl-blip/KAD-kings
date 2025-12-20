@@ -11,12 +11,12 @@
     --tileBorder: rgba(255,255,255,0.06);
     --white:#fff;
 
-    /* ✅ Players bigger than the card (portrait tuned) */
+    /* Players bigger than the card (portrait tuned) */
     --tileW: 156px;
     --tileH: 190px;
     --avatar: 52px;
 
-    /* ✅ Card smaller so it’s not the focal point */
+    /* Card smaller so it’s not the focal point */
     --cardW: 220px;
     --cardH: 300px;
 
@@ -31,7 +31,7 @@
   html, body{
     margin:0;
     height:100%;
-    overflow:hidden;              /* ✅ never scroll */
+    overflow:hidden;              /* never scroll */
     background: var(--bg);
     color: var(--white);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -79,11 +79,11 @@
   .stage{
     position:relative;
     width:min(980px, 96vw);
-    height: calc(100% - 86px); /* title area */
+    height: calc(100% - 86px);
     max-height: 820px;
   }
 
-  /* Auto-scale container (shrinks if needed in split-screen / browser bars) */
+  /* Auto-scale container (shrinks if needed) */
   .scaleWrap{
     position:relative;
     width:100%;
@@ -93,7 +93,7 @@
 
   .pos{ position:absolute; transform:translate(-50%,-50%); }
 
-  /* Player tiles (bigger + stronger) */
+  /* Player tiles */
   .tile{
     width: var(--tileW);
     height: var(--tileH);
@@ -147,7 +147,7 @@
   }
   .pill:active{ transform:scale(.99); }
 
-  /* Center card (smaller + calmer) */
+  /* Center card */
   .card{
     width: var(--cardW);
     height: var(--cardH);
@@ -180,27 +180,32 @@
     padding: var(--btnPadY) var(--btnPadX);
     box-shadow: 0 14px 34px rgba(0,0,0,.50);
     cursor:pointer;
+    z-index: 5;
   }
   .drawBtn:active{ transform: translateX(-50%) scale(.99); }
 
-  /* Positions (tuned for bigger players + smaller card) */
+  /* ✅ Positions (adjusted so panel DOES NOT overlap Emily) */
   .p-top-mid{ left:50%; top:12%; }
   .p-top-left{ left:28%; top:17%; }
   .p-top-right{ left:72%; top:17%; }
+
   .p-mid-left{ left:15%; top:54%; }
-  .p-mid-right{ left:85%; top:54%; }
+
+  /* key fix: move mid-right player left + slightly down */
+  .p-mid-right{ left:68%; top:60%; }
+
   .p-bot-left{ left:28%; top:90%; }
 
   /* Card slightly lower */
   .center{ left:50%; top:58%; }
 
-  /* Side panel (Sticky + Active Rules) */
+  /* Side panel */
   .panel{
     position:absolute;
-    right: 10px;
-    top: 55%;
+    right: 6px;          /* a touch closer to edge */
+    top: 54%;
     transform: translateY(-50%);
-    width: 220px;
+    width: 212px;        /* slightly narrower */
     padding: 12px;
     border-radius: 18px;
     background: rgba(11,11,11,.92);
@@ -209,6 +214,7 @@
     display:flex;
     flex-direction:column;
     gap:12px;
+    z-index: 4;          /* stays above background, but no longer covering Emily */
   }
 
   .sectionTitle{
@@ -315,7 +321,7 @@
   .miniBtn.dark{ background: rgba(255,255,255,0.10); color:#fff; border: 1px solid rgba(255,255,255,0.12); }
   .miniBtn:active{ transform: scale(.99); }
 
-  /* Small phones safety */
+  /* Small phones */
   @media (max-width: 480px){
     :root{
       --tileW: 106px;
@@ -338,14 +344,17 @@
     .p-top-left{ left:25%; top:16%; }
     .p-top-right{ left:75%; top:16%; }
     .p-mid-left{ left:14%; top:52%; }
-    .p-mid-right{ left:86%; top:52%; }
+
+    /* keep right-mid away from panel on small screens too */
+    .p-mid-right{ left:66%; top:62%; }
+
     .p-bot-left{ left:25%; top:88%; }
     .center{ left:50%; top:58%; }
 
     .panel{
-      right: 8px;
-      top: 68%;
-      width: 178px;
+      right: 6px;
+      top: 69%;
+      width: 172px;
       padding: 10px;
       gap:10px;
     }
@@ -379,14 +388,11 @@
 
     <div class="stage" id="stage">
       <div class="scaleWrap" id="scaleWrap">
-        <!-- Player tiles injected via JS -->
 
-        <!-- Center card -->
         <div class="pos center">
           <div class="card" id="centerCard">Draw a card<br/>No mercy</div>
         </div>
 
-        <!-- Sticky + Active Rules panel -->
         <div class="panel" id="panel">
           <div class="sectionTitle">
             Sticky Powers <span class="chip">LIVE</span>
@@ -426,7 +432,6 @@
           </div>
         </div>
 
-        <!-- Draw button -->
         <button class="drawBtn" id="drawBtn">DRAW CARD</button>
       </div>
     </div>
