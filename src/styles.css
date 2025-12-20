@@ -151,4 +151,51 @@ body {
   left: 0;
   right: 0;
   border-radius: 16px 16px 0 0;
+}/* REACTION OVERLAY */
+
+.reaction-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
 }
+
+.reaction-box {
+  background: #111;
+  border-radius: 20px;
+  padding: 24px;
+  width: min(90vw, 420px);
+  text-align: center;
+  border: 2px solid white;
+}
+
+.reaction-box h2 {
+  margin-bottom: 8px;
+}
+
+.reaction-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.reaction-buttons button {
+  padding: 12px;
+  font-size: 16px;
+}
+
+.reaction-buttons button:disabled {
+  opacity: 0.3;
+}
+
+.loser {
+  margin-top: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffb347;
+}
+
