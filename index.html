@@ -11,15 +11,16 @@
     --tileBorder: rgba(255,255,255,0.06);
     --white:#fff;
 
-    --tileW: 170px;
-    --tileH: 206px;
-    --avatar: 56px;
+    /* ✅ Players are the stars */
+    --tileW: 160px;
+    --tileH: 196px;
+    --avatar: 54px;
 
-    --cardW: 190px;
-    --cardH: 255px;
+    /* ✅ Card smaller, secondary */
+    --cardW: 165px;
+    --cardH: 225px;
 
-    --titleSize: 48px;
-
+    --titleSize: 54px;
     --btnPadY: 11px;
     --btnPadX: 20px;
   }
@@ -64,7 +65,7 @@
   }
 
   h1{
-    margin: 10px 0 4px; /* tighter */
+    margin: 10px 0 4px;
     font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     font-size: var(--titleSize);
     font-weight: 700;
@@ -73,10 +74,9 @@
     line-height:1;
   }
 
-  /* ✅ Banner tightened + lifted so it never collides */
   .turnBanner{
-    margin: 0 0 14px;        /* more gap below */
-    padding: 6px 10px;       /* slimmer */
+    margin: 0 0 14px;
+    padding: 6px 10px;
     border-radius: 999px;
     background: rgba(255,255,255,0.10);
     border: 1px solid rgba(255,255,255,0.12);
@@ -84,13 +84,13 @@
     font-weight: 1000;
     letter-spacing: .12em;
     text-transform: uppercase;
-    font-size: 11px;         /* slightly smaller */
+    font-size: 11px;
     display:flex;
     align-items:center;
     gap:10px;
     max-width: min(92vw, 680px);
     position: relative;
-    z-index: 30;             /* ensure above tiles */
+    z-index: 30;
   }
   .turnDot{
     width:9px; height:9px; border-radius:999px;
@@ -122,9 +122,8 @@
   .stage{
     position:relative;
     width:min(1040px, 98vw);
-    /* ✅ more room reserved for title+banner */
     height: calc(100% - 122px);
-    max-height: 900px;
+    max-height: 920px;
   }
 
   .scaleWrap{
@@ -142,7 +141,7 @@
     border-radius: 22px;
     background: rgba(11,11,11,.96);
     border: 1px solid var(--tileBorder);
-    box-shadow: 0 22px 54px rgba(0,0,0,0.78);
+    box-shadow: 0 18px 44px rgba(0,0,0,0.74); /* slightly softer */
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -152,13 +151,12 @@
     cursor:pointer;
   }
 
+  /* ✅ TURN highlight is now subtle, not “huge card” */
   .tile.turn{
-    border-color: rgba(255,255,255,0.28);
+    border-color: rgba(255,255,255,0.22);
     box-shadow:
-      0 0 0 2px rgba(255,255,255,0.10),
-      0 0 0 10px rgba(255,255,255,0.03),
-      0 28px 70px rgba(255,255,255,0.06),
-      0 22px 54px rgba(0,0,0,0.78);
+      0 0 0 2px rgba(255,255,255,0.07),
+      0 22px 52px rgba(0,0,0,0.76);
   }
 
   .turnTag{
@@ -232,14 +230,14 @@
   }
   .pill:active{ transform:scale(.99); }
 
-  /* ✅ Card now has internal layout: top / middle / footer */
+  /* ✅ Card internal layout (clean “Drew:” footer) */
   .card{
     width: var(--cardW);
     height: var(--cardH);
     background:#fff;
     color:#000;
     border-radius: 22px;
-    box-shadow: 0 18px 46px rgba(0,0,0,.55);
+    box-shadow: 0 16px 40px rgba(0,0,0,.50);
     display:flex;
     flex-direction:column;
     padding: 14px 16px 12px;
@@ -253,29 +251,29 @@
     align-items:flex-start;
     justify-content:center;
     gap:10px;
-    min-height: 60px;
+    min-height: 56px;
   }
   .cardFace{
-    font-size: 34px;
+    font-size: 30px;
     font-weight: 900;
     line-height: 1;
     margin-top: 2px;
   }
   .cardRule{
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 900;
     font-family: system-ui;
     opacity:.88;
     line-height: 1.15;
     text-align:left;
-    max-width: 110px;
+    max-width: 104px;
   }
   .cardMid{
     flex:1;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size: 20px;
+    font-size: 19px;
     padding: 6px 8px;
   }
   .cardFooter{
@@ -289,9 +287,6 @@
     align-items:center;
     gap:8px;
     min-height: 18px;
-  }
-  .cardFooter .dot{
-    width:4px;height:4px;border-radius:999px;background:rgba(0,0,0,.35);
   }
 
   .drawBtn{
@@ -329,15 +324,17 @@
     z-index: 6;
     display:none;
   }
-  .ghostBtn:active{ transform: translateX(-50%) scale(.99); }
 
-  .p-top-mid{   left:50%; top:13%; }
-  .p-top-left{  left:26%; top:19%; }
-  .p-top-right{ left:74%; top:19%; }
-  .p-mid-left{  left:20%; top:56%; }
-  .p-mid-right{ left:64%; top:56%; }
-  .p-bot-left{  left:30%; top:89%; }
-  .center{ left:46%; top:58%; }
+  /* ✅ More spacing so tiles never overlap */
+  .p-top-mid{   left:46%; top:14%; }
+  .p-top-left{  left:22%; top:22%; }
+  .p-top-right{ left:68%; top:22%; }
+  .p-mid-left{  left:16%; top:60%; }
+  .p-mid-right{ left:58%; top:60%; }
+  .p-bot-left{  left:26%; top:90%; }
+
+  /* Center moved a hair left so the panel feels balanced */
+  .center{ left:41%; top:60%; }
 
   .panel{
     position:absolute;
@@ -442,7 +439,6 @@
     color:#fff;
     border: 1px solid rgba(255,255,255,0.12);
   }
-  .powerBtn:active{ transform: scale(.99); }
   .powerBtn.primary{
     background:#fff;
     color:#000;
@@ -479,7 +475,6 @@
   }
   .miniBtn.light{ background:#fff; color:#000; }
   .miniBtn.dark{ background: rgba(255,255,255,0.10); color:#fff; border: 1px solid rgba(255,255,255,0.12); }
-  .miniBtn:active{ transform: scale(.99); }
 
   #toast{
     position:fixed;
@@ -505,30 +500,30 @@
     pointer-events:none;
   }
 
+  /* ✅ Mobile portrait tuning (S24 Ultra-ish) */
   @media (max-width: 480px){
     :root{
       --tileW: 112px;
       --tileH: 142px;
       --avatar: 36px;
 
-      --cardW: 160px;
-      --cardH: 210px;
+      --cardW: 150px;
+      --cardH: 200px;
 
-      --titleSize: 32px;
+      --titleSize: 34px;
       --btnPadY: 9px;
       --btnPadX: 14px;
     }
 
     .turnSmall{ display:none; }
-    .turnBanner{ margin-bottom: 16px; } /* extra gap */
 
-    .p-top-mid{   left:50%; top:14%; }
-    .p-top-left{  left:28%; top:18%; }
-    .p-top-right{ left:72%; top:18%; }
-    .p-mid-left{  left:18%; top:54%; }
-    .p-mid-right{ left:60%; top:54%; }
+    .p-top-mid{   left:46%; top:14%; }
+    .p-top-left{  left:26%; top:18%; }
+    .p-top-right{ left:68%; top:18%; }
+    .p-mid-left{  left:18%; top:55%; }
+    .p-mid-right{ left:58%; top:55%; }
     .p-bot-left{  left:30%; top:88%; }
-    .center{ left:46%; top:58%; }
+    .center{ left:42%; top:58%; }
 
     .panel{
       right: 2px;
@@ -538,8 +533,8 @@
       gap:10px;
     }
 
-    .cardFace{ font-size: 30px; }
-    .cardRule{ font-size: 12px; max-width: 96px; }
+    .cardFace{ font-size: 28px; }
+    .cardRule{ font-size: 12px; max-width: 92px; }
     .cardMid{ font-size: 18px; }
     .name{ font-size: 14px; }
   }
@@ -565,9 +560,7 @@
         <div class="pos center">
           <div class="card" id="centerCard">
             <div class="cardMid">Draw a card<br/>No mercy</div>
-            <div class="cardFooter" id="cardFooter" style="visibility:hidden">
-              <span id="cardFooterBy">Drew: Mike</span>
-            </div>
+            <div class="cardFooter" style="visibility:hidden"></div>
           </div>
         </div>
 
@@ -691,9 +684,6 @@
 
   const toast = document.getElementById("toast");
 
-  const cardFooter = document.getElementById("cardFooter");
-  const cardFooterBy = document.getElementById("cardFooterBy");
-
   const activeRules = [];
   const sticky = { thumbmaster:null, questionMaster:null, heavenMaster:null };
 
@@ -702,6 +692,7 @@
   let deck = [];
   let idx = 0;
 
+  // Sneaky round length (no visible countdown)
   const ROUND_MS = 4500;
 
   let round = {
@@ -947,9 +938,7 @@
   function setCenterCardIdle(){
     centerCard.innerHTML = `
       <div class="cardMid">Draw a card<br/>No mercy</div>
-      <div class="cardFooter" id="cardFooter" style="visibility:hidden">
-        <span id="cardFooterBy">Drew: Mike</span>
-      </div>
+      <div class="cardFooter" style="visibility:hidden"></div>
     `;
   }
 
@@ -966,7 +955,6 @@
     `;
   }
 
-  // ---- Cards ----
   function endState(){
     centerCard.innerHTML = `
       <div class="cardMid" style="font-size:18px;font-weight:900">
@@ -1024,7 +1012,6 @@
     renderSticky();
     renderHistory();
 
-    // ✅ Clean card layout (no weird "Drew:" wrapping)
     setCenterCardResult({
       face: card,
       rule,
@@ -1038,7 +1025,6 @@
 
   drawBtn.addEventListener("click", drawCard);
 
-  // ---- Fit ----
   function fitToScreen(){
     if (!stage || !wrap) return;
 
