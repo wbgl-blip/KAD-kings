@@ -1,12 +1,632 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KAD Kings</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>KAD Kings</title>
+
+<style>
+  :root{
+    --bg:#000;
+    --tileBorder: rgba(255,255,255,0.06);
+    --white:#fff;
+
+    /* Portrait-first sizing (tuned for big Android phones like S24 Ultra) */
+    --tileW: 138px;
+    --tileH: 166px;
+    --avatar: 44px;
+
+    --cardW: 285px;
+    --cardH: 390px;
+
+    --titleSize: 48px;
+
+    --btnPadY: 12px;
+    --btnPadX: 22px;
+  }
+
+  *{box-sizing:border-box}
+
+  html, body{
+    margin:0;
+    height:100%;
+    overflow:hidden;              /* ✅ never scroll */
+    background: var(--bg);
+    color: var(--white);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    touch-action: manipulation;   /* ✅ better taps on Android */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .bg1{
+    position:fixed; inset:0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.085) 0%, rgba(0,0,0,0.92) 55%, rgba(0,0,0,1) 100%);
+    pointer-events:none;
+  }
+  .bg2{
+    position:fixed; inset:0;
+    opacity:.26;
+    filter: blur(52px);
+    background:
+      radial-gradient(circle at 18% 26%, rgba(255,255,255,0.11), transparent 46%),
+      radial-gradient(circle at 76% 62%, rgba(255,255,255,0.09), transparent 42%);
+    pointer-events:none;
+  }
+
+  .app{
+    position:relative;
+    height:100svh;
+    height:100dvh;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  h1{
+    margin: 12px 0 8px;
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    font-size: var(--titleSize);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-align:center;
+    line-height:1;
+  }
+
+  .stage{
+    position:relative;
+    width:min(980px, 96vw);
+    height: calc(100% - 86px); /* title area */
+    max-height: 820px;
+  }
+
+  /* ✅ Auto-scale container (shrinks if needed in split-screen / browser bars) */
+  .scaleWrap{
+    position:relative;
+    width:100%;
+    height:100%;
+    transform-origin: top center;
+  }
+
+  .pos{ position:absolute; transform:translate(-50%,-50%); }
+
+  .tile{
+    width: var(--tileW);
+    height: var(--tileH);
+    border-radius: 20px;
+    background: rgba(11,11,11,.95);
+    border: 1px solid var(--tileBorder);
+    box-shadow: 0 18px 42px rgba(0,0,0,0.72);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    padding: 14px 14px 13px;
+  }
+
+  .avatar{
+    width: var(--avatar);
+    height: var(--avatar);
+    border-radius: 999px;
+    background: rgba(255,255,255,.35);
+  }
+
+  .name{
+    margin-top:-6px;
+    font-weight:900;
+    font-size: 16px;
+    text-align:center;
+  }
+
+  .stats{
+    margin-top:6px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+    justify-content:center;
+    font-size: 14px;
+    opacity:.92;
+    font-weight:800;
+  }
+
+  .pill{
+    margin-top:10px;
+    font-weight:1000;
+    font-size: 13px;
+    background:#fff;
+    color:#000;
+    border:0;
+    border-radius: 12px;
+    padding: 7px 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.35);
+    cursor:pointer;
+  }
+  .pill:active{ transform:scale(.99); }
+
+  .card{
+    width: var(--cardW);
+    height: var(--cardH);
+    background:#fff;
+    color:#000;
+    border-radius: 24px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.70);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 0 26px;
+    text-align:center;
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    font-weight: 950;
+    font-size: 28px;
+    line-height: 1.08;
+  }
+
+  .drawBtn{
+    position:absolute;
+    left:50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    background:#fff;
+    color:#000;
+    border:0;
+    border-radius: 12px;
+    font-weight: 1000;
+    letter-spacing: .09em;
+    padding: var(--btnPadY) var(--btnPadX);
+    box-shadow: 0 14px 34px rgba(0,0,0,.50);
+    cursor:pointer;
+  }
+  .drawBtn:active{ transform: translateX(-50%) scale(.99); }
+
+  /* Portrait positions */
+  .p-top-mid{ left:50%; top:11%; }
+  .p-top-left{ left:29%; top:15%; }
+  .p-top-right{ left:71%; top:15%; }
+  .p-mid-left{ left:16%; top:52%; }
+  .p-mid-right{ left:84%; top:52%; }
+  .p-bot-left{ left:29%; top:88%; }
+  .center{ left:50%; top:54%; }
+
+  /* ✅ Side panel (Sticky + Active Rules) */
+  .panel{
+    position:absolute;
+    right: 10px;
+    top: 52%;
+    transform: translateY(-50%);
+    width: 220px;
+    padding: 12px;
+    border-radius: 18px;
+    background: rgba(11,11,11,.92);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 18px 42px rgba(0,0,0,0.72);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .sectionTitle{
+    font-weight: 1000;
+    letter-spacing: .06em;
+    font-size: 12px;
+    opacity: .9;
+    text-transform: uppercase;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+
+  .chip{
+    font-size: 11px;
+    font-weight: 1000;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.10);
+    opacity:.9;
+  }
+
+  .stickyGrid{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .stickyRow{
+    padding: 10px 10px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.06);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+
+  .stickyLabel{
+    font-size: 12px;
+    font-weight: 1000;
+    letter-spacing:.02em;
+    opacity:.9;
+  }
+
+  .stickyValue{
+    font-size: 12px;
+    font-weight: 1000;
+    opacity:.85;
+    text-align:right;
+    max-width: 120px;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .stickyOn{
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.16);
+  }
+
+  .rulesList{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    overflow:hidden; /* no scroll */
+  }
+
+  .ruleItem{
+    padding: 10px 10px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 800;
+  }
+
+  .ruleMeta{
+    margin-top: 6px;
+    font-size: 11px;
+    opacity: .7;
+    font-weight: 900;
+    letter-spacing: .02em;
+  }
+
+  .btnRow{
+    display:flex;
+    gap:8px;
+  }
+
+  .miniBtn{
+    flex:1;
+    border:0;
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-weight: 1000;
+    cursor:pointer;
+  }
+  .miniBtn.light{ background:#fff; color:#000; }
+  .miniBtn.dark{ background: rgba(255,255,255,0.10); color:#fff; border: 1px solid rgba(255,255,255,0.12); }
+  .miniBtn:active{ transform: scale(.99); }
+
+  @media (max-width: 480px){
+    :root{
+      --tileW: 92px;
+      --tileH: 110px;
+      --avatar: 28px;
+      --cardW: 180px;
+      --cardH: 250px;
+      --titleSize: 32px;
+      --btnPadY: 9px;
+      --btnPadX: 14px;
+    }
+
+    .name{ font-size: 13px; }
+    .stats{ font-size: 12px; gap:6px; }
+    .pill{ font-size: 11px; padding: 5px 8px; border-radius: 9px; }
+    .card{ font-size: 20px; }
+
+    .p-top-left{ left:25%; top:16%; }
+    .p-top-right{ left:75%; top:16%; }
+    .p-mid-left{ left:14%; top:52%; }
+    .p-mid-right{ left:86%; top:52%; }
+    .p-bot-left{ left:25%; top:88%; }
+
+    .panel{
+      right: 8px;
+      top: 68%;
+      width: 178px;
+      padding: 10px;
+      gap:10px;
+    }
+
+    .ruleItem{ font-size: 12px; padding: 8px 8px; }
+  }
+
+  @media (max-height: 740px){
+    :root{
+      --tileW: 120px;
+      --tileH: 146px;
+      --cardW: 250px;
+      --cardH: 340px;
+      --titleSize: 40px;
+    }
+  }
+</style>
+</head>
+
+<body>
+  <div class="bg1"></div>
+  <div class="bg2"></div>
+
+  <div class="app">
+    <h1>KAD Kings</h1>
+
+    <div class="stage" id="stage">
+      <div class="scaleWrap" id="scaleWrap">
+        <div class="pos center">
+          <div class="card" id="centerCard">Draw a card<br/>No mercy</div>
+        </div>
+
+        <div class="panel" id="panel">
+          <div class="sectionTitle">
+            Sticky Powers <span class="chip">LIVE</span>
+          </div>
+
+          <div class="stickyGrid">
+            <div class="stickyRow" id="thumbRow">
+              <div class="stickyLabel">Thumbmaster (J)</div>
+              <div class="stickyValue" id="thumbVal">None</div>
+            </div>
+
+            <div class="stickyRow" id="questionRow">
+              <div class="stickyLabel">Question Master (Q)</div>
+              <div class="stickyValue" id="questionVal">None</div>
+            </div>
+
+            <div class="stickyRow" id="heavenRow">
+              <div class="stickyLabel">Heaven (7)</div>
+              <div class="stickyValue" id="heavenVal">None</div>
+            </div>
+          </div>
+
+          <div class="sectionTitle">
+            Active Rules <span class="chip" id="rulesCount">0</span>
+          </div>
+
+          <div class="rulesList" id="rulesList">
+            <div class="ruleItem" style="opacity:.75">
+              No rules yet.
+              <div class="ruleMeta">Draw a King to add one.</div>
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button class="miniBtn dark" id="addRuleBtn">+ Rule</button>
+            <button class="miniBtn light" id="clearRulesBtn">Clear</button>
+          </div>
+        </div>
+
+        <button class="drawBtn" id="drawBtn">DRAW CARD</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const players = [
+    {id:"beau",  name:"Beau",  drinks:0, pos:"p-top-left"},
+    {id:"mike",  name:"Mike",  drinks:0, pos:"p-top-mid"},
+    {id:"jess",  name:"Jess",  drinks:0, pos:"p-top-right"},
+    {id:"alex",  name:"Alex",  drinks:0, pos:"p-mid-left"},
+    {id:"emily", name:"Emily", drinks:0, pos:"p-mid-right"},
+    {id:"sean",  name:"Sean",  drinks:0, pos:"p-bot-left"},
+  ];
+
+  const kingsRules = {
+    A: "Waterfall – everyone drinks, no stopping",
+    "2": "You – choose someone to drink",
+    "3": "Me – you drink",
+    "4": "For whores – everyone drinks",
+    "5": "Guys – all guys drink",
+    "6": "For dicks – everyone drinks",
+    "7": "Heaven – last to point to heaven drinks",
+    "8": "Mate – pick a drinking buddy",
+    "9": "Rhyme – say a word, others rhyme",
+    "10": "Categories – pick a category",
+    J: "Thumbmaster – last thumb down drinks",
+    Q: "Question master – answer questions or drink",
+    K: "King – make a rule"
+  };
+
+  const stage = document.getElementById("stage");
+  const wrap = document.getElementById("scaleWrap");
+  const centerCard = document.getElementById("centerCard");
+  const drawBtn = document.getElementById("drawBtn");
+
+  const thumbRow = document.getElementById("thumbRow");
+  const questionRow = document.getElementById("questionRow");
+  const heavenRow = document.getElementById("heavenRow");
+  const thumbVal = document.getElementById("thumbVal");
+  const questionVal = document.getElementById("questionVal");
+  const heavenVal = document.getElementById("heavenVal");
+
+  const rulesCount = document.getElementById("rulesCount");
+  const rulesList = document.getElementById("rulesList");
+  const addRuleBtn = document.getElementById("addRuleBtn");
+  const clearRulesBtn = document.getElementById("clearRulesBtn");
+
+  const activeRules = [];
+  const sticky = {
+    thumbmaster: null,
+    questionMaster: null,
+    heavenMaster: null
+  };
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function renderSticky(){
+    thumbVal.textContent = sticky.thumbmaster || "None";
+    questionVal.textContent = sticky.questionMaster || "None";
+    heavenVal.textContent = sticky.heavenMaster || "None";
+
+    thumbRow.classList.toggle("stickyOn", !!sticky.thumbmaster);
+    questionRow.classList.toggle("stickyOn", !!sticky.questionMaster);
+    heavenRow.classList.toggle("stickyOn", !!sticky.heavenMaster);
+  }
+
+  function renderRules(){
+    rulesCount.textContent = String(activeRules.length);
+    const shown = activeRules.slice(-6).reverse();
+
+    if (shown.length === 0){
+      rulesList.innerHTML = `
+        <div class="ruleItem" style="opacity:.75">
+          No rules yet.
+          <div class="ruleMeta">Draw a King to add one.</div>
+        </div>
+      `;
+      return;
+    }
+
+    rulesList.innerHTML = shown.map((r, i) => {
+      const n = activeRules.length - i;
+      return `
+        <div class="ruleItem">
+          ${escapeHtml(r.text)}
+          <div class="ruleMeta">Rule #${n}${r.by ? " • by " + escapeHtml(r.by) : ""}</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function promptForRule(who){
+    const text = prompt("New rule (King):", "");
+    if (!text) return;
+    activeRules.push({ text: text.trim(), by: who || "" });
+    renderRules();
+    fitToScreen();
+  }
+
+  addRuleBtn.addEventListener("click", () => promptForRule("manual"));
+  clearRulesBtn.addEventListener("click", () => {
+    if (!activeRules.length) return;
+    if (!confirm("Clear all active rules?")) return;
+    activeRules.length = 0;
+    renderRules();
+    fitToScreen();
+  });
+
+  function tileHTML(p){
+    return `
+      <div class="pos ${p.pos}" data-id="${p.id}">
+        <div class="tile">
+          <div class="avatar"></div>
+          <div>
+            <div class="name">${p.name}</div>
+            <div class="stats"><span>🍺</span><span class="drinkCount">${p.drinks}</span></div>
+          </div>
+          <button class="pill">+1 Beer</button>
+        </div>
+      </div>
+    `;
+  }
+
+  wrap.insertAdjacentHTML("afterbegin", players.map(tileHTML).join(""));
+
+  wrap.querySelectorAll(".pos[data-id] .pill").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const root = e.target.closest(".pos[data-id]");
+      const id = root.getAttribute("data-id");
+      const p = players.find(x => x.id === id);
+      p.drinks += 1;
+      root.querySelector(".drinkCount").textContent = p.drinks;
+    });
+  });
+
+  const suits = ["♠","♥","♦","♣"];
+  const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+  const deck = [];
+  for (const r of ranks) for (const s of suits) deck.push(`${r}${s}`);
+  deck.sort(() => Math.random() - 0.5);
+
+  let idx = 0;
+
+  function whoDrewThis(){
+    return players[(idx - 1) % players.length]?.name || "someone";
+  }
+
+  drawBtn.addEventListener("click", () => {
+    if (idx >= deck.length){
+      centerCard.innerHTML = `
+        <div style="font-size:22px;font-weight:950;line-height:1.1">
+          All 52 cards drawn<br/>
+          <span style="font-size:16px;opacity:.8;font-family:system-ui">Game over</span>
+        </div>
+      `;
+      return;
+    }
+
+    const card = deck[idx++];
+    const rank = card.slice(0, -1);
+    const rule = kingsRules[rank] || "";
+    const who = whoDrewThis();
+
+    // Sticky owners update (replace on re-draw)
+    if (rank === "J") sticky.thumbmaster = who;
+    if (rank === "Q") sticky.questionMaster = who;
+    if (rank === "7") sticky.heavenMaster = who;
+
+    // King prompts a new rule
+    if (rank === "K") setTimeout(() => promptForRule(who), 20);
+
+    renderSticky();
+
+    // Center card display: add hint when sticky cards are drawn
+    let stickyHint = "";
+    if (rank === "J") stickyHint = `<div style="margin-top:8px;font-size:13px;opacity:.78;font-family:system-ui;font-weight:1000">Thumbmaster is now: ${escapeHtml(who)}</div>`;
+    if (rank === "Q") stickyHint = `<div style="margin-top:8px;font-size:13px;opacity:.78;font-family:system-ui;font-weight:1000">Question Master is now: ${escapeHtml(who)}</div>`;
+    if (rank === "7") stickyHint = `<div style="margin-top:8px;font-size:13px;opacity:.78;font-family:system-ui;font-weight:1000">Heaven is now owned by: ${escapeHtml(who)}</div>`;
+
+    centerCard.innerHTML = `
+      <div style="font-size:46px;font-weight:950;margin-bottom:8px">
+        ${card}
+      </div>
+      <div style="font-size:16px;font-weight:1000;opacity:.92;line-height:1.2;font-family:system-ui">
+        ${rule}
+      </div>
+      ${stickyHint}
+      <div style="margin-top:8px;font-size:13px;opacity:.65;font-family:system-ui;font-weight:900">
+        ${idx} / 52 • Drew: ${escapeHtml(who)}
+      </div>
+    `;
+
+    fitToScreen();
+  });
+
+  function fitToScreen(){
+    if (!stage || !wrap) return;
+    wrap.style.transform = "scale(1)";
+    const stageRect = stage.getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
+    const scaleX = stageRect.width / wrapRect.width;
+    const scaleY = stageRect.height / wrapRect.height;
+    wrap.style.transform = `scale(${Math.min(1, scaleX, scaleY)})`;
+  }
+
+  window.addEventListener("load", () => {
+    renderSticky();
+    renderRules();
+    fitToScreen();
+  });
+  window.addEventListener("resize", () => requestAnimationFrame(fitToScreen));
+  window.addEventListener("orientationchange", () => setTimeout(fitToScreen, 60));
+</script>
+</body>
 </html>
