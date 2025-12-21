@@ -1,15 +1,42 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import "./styles.css";
 
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex"];
+
+function buildDeck() {
+  const suits = ["♠", "♥", "♦", "♣"];
+  const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+  const deck = [];
+  for (const r of ranks) {
+    for (const s of suits) {
+      deck.push(`${r}${s}`);
+    }
+  }
+  return deck.sort(() => Math.random() - 0.5);
+}
 
 export default function App() {
   const [counts, setCounts] = useState(
     Object.fromEntries(PLAYERS.map((p) => [p, 0]))
   );
 
+  const [deck, setDeck] = useState(buildDeck);
+  const [index, setIndex] = useState(0);
+  const [card, setCard] = useState(null);
+
+  const cardsLeft = deck.length - index;
+
   function addBeer(name) {
     setCounts((c) => ({ ...c, [name]: c[name] + 1 }));
+  }
+
+  function drawCard() {
+    if (index >= deck.length) {
+      setCard("DECK EMPTY");
+      return;
+    }
+    setCard(deck[index]);
+    setIndex((i) => i + 1);
   }
 
   return (
@@ -32,21 +59,32 @@ export default function App() {
 
       {/* HUD */}
       <div className="hud">
-        {/* DRAW ROW */}
+        {/* DRAW + CARD */}
         <div className="hud-deck">
-          <button className="draw-slim">DRAW</button>
+          <button className="draw-slim" onClick={drawCard}>
+            DRAW
+          </button>
 
           <div className="deck-side">
-            <div className="deck-rank">Draw</div>
-            <div className="deck-sub">No mercy</div>
+            {card ? (
+              <>
+                <div className="deck-rank">{card}</div>
+                <div className="deck-sub">{cardsLeft} left</div>
+              </>
+            ) : (
+              <>
+                <div className="deck-rank">Draw</div>
+                <div className="deck-sub">No mercy</div>
+              </>
+            )}
           </div>
         </div>
 
-        {/* STATUS ROW */}
+        {/* STATUS */}
         <div className="hud-row">
           <div className="hud-item">
             <span className="hud-title">Progress</span>
-            0 / 52
+            {index} / 52
           </div>
           <div className="hud-item">
             <span className="hud-title">Thumbmaster (J)</span>
@@ -68,3 +106,4 @@ export default function App() {
     </div>
   );
 }
+
