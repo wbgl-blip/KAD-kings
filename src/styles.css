@@ -51,7 +51,7 @@ h1 {
   gap: 14px;
   justify-content: center;
   align-content: start;
-  padding-bottom: 220px; /* space for HUD */
+  padding-bottom: 260px; /* space for HUD */
 }
 
 /* =========================
