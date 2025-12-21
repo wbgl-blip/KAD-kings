@@ -29,38 +29,32 @@ export default function App() {
     setCard(next);
   }
 
-  return (
-    <div className="app">
-      <h1>KAD Kings</h1>
+<div className="app">
+  <h1 className="title">KAD Kings</h1>
 
-      <div className="table">
-        {PLAYERS.map(name => (
-          <div className="player" key={name}>
-            <div className="avatar" />
-            <div className="name">{name}</div>
-            <div className="count">🍺 0</div>
-            <button className="beer">+1 Beer</button>
-          </div>
-        ))}
-
-        <div className="card">
-          {card ? (
-            <>
-              <div className="card-rank">{card}</div>
-              <div className="card-sub">{cardsLeft} cards left</div>
-            </>
-          ) : (
-            <>
-              <div className="card-rank">Draw a card</div>
-              <div className="card-sub">No mercy</div>
-            </>
-          )}
-        </div>
+  <div className="table">
+    <div className="deck">
+      <div className="deck-card">
+        {card ? card : "DRAW"}
       </div>
-
-      <button className="draw" onClick={drawCard}>
-        DRAW CARD
-      </button>
+      <div className="deck-sub">{cardsLeft} left</div>
     </div>
-  );
-}
+
+    {PLAYERS.map((name, i) => (
+      <div
+        className="player"
+        key={name}
+        style={{ "--i": i, "--n": PLAYERS.length }}
+      >
+        <div className="avatar" />
+        <div className="name">{name}</div>
+        <div className="count">🍺 0</div>
+      </div>
+    ))}
+  </div>
+
+  <button className="draw" onClick={drawCard}>
+    DRAW CARD
+  </button>
+</div>
+
