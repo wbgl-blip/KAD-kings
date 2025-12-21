@@ -248,3 +248,26 @@ body {
     opacity: 1;
   }
 }
+/* =========================
+   DESKTOP → MOBILE LOCK
+========================= */
+
+/* Center app on desktop */
+@media (min-width: 480px) {
+  body {
+    display: flex;
+    justify-content: center;
+    background: #000;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 420px; /* PHONE WIDTH */
+    min-height: 100vh;
+    background: #000;
+  }
+
+  .app {
+    width: 100%;
+  }
+}
