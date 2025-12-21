@@ -17,13 +17,9 @@ export default function App() {
   const [card, setCard] = useState(null);
 
   const cardsLeft = deck.length - index;
-  const count = PLAYERS.length;
 
   function drawCard() {
-    if (index >= deck.length) {
-      setCard("DECK EMPTY");
-      return;
-    }
+    if (index >= deck.length) return;
     setCard(deck[index]);
     setIndex(i => i + 1);
   }
@@ -32,27 +28,24 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* Table */}
+      {/* TABLE */}
       <div
-        className="table"
         style={{
           position: "relative",
-          width: "100%",
-          maxWidth: 360,
-          aspectRatio: "1 / 1",
+          width: 360,
+          height: 360,              // 🔒 fixed circle
           margin: "0 auto",
-          transform: "translateY(-10px)", // 🔑 lift whole circle
         }}
       >
-        {/* Center deck */}
+        {/* DECK */}
         <div
           className="card"
           style={{
             position: "absolute",
             inset: 0,
             margin: "auto",
-            width: 105,
-            height: 145,
+            width: 100,
+            height: 140,
           }}
         >
           {card ? (
@@ -68,10 +61,10 @@ export default function App() {
           )}
         </div>
 
-        {/* Players */}
+        {/* PLAYERS */}
         {PLAYERS.map((name, i) => {
-          const angle = (360 / count) * i - 90;
-          const radius = 165; // 🔑 more breathing room
+          const angle = (360 / PLAYERS.length) * i - 90;
+          const radius = 180; // ✅ THIS was the problem
 
           return (
             <div
@@ -97,11 +90,11 @@ export default function App() {
         })}
       </div>
 
-      {/* Draw button */}
+      {/* DRAW BUTTON — OUTSIDE CIRCLE */}
       <button
         className="draw"
         onClick={drawCard}
-        style={{ marginTop: 6 }}
+        style={{ marginTop: 14 }}
       >
         DRAW CARD
       </button>
