@@ -70,38 +70,39 @@ export default function App() {
         </div>
       </div>
 
-      {/* HUD */}
-      <div className="hud">
-        <div className="hud-top">
-          <button className="draw" onClick={drawCard}>
-            DRAW CARD
-          </button>
-          <button className="hud-min">–</button>
-        </div>
+      {/* HUD — DOCKED + NARROW */}
+<div className="hud">
+  <div className="hud-inner">
+    <div className="hud-top">
+      <div className="hud-card">
+        <div className="card-title">{cardText}</div>
+        <div className="card-sub">{cardsLeft} left</div>
+      </div>
 
-        <div className="hud-info">
-          <div className="hud-box">
-            Progress<br />
-            {index} / 52
-          </div>
-          <div className="hud-box">
-            Thumbmaster (J)<br />
-            None
-          </div>
-          <div className="hud-box">
-            Heaven (7)<br />
-            None
-          </div>
-        </div>
+      <button className="draw">
+        DRAW
+      </button>
+    </div>
 
-        <div className="hud-actions">
-          <button>START J</button>
-          <button>START 7</button>
-          <button className="reset" onClick={resetGame}>
-            RESET
-          </button>
-        </div>
+    <div className="hud-info">
+      <div>
+        <strong>Progress</strong>
+        <span>{52 - cardsLeft} / 52</span>
+      </div>
+      <div>
+        <strong>Thumbmaster (J)</strong>
+        <span>None</span>
+      </div>
+      <div>
+        <strong>Heaven (7)</strong>
+        <span>None</span>
       </div>
     </div>
-  );
-}
+
+    <div className="hud-actions">
+      <button>START J</button>
+      <button>START 7</button>
+      <button className="reset">RESET</button>
+    </div>
+  </div>
+</div>
