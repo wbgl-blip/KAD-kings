@@ -150,9 +150,10 @@ h1 {
 
 .hud-info div {
   background: #111;
-  padding: 6px;
+  padding: 6px 4px;
   border-radius: 10px;
   text-align: center;
+  line-height: 1.2;
 }
 
 /* ACTIONS */
