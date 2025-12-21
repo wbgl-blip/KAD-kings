@@ -13,7 +13,6 @@ function buildDeck() {
 export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [index, setIndex] = useState(0);
-  const [card, setCard] = useState(null);
   const [cardText, setCardText] = useState("Draw");
 
   const [beers, setBeers] = useState(
@@ -25,7 +24,6 @@ export default function App() {
   function drawCard() {
     if (index >= deck.length) return;
     const next = deck[index];
-    setCard(next);
     setCardText(next);
     setIndex(i => i + 1);
   }
@@ -37,7 +35,6 @@ export default function App() {
   function resetGame() {
     setDeck(buildDeck());
     setIndex(0);
-    setCard(null);
     setCardText("Draw");
     setBeers(Object.fromEntries(PLAYERS.map(p => [p, 0])));
   }
@@ -46,7 +43,7 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* PLAYERS */}
+      {/* PLAYER GRID */}
       <div className="table">
         {PLAYERS.map(name => (
           <div className="player" key={name}>
@@ -58,8 +55,7 @@ export default function App() {
             </button>
           </div>
         ))}
-
-        
+      </div> {/* ✅ THIS WAS MISSING */}
 
       {/* HUD */}
       <div className="hud">
