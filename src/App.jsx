@@ -15,6 +15,9 @@ export default function App() {
   const [counts, setCounts] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
+  const [stats, setStats] = useState(
+    Object.fromEntries(PLAYERS.map(p => [p, { reactionsLost: 0 }]))
+  );
 
   const [deck, setDeck] = useState(buildDeck);
   const [index, setIndex] = useState(0);
@@ -30,6 +33,7 @@ export default function App() {
   const [reactionType, setReactionType] = useState(null); // "J" | "7"
   const [reactionStart, setReactionStart] = useState(null);
   const [reactions, setReactions] = useState({});
+  const [lastLoser, setLastLoser] = useState(null); // for feedback
 
   const cardsLeft = deck.length - index;
 
@@ -50,6 +54,7 @@ export default function App() {
   }
 
   function startReaction(type) {
+    setLastLoser(null);
     setReactionType(type);
     setReactionStart(Date.now());
     setReactions({});
@@ -66,9 +71,19 @@ export default function App() {
         const loser = Object.entries(updated)
           .sort((a, b) => b[1] - a[1])[0][0];
 
+        // punish loser
         addBeer(loser);
+        setStats(s => ({
+          ...s,
+          [loser]: {
+            reactionsLost: s[loser].reactionsLost + 1
+          }
+        }));
 
-        // clear reaction ONLY (power stays)
+        // feedback
+        setLastLoser(loser);
+
+        // clear reaction ONLY (powers stay)
         setReactionType(null);
         setReactionStart(null);
       }
@@ -79,6 +94,8 @@ export default function App() {
 
   const canStartJ = turn && turn === thumbHolder;
   const canStart7 = turn && turn === heavenHolder;
+
+  const totalDrinks = Object.values(counts).reduce((a, b) => a + b, 0);
 
   return (
     <div className="app">
@@ -92,6 +109,7 @@ export default function App() {
             className={`player 
               ${turn === name ? "active" : ""}
               ${reactionType ? "reactable" : ""}
+              ${lastLoser === name ? "loser" : ""}
             `}
             onClick={() => {
               reactionType ? react(name) : setTurn(name);
@@ -100,6 +118,7 @@ export default function App() {
             <div className="avatar" />
             <div className="name">{name}</div>
             <div className="count">🍺 {counts[name]}</div>
+            <div className="meta">💀 {stats[name].reactionsLost}</div>
             <button
               className="beer"
               onClick={(e) => {
@@ -150,25 +169,35 @@ export default function App() {
           </div>
         </div>
 
+        {/* SESSION STATS */}
+        <div className="hud-row">
+          <div className="hud-item">
+            <span className="hud-title">Total Drinks</span>
+            {totalDrinks}
+          </div>
+          <div className="hud-item">
+            <span className="hud-title">Reactions Lost</span>
+            {Object.values(stats).reduce((a, s) => a + s.reactionsLost, 0)}
+          </div>
+          <div className="hud-item">
+            <span className="hud-title">Cards Drawn</span>
+            {index}
+          </div>
+        </div>
+
         <div className="hud-actions">
-          <button
-            disabled={!canStartJ}
-            onClick={() => startReaction("J")}
-          >
+          <button disabled={!canStartJ} onClick={() => startReaction("J")}>
             START J
           </button>
-
-          <button
-            disabled={!canStart7}
-            onClick={() => startReaction("7")}
-          >
+          <button disabled={!canStart7} onClick={() => startReaction("7")}>
             START 7
           </button>
-
           <button
             className="secondary"
             onClick={() => {
               setCounts(Object.fromEntries(PLAYERS.map(p => [p, 0])));
+              setStats(Object.fromEntries(PLAYERS.map(p => [p, { reactionsLost: 0 }])));
+
               setDeck(buildDeck());
               setIndex(0);
               setCard(null);
@@ -176,6 +205,7 @@ export default function App() {
               setThumbHolder(null);
               setHeavenHolder(null);
               setReactionType(null);
+              setLastLoser(null);
             }}
           >
             RESET GAME
