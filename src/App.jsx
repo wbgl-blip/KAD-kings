@@ -1,6 +1,4 @@
 import { useState } from "react";
-const [cardText, setCardText] = useState("Draw");
-const [cardsLeft, setCardsLeft] = useState(52);
 
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex"];
 
@@ -16,6 +14,8 @@ export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [index, setIndex] = useState(0);
   const [card, setCard] = useState(null);
+  const [cardText, setCardText] = useState("Draw");
+
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
@@ -24,7 +24,9 @@ export default function App() {
 
   function drawCard() {
     if (index >= deck.length) return;
-    setCard(deck[index]);
+    const next = deck[index];
+    setCard(next);
+    setCardText(next);
     setIndex(i => i + 1);
   }
 
@@ -36,6 +38,7 @@ export default function App() {
     setDeck(buildDeck());
     setIndex(0);
     setCard(null);
+    setCardText("Draw");
     setBeers(Object.fromEntries(PLAYERS.map(p => [p, 0])));
   }
 
@@ -43,7 +46,7 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* PLAYER GRID */}
+      {/* PLAYERS */}
       <div className="table">
         {PLAYERS.map(name => (
           <div className="player" key={name}>
@@ -56,7 +59,7 @@ export default function App() {
           </div>
         ))}
 
-        {/* CARD */}
+        {/* CENTER CARD */}
         <div className="card">
           {card ? (
             <>
@@ -72,39 +75,44 @@ export default function App() {
         </div>
       </div>
 
-      {/* HUD — DOCKED + NARROW */}
-<div className="hud">
-  <div className="hud-inner">
-    <div className="hud-top">
-      <div className="hud-card">
-        <div className="card-title">{cardText}</div>
-        <div className="card-sub">{cardsLeft} left</div>
-      </div>
+      {/* HUD */}
+      <div className="hud">
+        <div className="hud-inner">
+          <div className="hud-top">
+            <div className="hud-card">
+              <div className="card-title">{cardText}</div>
+              <div className="card-sub">{cardsLeft} left</div>
+            </div>
 
-      <button className="draw"> onClick={drawCard}>
-        DRAW
-      </button>
-    </div>
+            <button className="draw" onClick={drawCard}>
+              DRAW
+            </button>
+          </div>
 
-    <div className="hud-info">
-      <div>
-        <strong>Progress</strong>
-        <span>{52 - cardsLeft} / 52</span>
-      </div>
-      <div>
-        <strong>Thumbmaster (J)</strong>
-        <span>None</span>
-      </div>
-      <div>
-        <strong>Heaven (7)</strong>
-        <span>None</span>
-      </div>
-    </div>
+          <div className="hud-info">
+            <div>
+              <strong>Progress</strong>
+              <span>{52 - cardsLeft} / 52</span>
+            </div>
+            <div>
+              <strong>Thumbmaster (J)</strong>
+              <span>None</span>
+            </div>
+            <div>
+              <strong>Heaven (7)</strong>
+              <span>None</span>
+            </div>
+          </div>
 
-    <div className="hud-actions">
-      <button>START J</button>
-      <button>START 7</button>
-      <button className="reset">RESET</button>
+          <div className="hud-actions">
+            <button>START J</button>
+            <button>START 7</button>
+            <button className="reset" onClick={resetGame}>
+              RESET
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  );
+}
