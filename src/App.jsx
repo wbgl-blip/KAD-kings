@@ -1,4 +1,6 @@
 import { useState } from "react";
+const [cardText, setCardText] = useState("Draw");
+const [cardsLeft, setCardsLeft] = useState(52);
 
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex"];
 
@@ -79,7 +81,7 @@ export default function App() {
         <div className="card-sub">{cardsLeft} left</div>
       </div>
 
-      <button className="draw">
+      <button className="draw"> onClick={drawCard}>
         DRAW
       </button>
     </div>
