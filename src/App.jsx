@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./styles.css";
 
-const PLAYERS = ["Beau", "Mike", "Jess", "Alex", "Emily", "Sean"];
+const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Alex", "Jess"];
 
 function buildDeck() {
   const suits = ["♠", "♥", "♦", "♣"];
@@ -24,34 +24,36 @@ export default function App() {
     setIndex(i => i + 1);
   }
 
+  // 🔧 GEOMETRY (THIS IS WHAT FIXES IT)
+  const size = 420;          // container size
+  const center = size / 2;
+  const radius = 210;        // MUST be > size/2 to move players outward
+
   return (
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* TABLE */}
       <div
         style={{
           position: "relative",
-          width: 360,
-          height: 360,              // 🔒 fixed circle
+          width: size,
+          height: size,
           margin: "0 auto",
         }}
       >
-        {/* DECK */}
+        {/* CENTER DECK */}
         <div
           className="card"
           style={{
             position: "absolute",
-            inset: 0,
-            margin: "auto",
-            width: 100,
-            height: 140,
+            top: center - 95,
+            left: center - 70,
           }}
         >
           {card ? (
             <>
               <div className="card-rank">{card}</div>
-              <div className="card-sub">{cardsLeft} left</div>
+              <div className="card-sub">{cardsLeft} cards left</div>
             </>
           ) : (
             <>
@@ -61,10 +63,11 @@ export default function App() {
           )}
         </div>
 
-        {/* PLAYERS */}
+        {/* PLAYERS AROUND CIRCLE */}
         {PLAYERS.map((name, i) => {
-          const angle = (360 / PLAYERS.length) * i - 90;
-          const radius = 180; // ✅ THIS was the problem
+          const angle = (2 * Math.PI / PLAYERS.length) * i - Math.PI / 2;
+          const x = center + radius * Math.cos(angle) - 45;
+          const y = center + radius * Math.sin(angle) - 65;
 
           return (
             <div
@@ -72,13 +75,10 @@ export default function App() {
               className="player"
               style={{
                 position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: `
-                  rotate(${angle}deg)
-                  translate(${radius}px)
-                  rotate(${-angle}deg)
-                `,
+                left: x,
+                top: y,
+                width: 90,
+                height: 130,
               }}
             >
               <div className="avatar" />
@@ -90,12 +90,7 @@ export default function App() {
         })}
       </div>
 
-      {/* DRAW BUTTON — OUTSIDE CIRCLE */}
-      <button
-        className="draw"
-        onClick={drawCard}
-        style={{ marginTop: 14 }}
-      >
+      <button className="draw" onClick={drawCard}>
         DRAW CARD
       </button>
     </div>
