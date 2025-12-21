@@ -26,23 +26,23 @@ button {
    APP WRAPPER
 ========================= */
 .app {
-  height: 100vh;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 12px;
-  overflow: hidden; /* 🔒 no scrolling */
+  padding: 10px;
+  overflow: hidden; /* 🔒 hard no-scroll */
 }
 
 h1 {
   font-family: Georgia, serif;
-  font-size: 28px;
+  font-size: 26px;
   margin-bottom: 6px;
 }
 
 /* =========================
-   TABLE LAYOUT (6 PLAYERS)
+   TABLE (PLAYERS FIRST)
 ========================= */
 .table {
   flex: 1;
@@ -50,29 +50,30 @@ h1 {
   max-width: 420px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto auto;
-  gap: 12px;
+  grid-auto-rows: 118px;
+  gap: 10px;
   align-content: center;
 }
 
 /* =========================
-   PLAYER CARDS
+   PLAYER CARDS (FOCAL)
 ========================= */
 .player {
-  background: #0e0e0e;
-  border-radius: 16px;
+  background: #0f0f0f;
+  border-radius: 18px;
   padding: 10px;
-  height: 120px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    0 6px 16px rgba(0,0,0,0.6);
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   background: #666;
   border-radius: 50%;
 }
@@ -87,68 +88,73 @@ h1 {
   opacity: 0.85;
 }
 
-.beer {
+.player button {
   width: 100%;
   padding: 6px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fff;
   color: #000;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 13px;
 }
 
 /* =========================
-   CENTER DECK
+   DECK (SECONDARY)
 ========================= */
 .card {
   grid-column: 1 / -1;
   justify-self: center;
-  width: 140px;
-  height: 190px;
+  width: 110px;
+  height: 150px;
   background: #fff;
   color: #000;
-  border-radius: 14px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-family: Georgia, serif;
   text-align: center;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.5);
 }
 
 .card-rank {
-  font-size: 20px;
-  margin-bottom: 6px;
+  font-size: 18px;
+  margin-bottom: 4px;
 }
 
 .card-sub {
-  font-size: 12px;
-  opacity: 0.7;
+  font-size: 11px;
+  opacity: 0.65;
 }
 
 /* =========================
    DRAW BUTTON
 ========================= */
 .draw {
-  margin-top: 10px;
-  padding: 10px 22px;
+  margin-top: 8px;
+  padding: 10px 24px;
   border-radius: 999px;
   background: #fff;
   color: #000;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
 }
 
 /* =========================
-   RESPONSIVE SAFETY
+   SMALL HEIGHT SAFETY
 ========================= */
 @media (max-height: 700px) {
-  .player {
-    height: 105px;
+  .table {
+    grid-auto-rows: 104px;
   }
 
   .card {
-    width: 120px;
-    height: 165px;
+    width: 96px;
+    height: 132px;
+  }
+
+  h1 {
+    font-size: 22px;
   }
 }
