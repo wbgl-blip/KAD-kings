@@ -19,17 +19,36 @@ export default function App() {
   const [index, setIndex] = useState(0);
   const [card, setCard] = useState(null);
 
+  const [thumbmaster, setThumbmaster] = useState(null);
+  const [heaven, setHeaven] = useState(null);
+
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
   const cardsLeft = deck.length - index;
+  const activeRule = thumbmaster || heaven;
 
   function drawCard() {
     if (index >= deck.length) return;
+
     const next = deck[index];
     setCard(next);
     setIndex(i => i + 1);
+
+    const rank = next.replace(/[^A-Z0-9]/g, "");
+
+    if (rank === "J") {
+      setThumbmaster(prev =>
+        prev ? null : PLAYERS[(index + 1) % PLAYERS.length]
+      );
+    }
+
+    if (rank === "7") {
+      setHeaven(prev =>
+        prev ? null : PLAYERS[(index + 1) % PLAYERS.length]
+      );
+    }
   }
 
   function addBeer(name) {
@@ -40,9 +59,13 @@ export default function App() {
   }
 
   function resetGame() {
+    if (activeRule) return;
+
     setDeck(buildDeck());
     setIndex(0);
     setCard(null);
+    setThumbmaster(null);
+    setHeaven(null);
     setBeers(
       Object.fromEntries(PLAYERS.map(p => [p, 0]))
     );
@@ -52,17 +75,14 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* PLAYER GRID */}
+      {/* PLAYERS */}
       <div className="table">
         {PLAYERS.map(name => (
           <div className="player" key={name}>
             <div className="avatar" />
             <div className="name">{name}</div>
             <div className="count">🍺 {beers[name]}</div>
-            <button
-              className="beer"
-              onClick={() => addBeer(name)}
-            >
+            <button className="beer" onClick={() => addBeer(name)}>
               +1 Beer
             </button>
           </div>
@@ -73,9 +93,9 @@ export default function App() {
       <div className="hud">
         <div className="hud-inner">
 
-          {/* TOP ROW */}
+          {/* TOP */}
           <div className="hud-top">
-            <div className="hud-card" key={card}>
+            <div className="hud-card">
               <div className="card-title">
                 {card ?? "Draw"}
               </div>
@@ -101,20 +121,21 @@ export default function App() {
             </div>
             <div>
               <strong>Thumbmaster (J)</strong>
-              <span>None</span>
+              <span>{thumbmaster ?? "None"}</span>
             </div>
             <div>
               <strong>Heaven (7)</strong>
-              <span>None</span>
+              <span>{heaven ?? "None"}</span>
             </div>
           </div>
 
           {/* ACTIONS */}
           <div className="hud-actions">
-            <button>START J</button>
-            <button>START 7</button>
+            <button disabled>START J</button>
+            <button disabled>START 7</button>
             <button
               className="reset"
+              disabled={activeRule}
               onClick={resetGame}
             >
               RESET
