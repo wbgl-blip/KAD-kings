@@ -22,7 +22,11 @@ export default function App() {
 
   const [turn, setTurn] = useState(null);
 
-  // reaction state
+  // sticky power holders
+  const [thumbHolder, setThumbHolder] = useState(null);
+  const [heavenHolder, setHeavenHolder] = useState(null);
+
+  // reaction state (momentary)
   const [reactionType, setReactionType] = useState(null); // "J" | "7"
   const [reactionStart, setReactionStart] = useState(null);
   const [reactions, setReactions] = useState({});
@@ -34,12 +38,15 @@ export default function App() {
   }
 
   function drawCard() {
-    if (index >= deck.length) {
-      setCard("DECK EMPTY");
-      return;
-    }
-    setCard(deck[index]);
+    if (index >= deck.length) return;
+
+    const drawn = deck[index];
+    setCard(drawn);
     setIndex(i => i + 1);
+
+    // assign sticky powers on draw
+    if (drawn.startsWith("J")) setThumbHolder(turn);
+    if (drawn.startsWith("7")) setHeavenHolder(turn);
   }
 
   function startReaction(type) {
@@ -60,6 +67,8 @@ export default function App() {
           .sort((a, b) => b[1] - a[1])[0][0];
 
         addBeer(loser);
+
+        // clear reaction ONLY (power stays)
         setReactionType(null);
         setReactionStart(null);
       }
@@ -67,6 +76,9 @@ export default function App() {
       return updated;
     });
   }
+
+  const canStartJ = turn && turn === thumbHolder;
+  const canStart7 = turn && turn === heavenHolder;
 
   return (
     <div className="app">
@@ -130,17 +142,29 @@ export default function App() {
           </div>
           <div className="hud-item">
             <span className="hud-title">Thumbmaster (J)</span>
-            {reactionType === "J" ? "LIVE" : "None"}
+            {thumbHolder || "None"}
           </div>
           <div className="hud-item">
             <span className="hud-title">Heaven (7)</span>
-            {reactionType === "7" ? "LIVE" : "None"}
+            {heavenHolder || "None"}
           </div>
         </div>
 
         <div className="hud-actions">
-          <button onClick={() => startReaction("J")}>START J</button>
-          <button onClick={() => startReaction("7")}>START 7</button>
+          <button
+            disabled={!canStartJ}
+            onClick={() => startReaction("J")}
+          >
+            START J
+          </button>
+
+          <button
+            disabled={!canStart7}
+            onClick={() => startReaction("7")}
+          >
+            START 7
+          </button>
+
           <button
             className="secondary"
             onClick={() => {
@@ -148,11 +172,13 @@ export default function App() {
               setDeck(buildDeck());
               setIndex(0);
               setCard(null);
-              setReactionType(null);
               setTurn(null);
+              setThumbHolder(null);
+              setHeavenHolder(null);
+              setReactionType(null);
             }}
           >
-            RESET
+            RESET GAME
           </button>
         </div>
       </div>
