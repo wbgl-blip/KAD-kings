@@ -22,6 +22,11 @@ export default function App() {
 
   const [turn, setTurn] = useState(null);
 
+  // reaction state
+  const [reactionType, setReactionType] = useState(null); // "J" | "7"
+  const [reactionStart, setReactionStart] = useState(null);
+  const [reactions, setReactions] = useState({});
+
   const cardsLeft = deck.length - index;
 
   function addBeer(name) {
@@ -37,6 +42,32 @@ export default function App() {
     setIndex(i => i + 1);
   }
 
+  function startReaction(type) {
+    setReactionType(type);
+    setReactionStart(Date.now());
+    setReactions({});
+  }
+
+  function react(name) {
+    if (!reactionType || reactions[name]) return;
+
+    const time = Date.now() - reactionStart;
+    setReactions(r => {
+      const updated = { ...r, [name]: time };
+
+      if (Object.keys(updated).length === PLAYERS.length) {
+        const loser = Object.entries(updated)
+          .sort((a, b) => b[1] - a[1])[0][0];
+
+        addBeer(loser);
+        setReactionType(null);
+        setReactionStart(null);
+      }
+
+      return updated;
+    });
+  }
+
   return (
     <div className="app">
       <h1>KAD Kings</h1>
@@ -46,8 +77,13 @@ export default function App() {
         {PLAYERS.map(name => (
           <div
             key={name}
-            className={`player ${turn === name ? "active" : ""}`}
-            onClick={() => setTurn(name)}
+            className={`player 
+              ${turn === name ? "active" : ""}
+              ${reactionType ? "reactable" : ""}
+            `}
+            onClick={() => {
+              reactionType ? react(name) : setTurn(name);
+            }}
           >
             <div className="avatar" />
             <div className="name">{name}</div>
@@ -67,7 +103,7 @@ export default function App() {
 
       {/* HUD */}
       <div className="hud">
-        <div className="hud-deck">
+        <div className={`hud-deck ${reactionType ? "flash" : ""}`}>
           <button className="draw-slim" onClick={drawCard}>
             DRAW
           </button>
@@ -94,18 +130,30 @@ export default function App() {
           </div>
           <div className="hud-item">
             <span className="hud-title">Thumbmaster (J)</span>
-            None
+            {reactionType === "J" ? "LIVE" : "None"}
           </div>
           <div className="hud-item">
             <span className="hud-title">Heaven (7)</span>
-            None
+            {reactionType === "7" ? "LIVE" : "None"}
           </div>
         </div>
 
         <div className="hud-actions">
-          <button>START J</button>
-          <button>START 7</button>
-          <button className="secondary">RESET</button>
+          <button onClick={() => startReaction("J")}>START J</button>
+          <button onClick={() => startReaction("7")}>START 7</button>
+          <button
+            className="secondary"
+            onClick={() => {
+              setCounts(Object.fromEntries(PLAYERS.map(p => [p, 0])));
+              setDeck(buildDeck());
+              setIndex(0);
+              setCard(null);
+              setReactionType(null);
+              setTurn(null);
+            }}
+          >
+            RESET
+          </button>
         </div>
       </div>
     </div>
