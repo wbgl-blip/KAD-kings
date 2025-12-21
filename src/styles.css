@@ -1,16 +1,20 @@
-/* RESET */
+/* =========================
+   RESET / BASE
+========================= */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   background: #000;
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow: hidden;
+  overflow: hidden; /* lock screen */
 }
 
 button {
@@ -19,7 +23,9 @@ button {
   cursor: pointer;
 }
 
-/* APP */
+/* =========================
+   APP WRAPPER
+========================= */
 .app {
   height: 100vh;
   display: flex;
@@ -31,24 +37,31 @@ button {
 h1 {
   font-family: Georgia, serif;
   font-size: 28px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-/* PLAYER GRID — NEVER MOVES */
+/* =========================
+   PLAYER GRID (LOCKED)
+========================= */
 .table {
   width: 100%;
   max-width: 420px;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-  padding-bottom: 280px; /* HUD space */
+  align-content: start;
+  padding-bottom: 260px; /* HUD reserve */
 }
 
+/* =========================
+   PLAYER CARDS
+========================= */
 .player {
   background: radial-gradient(circle at top, #151515, #0b0b0b);
   border-radius: 18px;
   padding: 14px;
-  height: 130px;
+  min-height: 130px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -85,7 +98,9 @@ h1 {
   font-size: 14px;
 }
 
-/* HUD — DOCKED & NARROW */
+/* =========================
+   HUD — DOCKED
+========================= */
 .hud {
   position: fixed;
   bottom: 0;
@@ -93,19 +108,24 @@ h1 {
   right: 0;
   display: flex;
   justify-content: center;
-  padding: 10px;
+  padding: 12px;
+  pointer-events: none; /* prevents overlap bugs */
 }
 
 .hud-inner {
+  pointer-events: auto;
   width: 100%;
   max-width: 420px;
+  margin: 0 auto;
   background: #0b0b0b;
   border-radius: 22px 22px 0 0;
-  padding: 10px;
-  box-shadow: 0 -10px 30px rgba(0,0,0,0.85);
+  padding: 12px;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.8);
 }
 
-/* CARD + DRAW SPLIT */
+/* =========================
+   HUD TOP (CARD + DRAW)
+========================= */
 .hud-top {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -117,21 +137,28 @@ h1 {
   background: #fff;
   color: #000;
   border-radius: 16px;
-  padding: 10px;
+  padding: 10px 12px;
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: center;
 }
 
 .card-title {
   font-family: Georgia, serif;
   font-size: 16px;
+  line-height: 1.1;
 }
 
 .card-sub {
   font-size: 11px;
   opacity: 0.7;
+  margin-top: 2px;
 }
 
 .draw {
+  height: 56px;
   border-radius: 16px;
   background: #fff;
   color: #000;
@@ -139,24 +166,33 @@ h1 {
   font-size: 15px;
 }
 
-/* INFO */
+/* =========================
+   HUD INFO
+========================= */
 .hud-info {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  font-size: 10px;
-  margin-bottom: 6px;
+  gap: 8px;
+  font-size: 11px;
+  margin-bottom: 8px;
 }
 
 .hud-info div {
   background: #111;
-  padding: 6px 4px;
+  padding: 6px;
   border-radius: 10px;
   text-align: center;
-  line-height: 1.2;
 }
 
-/* ACTIONS */
+.hud-info span {
+  display: block;
+  margin-top: 3px;
+  opacity: 0.8;
+}
+
+/* =========================
+   HUD ACTIONS
+========================= */
 .hud-actions {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -174,4 +210,11 @@ h1 {
 .hud-actions .reset {
   background: #fff;
   color: #000;
+}
+
+/* =========================
+   SAFETY
+========================= */
+body {
+  overflow-x: hidden;
 }
