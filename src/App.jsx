@@ -32,7 +32,7 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* Square radial table */}
+      {/* Table */}
       <div
         className="table"
         style={{
@@ -41,17 +41,18 @@ export default function App() {
           maxWidth: 360,
           aspectRatio: "1 / 1",
           margin: "0 auto",
+          transform: "translateY(-10px)", // 🔑 lift whole circle
         }}
       >
-        {/* Center deck (smaller) */}
+        {/* Center deck */}
         <div
           className="card"
           style={{
             position: "absolute",
             inset: 0,
             margin: "auto",
-            width: 110,
-            height: 150,
+            width: 105,
+            height: 145,
           }}
         >
           {card ? (
@@ -67,10 +68,10 @@ export default function App() {
           )}
         </div>
 
-        {/* Players around deck */}
+        {/* Players */}
         {PLAYERS.map((name, i) => {
           const angle = (360 / count) * i - 90;
-          const radius = 155; // 🔑 increased spacing
+          const radius = 165; // 🔑 more breathing room
 
           return (
             <div
@@ -96,7 +97,12 @@ export default function App() {
         })}
       </div>
 
-      <button className="draw" onClick={drawCard}>
+      {/* Draw button */}
+      <button
+        className="draw"
+        onClick={drawCard}
+        style={{ marginTop: 6 }}
+      >
         DRAW CARD
       </button>
     </div>
