@@ -52,7 +52,7 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* PLAYER GRID — LOCKED */}
+      {/* PLAYER GRID */}
       <div className="table">
         {PLAYERS.map(name => (
           <div className="player" key={name}>
@@ -69,13 +69,13 @@ export default function App() {
         ))}
       </div>
 
-      {/* HUD — SINGLE SOURCE OF TRUTH */}
+      {/* HUD */}
       <div className="hud">
         <div className="hud-inner">
 
           {/* TOP ROW */}
           <div className="hud-top">
-            <div className="hud-card" key={card>
+            <div className="hud-card" key={card}>
               <div className="card-title">
                 {card ?? "Draw"}
               </div>
