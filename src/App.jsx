@@ -59,21 +59,7 @@ export default function App() {
           </div>
         ))}
 
-        {/* CENTER CARD */}
-        <div className="card">
-          {card ? (
-            <>
-              <div className="card-rank">{card}</div>
-              <div className="card-sub">{cardsLeft} cards left</div>
-            </>
-          ) : (
-            <>
-              <div className="card-rank">Draw</div>
-              <div className="card-sub">No mercy</div>
-            </>
-          )}
-        </div>
-      </div>
+        
 
       {/* HUD */}
       <div className="hud">
