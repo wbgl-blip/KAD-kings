@@ -128,72 +128,101 @@ h1 {
   opacity: 0.7;
 }
 
-/* =========================
-   BOTTOM HUD (FIXED)
-========================= */
+/* HUD — DOCKED & NARROW */
 .hud {
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 100%;
-  background: radial-gradient(circle at top, #111, #000);
+  right: 0;
+  display: flex;
+  justify-content: center;
   padding: 12px;
-  box-shadow: 0 -12px 30px rgba(0,0,0,0.8);
+  background: transparent;
 }
 
-/* DRAW ROW */
+.hud-inner {
+  width: 100%;
+  max-width: 420px;
+  background: #0b0b0b;
+  border-radius: 22px 22px 0 0;
+  padding: 12px;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.8);
+}
+
+/* TOP ROW — CARD + DRAW */
 .hud-top {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-bottom: 10px;
 }
 
+/* CARD */
+.hud-card {
+  background: #fff;
+  color: #000;
+  border-radius: 16px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.card-title {
+  font-family: Georgia, serif;
+  font-size: 16px;
+}
+
+.card-sub {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* DRAW BUTTON — SLIM */
 .draw {
-  flex: 1;
-  padding: 14px;
-  border-radius: 999px;
+  border-radius: 16px;
+  border: none;
   background: #fff;
   color: #000;
   font-weight: 800;
-  font-size: 16px;
-  letter-spacing: 0.6px;
-}
-
-.hud-min {
-  width: 56px;
-  border-radius: 14px;
-  background: #222;
-  color: #fff;
-  font-size: 20px;
+  font-size: 15px;
+  cursor: pointer;
 }
 
 /* INFO ROW */
 .hud-info {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  font-size: 11px;
+  margin-bottom: 8px;
 }
 
-.hud-box {
-  background: #0f0f0f;
-  border-radius: 14px;
-  padding: 10px;
+.hud-info div {
+  background: #111;
+  padding: 6px;
+  border-radius: 10px;
   text-align: center;
-  font-size: 12px;
-  opacity: 0.9;
 }
 
-/* ACTION ROW */
+.hud-info span {
+  display: block;
+  margin-top: 3px;
+  opacity: 0.8;
+}
+
+/* ACTIONS */
 .hud-actions {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
 .hud-actions button {
-  flex: 1;
-  padding: 10px;
+  padding: 8px;
   border-radius: 999px;
+  border: none;
   background: #222;
   color: #fff;
   font-weight: 700;
@@ -202,18 +231,4 @@ h1 {
 .hud-actions .reset {
   background: #fff;
   color: #000;
-}
-
-/* =========================
-   RESPONSIVE SAFETY
-========================= */
-@media (max-height: 720px) {
-  .player {
-    height: 115px;
-  }
-
-  .card {
-    width: 130px;
-    height: 185px;
-  }
 }
