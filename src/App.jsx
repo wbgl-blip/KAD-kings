@@ -83,7 +83,18 @@ export default function App() {
       {/* PLAYERS */}
       <div className="table">
         {PLAYERS.map(name => (
-          <div className="player" key={name}>
+          <div
+  className={[
+    "player",
+    thumbmaster === name && "thumbmaster",
+    heaven === name && "heaven",
+  ]
+    .filter(Boolean)
+    .join(" ")
+  }
+  key={name}
+>
+
             <div className="avatar" />
             <div className="name">{name}</div>
             <div className="count">🍺 {beers[name]}</div>
