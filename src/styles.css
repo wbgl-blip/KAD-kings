@@ -41,7 +41,7 @@ h1 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-  padding-bottom: 230px; /* HUD space */
+  padding-bottom: 280px; /* HUD space */
 }
 
 .player {
@@ -101,7 +101,7 @@ h1 {
   max-width: 420px;
   background: #0b0b0b;
   border-radius: 22px 22px 0 0;
-  padding: 12px;
+  padding: 10px;
   box-shadow: 0 -10px 30px rgba(0,0,0,0.85);
 }
 
@@ -143,9 +143,9 @@ h1 {
 .hud-info {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  font-size: 11px;
-  margin-bottom: 8px;
+  gap: 6px;
+  font-size: 10px;
+  margin-bottom: 6px;
 }
 
 .hud-info div {
