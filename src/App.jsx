@@ -6,7 +6,11 @@ function buildDeck() {
   const suits = ["♠", "♥", "♦", "♣"];
   const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
   const deck = [];
-  for (const r of ranks) for (const s of suits) deck.push(`${r}${s}`);
+  for (const r of ranks) {
+    for (const s of suits) {
+      deck.push(`${r}${s}`);
+    }
+  }
   return deck.sort(() => Math.random() - 0.5);
 }
 
@@ -23,19 +27,25 @@ export default function App() {
 
   function drawCard() {
     if (index >= deck.length) return;
-    setCard(deck[index]);
+    const next = deck[index];
+    setCard(next);
     setIndex(i => i + 1);
   }
 
   function addBeer(name) {
-    setBeers(b => ({ ...b, [name]: b[name] + 1 }));
+    setBeers(b => ({
+      ...b,
+      [name]: b[name] + 1
+    }));
   }
 
   function resetGame() {
     setDeck(buildDeck());
     setIndex(0);
     setCard(null);
-    setBeers(Object.fromEntries(PLAYERS.map(p => [p, 0])));
+    setBeers(
+      Object.fromEntries(PLAYERS.map(p => [p, 0]))
+    );
   }
 
   return (
@@ -49,7 +59,10 @@ export default function App() {
             <div className="avatar" />
             <div className="name">{name}</div>
             <div className="count">🍺 {beers[name]}</div>
-            <button className="beer" onClick={() => addBeer(name)}>
+            <button
+              className="beer"
+              onClick={() => addBeer(name)}
+            >
               +1 Beer
             </button>
           </div>
@@ -59,6 +72,8 @@ export default function App() {
       {/* HUD — SINGLE SOURCE OF TRUTH */}
       <div className="hud">
         <div className="hud-inner">
+
+          {/* TOP ROW */}
           <div className="hud-top">
             <div className="hud-card">
               <div className="card-title">
@@ -69,11 +84,16 @@ export default function App() {
               </div>
             </div>
 
-            <button className="draw" onClick={drawCard}>
-              DRAW
+            <button
+              className="draw"
+              onClick={drawCard}
+              disabled={cardsLeft === 0}
+            >
+              {cardsLeft === 0 ? "EMPTY" : "DRAW"}
             </button>
           </div>
 
+          {/* INFO */}
           <div className="hud-info">
             <div>
               <strong>Progress</strong>
@@ -89,13 +109,18 @@ export default function App() {
             </div>
           </div>
 
+          {/* ACTIONS */}
           <div className="hud-actions">
             <button>START J</button>
             <button>START 7</button>
-            <button className="reset" onClick={resetGame}>
+            <button
+              className="reset"
+              onClick={resetGame}
+            >
               RESET
             </button>
           </div>
+
         </div>
       </div>
     </div>
