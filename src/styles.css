@@ -1,149 +1,111 @@
-/* ===== RESET ===== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body, #root {
-  height: 100%;
-  background: #000;
-  color: #fff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-/* ===== APP ===== */
-.app {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12px;
-  overflow: hidden;
-}
-
-h1 {
-  font-family: Georgia, serif;
-  font-size: 26px;
-  margin-bottom: 10px;
-}
-
-/* ===== TABLE ===== */
-.table {
-  flex: 1;
-  width: 100%;
-  max-width: 420px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto auto;
-  gap: 12px;
-  align-content: start;
-}
-
-/* ===== PLAYER ===== */
-.player {
-  background: #0e0e0e;
-  border-radius: 16px;
-  padding: 10px;
-  height: 110px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
-}
-
-.avatar {
-  width: 34px;
-  height: 34px;
-  background: #666;
-  border-radius: 50%;
-}
-
-.name {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.count {
-  font-size: 12px;
-  opacity: 0.85;
-}
-
-.beer {
-  width: 100%;
-  padding: 6px;
-  border-radius: 10px;
-  background: #fff;
-  color: #000;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-/* ===== CARD ===== */
-.card {
-  grid-column: 1 / -1;
-  justify-self: center;
-  margin-top: 4px;
-  width: 130px;
-  height: 175px;
-  background: #fff;
-  color: #000;
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-family: Georgia, serif;
-  text-align: center;
-  cursor: pointer;
-}
-
-.card-rank {
-  font-size: 20px;
-  margin-bottom: 6px;
-}
-
-.card-sub {
-  font-size: 12px;
-  opacity: 0.7;
-}
-
-/* ===== HUD ===== */
+/* =========================
+   HUD CONTAINER
+========================= */
 .hud {
   width: 100%;
   max-width: 420px;
-  background: #0e0e0e;
-  border-radius: 18px;
-  padding: 12px;
-  margin-top: 10px;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+  background: #0a0a0a;
+  border-radius: 20px 20px 0 0;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.hud-row {
+/* =========================
+   SIDEWAYS DECK
+========================= */
+.hud-deck {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  font-size: 13px;
-  padding: 6px 0;
-  opacity: 0.9;
-}
-
-.hud-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.hud-btn {
-  flex: 1;
+  background: #111;
+  border-radius: 14px;
   padding: 10px;
-  border-radius: 999px;
-  background: #222;
-  color: #fff;
+  cursor: pointer;
+  transition: transform 0.08s ease;
+}
+
+.hud-deck:active {
+  transform: scaleX(0.97);
+}
+
+.deck-body {
+  flex: 1;
+  height: 48px;
+  background: #fff;
+  color: #000;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.deck-label {
+  font-size: 13px;
+}
+
+.deck-face {
+  width: 48px;
+  height: 48px;
+  margin-left: 10px;
+  background: #fff;
+  color: #000;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, serif;
+  font-size: 16px;
+}
+
+/* =========================
+   HUD INFO ROW
+========================= */
+.hud-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.hud-item {
+  background: #111;
+  border-radius: 12px;
+  padding: 8px;
+  text-align: center;
+}
+
+.hud-title {
+  display: block;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.hud-value {
+  font-size: 13px;
   font-weight: 600;
 }
 
-.hud-btn.primary {
+/* =========================
+   HUD ACTIONS
+========================= */
+.hud-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.hud-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 999px;
   background: #fff;
   color: #000;
+  font-weight: 700;
+}
+
+.hud-actions .secondary {
+  background: #222;
+  color: #fff;
 }
