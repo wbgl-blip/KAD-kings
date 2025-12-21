@@ -218,3 +218,15 @@ h1 {
 body {
   overflow-x: hidden;
 }
+/* =========================
+   MOBILE HUD OFFSET
+========================= */
+@media (max-width: 767px) {
+  .hud {
+    bottom: 12px; /* lift HUD up */
+  }
+
+  .hud-inner {
+    border-radius: 22px; /* full pill when floating */
+  }
+}
