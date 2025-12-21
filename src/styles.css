@@ -1,3 +1,22 @@
+/* reaction state */
+.player.reactable {
+  cursor: pointer;
+}
+
+.player.reactable:active {
+  transform: scale(0.97);
+}
+
+/* subtle flash cue */
+.hud-deck.flash {
+  animation: flash 0.4s ease-in-out 2;
+}
+
+@keyframes flash {
+  0% { box-shadow: 0 0 0 rgba(255,255,255,0); }
+  50% { box-shadow: 0 0 18px rgba(255,255,255,0.6); }
+  100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
+}
 .player.active {
   box-shadow:
     0 0 0 2px #fff,
