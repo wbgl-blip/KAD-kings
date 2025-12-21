@@ -232,3 +232,48 @@ h1 {
   font-size: 11px;
   opacity: 0.75;
 }
+/* END GAME OVERLAY */
+.endgame {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.endcard {
+  width: 90%;
+  max-width: 420px;
+  background: #0e0e0e;
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+}
+
+.endcard h2 {
+  margin-bottom: 12px;
+}
+
+.medal {
+  padding: 10px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.medal.legendary { background: #3a2b5f; }
+.medal.gold { background: #6b5c1e; }
+.medal.silver { background: #444; }
+.medal.bronze { background: #3a2a1a; }
+.medal.shame { background: #5a1a1a; }
+
+.play-again {
+  margin-top: 12px;
+  padding: 10px;
+  width: 100%;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font-weight: 800;
+}
