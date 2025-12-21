@@ -12,18 +12,19 @@ function buildDeck() {
 }
 
 export default function App() {
-  const [deck, setDeck] = useState(buildDeck());
+  const [deck] = useState(buildDeck);
   const [index, setIndex] = useState(0);
-  const [currentCard, setCurrentCard] = useState(null);
+  const [card, setCard] = useState(null);
 
   const cardsLeft = deck.length - index;
+  const count = PLAYERS.length;
 
   function drawCard() {
     if (index >= deck.length) {
-      setCurrentCard("DECK EMPTY");
+      setCard("DECK EMPTY");
       return;
     }
-    setCurrentCard(deck[index]);
+    setCard(deck[index]);
     setIndex(i => i + 1);
   }
 
@@ -31,29 +32,65 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      <div className="table">
-        {PLAYERS.map((name) => (
-          <div className="player" key={name}>
-            <div className="avatar" />
-            <div className="name">{name}</div>
-            <div className="count">🍺 0</div>
-            <button className="beer">+1 Beer</button>
-          </div>
-        ))}
-
-        <div className="card">
-          {currentCard ? (
+      {/* Radial table */}
+      <div
+        className="table"
+        style={{
+          position: "relative",
+          gridTemplateColumns: "none",
+          gridAutoRows: "none",
+          display: "block",
+        }}
+      >
+        {/* Center deck */}
+        <div
+          className="card"
+          style={{
+            position: "absolute",
+            inset: 0,
+            margin: "auto",
+          }}
+        >
+          {card ? (
             <>
-              <div className="card-rank">{currentCard}</div>
-              <div className="card-sub">{cardsLeft} cards left</div>
+              <div className="card-rank">{card}</div>
+              <div className="card-sub">{cardsLeft} left</div>
             </>
           ) : (
             <>
-              <div className="card-rank">Draw a card</div>
+              <div className="card-rank">Draw</div>
               <div className="card-sub">No mercy</div>
             </>
           )}
         </div>
+
+        {/* Players around the deck */}
+        {PLAYERS.map((name, i) => {
+          const angle = (360 / count) * i - 90; // start at top
+          const radius = 140; // distance from center
+
+          return (
+            <div
+              key={name}
+              className="player"
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: `
+                  rotate(${angle}deg)
+                  translate(${radius}px)
+                  rotate(${-angle}deg)
+                `,
+              }}
+            >
+              <div className="avatar" />
+              <div className="name">{name}</div>
+              <div className="count">🍺 0</div>
+              <button className="beer">+1 Beer</button>
+            </div>
+          );
+        })}
       </div>
 
       <button className="draw" onClick={drawCard}>
