@@ -75,7 +75,7 @@ export default function App() {
 
           {/* TOP ROW */}
           <div className="hud-top">
-            <div className="hud-card">
+            <div className="hud-card" key={card>
               <div className="card-title">
                 {card ?? "Draw"}
               </div>
