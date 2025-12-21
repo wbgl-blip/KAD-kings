@@ -24,10 +24,11 @@ export default function App() {
     setIndex(i => i + 1);
   }
 
-  // 🔧 GEOMETRY (THIS IS WHAT FIXES IT)
-  const size = 420;          // container size
-  const center = size / 2;
-  const radius = 210;        // MUST be > size/2 to move players outward
+  /* ===== GEOMETRY FIX ===== */
+  const size = 420;
+  const centerX = size / 2;
+  const centerY = size / 2 - 20; // ⬆️ lifts whole circle
+  const radius = 235;           // ⬆️ pushes players outward
 
   return (
     <div className="app">
@@ -46,8 +47,8 @@ export default function App() {
           className="card"
           style={{
             position: "absolute",
-            top: center - 95,
-            left: center - 70,
+            top: centerY - 95,
+            left: centerX - 70,
           }}
         >
           {card ? (
@@ -63,11 +64,11 @@ export default function App() {
           )}
         </div>
 
-        {/* PLAYERS AROUND CIRCLE */}
+        {/* PLAYERS */}
         {PLAYERS.map((name, i) => {
           const angle = (2 * Math.PI / PLAYERS.length) * i - Math.PI / 2;
-          const x = center + radius * Math.cos(angle) - 45;
-          const y = center + radius * Math.sin(angle) - 65;
+          const x = centerX + radius * Math.cos(angle) - 45;
+          const y = centerY + radius * Math.sin(angle) - 65;
 
           return (
             <div
@@ -90,6 +91,7 @@ export default function App() {
         })}
       </div>
 
+      {/* DRAW BUTTON — NOW CLEAR */}
       <button className="draw" onClick={drawCard}>
         DRAW CARD
       </button>
