@@ -1,5 +1,3 @@
-const [thumbmaster, setThumbmaster] = useState(null); // J
-const [heaven, setHeaven] = useState(null); // 7
 import { useState } from "react";
 
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex"];
@@ -16,13 +14,17 @@ function buildDeck() {
   return deck.sort(() => Math.random() - 0.5);
 }
 
+function getRank(card) {
+  return card.replace(/[^A-Z0-9]/g, "");
+}
+
 export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [index, setIndex] = useState(0);
   const [card, setCard] = useState(null);
 
-  const [thumbmaster, setThumbmaster] = useState(null);
-  const [heaven, setHeaven] = useState(null);
+  const [thumbmaster, setThumbmaster] = useState(null); // J
+  const [heaven, setHeaven] = useState(null); // 7
 
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
@@ -31,25 +33,26 @@ export default function App() {
   const cardsLeft = deck.length - index;
   const activeRule = thumbmaster || heaven;
 
+  function currentPlayer() {
+    return PLAYERS[index % PLAYERS.length];
+  }
+
   function drawCard() {
     if (index >= deck.length) return;
 
     const next = deck[index];
+    const rank = getRank(next);
+    const player = currentPlayer();
+
     setCard(next);
     setIndex(i => i + 1);
 
-    const rank = next.replace(/[^A-Z0-9]/g, "");
-
     if (rank === "J") {
-      setThumbmaster(prev =>
-        prev ? null : PLAYERS[(index + 1) % PLAYERS.length]
-      );
+      setThumbmaster(player); // replace
     }
 
     if (rank === "7") {
-      setHeaven(prev =>
-        prev ? null : PLAYERS[(index + 1) % PLAYERS.length]
-      );
+      setHeaven(player); // replace
     }
   }
 
@@ -95,7 +98,6 @@ export default function App() {
       <div className="hud">
         <div className="hud-inner">
 
-          {/* TOP */}
           <div className="hud-top">
             <div className="hud-card">
               <div className="card-title">
@@ -115,7 +117,6 @@ export default function App() {
             </button>
           </div>
 
-          {/* INFO */}
           <div className="hud-info">
             <div>
               <strong>Progress</strong>
@@ -131,7 +132,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* ACTIONS */}
           <div className="hud-actions">
             <button disabled>START J</button>
             <button disabled>START 7</button>
