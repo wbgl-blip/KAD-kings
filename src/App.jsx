@@ -1,3 +1,5 @@
+const [thumbmaster, setThumbmaster] = useState(null); // J
+const [heaven, setHeaven] = useState(null); // 7
 import { useState } from "react";
 
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex"];
