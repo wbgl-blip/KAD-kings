@@ -1,76 +1,47 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-/* =========================
-   CONSTANTS
-========================= */
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex"];
 
-const SUITS = ["♠", "♥", "♦", "♣"];
-const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
-
-/* =========================
-   DECK BUILDER
-========================= */
 function buildDeck() {
+  const suits = ["♠", "♥", "♦", "♣"];
+  const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
   const deck = [];
-  for (const rank of RANKS) {
-    for (const suit of SUITS) {
-      deck.push(`${rank}${suit}`);
-    }
-  }
+  for (const r of ranks) for (const s of suits) deck.push(`${r}${s}`);
   return deck.sort(() => Math.random() - 0.5);
 }
 
-/* =========================
-   APP
-========================= */
 export default function App() {
-  // deck state
-  const [deck, setDeck] = useState([]);
-  const [drawIndex, setDrawIndex] = useState(0);
-  const [currentCard, setCurrentCard] = useState("Draw");
-
-  // beer counts
+  const [deck, setDeck] = useState(buildDeck);
+  const [index, setIndex] = useState(0);
+  const [card, setCard] = useState(null);
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
-  /* =========================
-     INIT (RUNS ONCE)
-  ========================= */
-  useEffect(() => {
-    const freshDeck = buildDeck();
-    setDeck(freshDeck);
-    setDrawIndex(0);
-    setCurrentCard("Draw");
-  }, []);
+  const cardsLeft = deck.length - index;
 
-  /* =========================
-     ACTIONS
-  ========================= */
   function drawCard() {
-    if (drawIndex >= deck.length) return;
-
-    const nextCard = deck[drawIndex];
-    setCurrentCard(nextCard);
-    setDrawIndex(i => i + 1);
+    if (index >= deck.length) return;
+    setCard(deck[index]);
+    setIndex(i => i + 1);
   }
 
-  function addBeer(player) {
-    setBeers(prev => ({
-      ...prev,
-      [player]: prev[player] + 1
-    }));
+  function addBeer(name) {
+    setBeers(b => ({ ...b, [name]: b[name] + 1 }));
   }
 
-  /* =========================
-     RENDER
-  ========================= */
+  function resetGame() {
+    setDeck(buildDeck());
+    setIndex(0);
+    setCard(null);
+    setBeers(Object.fromEntries(PLAYERS.map(p => [p, 0])));
+  }
+
   return (
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* PLAYERS — POSITIONS LOCKED BY CSS */}
+      {/* PLAYER GRID */}
       <div className="table">
         {PLAYERS.map(name => (
           <div className="player" key={name}>
@@ -82,20 +53,55 @@ export default function App() {
             </button>
           </div>
         ))}
-      </div>
 
-      {/* CARD — ALWAYS VISIBLE */}
-      <div className="card">
-        <div className="card-rank">{currentCard}</div>
-        <div className="card-sub">
-          {52 - drawIndex} cards left
+        {/* CARD */}
+        <div className="card">
+          {card ? (
+            <>
+              <div className="card-rank">{card}</div>
+              <div className="card-sub">{cardsLeft} cards left</div>
+            </>
+          ) : (
+            <>
+              <div className="card-rank">Draw</div>
+              <div className="card-sub">No mercy</div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* DRAW BUTTON */}
-      <button className="draw" onClick={drawCard}>
-        DRAW CARD
-      </button>
+      {/* HUD */}
+      <div className="hud">
+        <div className="hud-top">
+          <button className="draw" onClick={drawCard}>
+            DRAW CARD
+          </button>
+          <button className="hud-min">–</button>
+        </div>
+
+        <div className="hud-info">
+          <div className="hud-box">
+            Progress<br />
+            {index} / 52
+          </div>
+          <div className="hud-box">
+            Thumbmaster (J)<br />
+            None
+          </div>
+          <div className="hud-box">
+            Heaven (7)<br />
+            None
+          </div>
+        </div>
+
+        <div className="hud-actions">
+          <button>START J</button>
+          <button>START 7</button>
+          <button className="reset" onClick={resetGame}>
+            RESET
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
