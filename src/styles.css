@@ -1,134 +1,167 @@
-/* RESET */
+/* =========================
+   RESET / BASE
+========================= */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   background: #000;
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* APP */
+button {
+  font: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+/* =========================
+   APP
+========================= */
 .app {
   min-height: 100vh;
-  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 12px;
+  overflow: hidden;
 }
 
 h1 {
   font-family: Georgia, serif;
   font-size: 28px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
-/* PLAYER GRID (Layout B) */
+/* =========================
+   PLAYER GRID (LOCKED)
+========================= */
 .player-grid {
   width: 100%;
   max-width: 420px;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 128px;
   gap: 14px;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .player {
   background: #0e0e0e;
-  border-radius: 16px;
-  padding: 12px;
+  border-radius: 18px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+  justify-content: space-between;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .avatar {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   background: #666;
   border-radius: 50%;
-  margin-bottom: 6px;
 }
 
 .name {
   font-weight: 600;
+  font-size: 14px;
 }
 
 .count {
-  font-size: 13px;
+  font-size: 12px;
   opacity: 0.85;
-  margin-bottom: 6px;
 }
 
 .beer {
   width: 100%;
-  padding: 8px;
-  border-radius: 10px;
+  padding: 6px;
+  border-radius: 999px;
   background: #fff;
   color: #000;
   font-weight: 700;
-  border: none;
+  font-size: 13px;
 }
 
-/* HUD */
+/* =========================
+   HUD
+========================= */
 .hud {
   width: 100%;
   max-width: 420px;
-  background: #0b0b0b;
-  border-radius: 20px;
-  padding: 14px;
-  margin-top: auto;
-  box-shadow: 0 -8px 30px rgba(0,0,0,0.6);
+  margin-top: 6px;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* DRAW + CARD (50 / 50) */
 .hud-deck {
   display: flex;
   gap: 10px;
   margin-bottom: 12px;
 }
 
-.deck-body {
+.draw-slim {
+  flex: 1;
+  background: #fff;
+  color: #000;
+  border-radius: 999px;
+  font-weight: 800;
+  padding: 14px 0;
+  letter-spacing: 0.5px;
+}
+
+.deck-side {
   flex: 1;
   background: #fff;
   color: #000;
   border-radius: 14px;
-  padding: 14px;
+  padding: 10px;
   text-align: center;
-  font-weight: 800;
-}
-
-.deck-face {
-  width: 52px;
-  background: #fff;
-  color: #000;
-  border-radius: 12px;
+  font-family: Georgia, serif;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  font-weight: 800;
 }
 
+.deck-rank {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.deck-sub {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* STATUS */
 .hud-row {
   display: flex;
   justify-content: space-between;
+  font-size: 12px;
+  opacity: 0.85;
   margin-bottom: 10px;
 }
 
 .hud-item {
   text-align: center;
-  font-size: 12px;
+  flex: 1;
 }
 
 .hud-title {
-  opacity: 0.6;
   display: block;
+  font-size: 11px;
+  opacity: 0.6;
 }
 
+/* ACTIONS */
 .hud-actions {
   display: flex;
   gap: 8px;
@@ -136,15 +169,23 @@ h1 {
 
 .hud-actions button {
   flex: 1;
-  padding: 8px;
-  border-radius: 999px;
   background: #222;
   color: #fff;
-  border: none;
-  font-weight: 700;
+  border-radius: 999px;
+  padding: 10px 0;
+  font-weight: 600;
 }
 
 .hud-actions .secondary {
   background: #fff;
   color: #000;
+}
+
+/* =========================
+   SAFETY
+========================= */
+@media (max-height: 720px) {
+  .player-grid {
+    grid-auto-rows: 118px;
+  }
 }
