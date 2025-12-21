@@ -271,3 +271,15 @@ body {
     width: 100%;
   }
 }
+/* =========================
+   MOBILE HUD LIFT (FINAL)
+========================= */
+@media (max-height: 750px) {
+  .hud {
+    padding-bottom: 28px; /* lifts HUD slightly */
+  }
+
+  .table {
+    padding-bottom: 220px; /* tighter reserve */
+  }
+}
