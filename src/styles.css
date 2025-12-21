@@ -1,96 +1,134 @@
-/* =========================
-   HUD CONTAINER
-========================= */
+/* RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  background: #000;
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* APP */
+.app {
+  min-height: 100vh;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  font-family: Georgia, serif;
+  font-size: 28px;
+  margin-bottom: 18px;
+}
+
+/* PLAYER GRID (Layout B) */
+.player-grid {
+  width: 100%;
+  max-width: 420px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.player {
+  background: #0e0e0e;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  background: #666;
+  border-radius: 50%;
+  margin-bottom: 6px;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.count {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+
+.beer {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  background: #fff;
+  color: #000;
+  font-weight: 700;
+  border: none;
+}
+
+/* HUD */
 .hud {
   width: 100%;
   max-width: 420px;
-  background: #0a0a0a;
-  border-radius: 20px 20px 0 0;
+  background: #0b0b0b;
+  border-radius: 20px;
   padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  margin-top: auto;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.6);
 }
 
-/* =========================
-   SIDEWAYS DECK
-========================= */
 .hud-deck {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #111;
-  border-radius: 14px;
-  padding: 10px;
-  cursor: pointer;
-  transition: transform 0.08s ease;
-}
-
-.hud-deck:active {
-  transform: scaleX(0.97);
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .deck-body {
   flex: 1;
-  height: 48px;
   background: #fff;
   color: #000;
-  border-radius: 10px;
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  font-weight: 800;
+}
+
+.deck-face {
+  width: 52px;
+  background: #fff;
+  color: #000;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  letter-spacing: 0.5px;
 }
 
-.deck-label {
-  font-size: 13px;
-}
-
-.deck-face {
-  width: 48px;
-  height: 48px;
-  margin-left: 10px;
-  background: #fff;
-  color: #000;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: Georgia, serif;
-  font-size: 16px;
-}
-
-/* =========================
-   HUD INFO ROW
-========================= */
 .hud-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .hud-item {
-  background: #111;
-  border-radius: 12px;
-  padding: 8px;
   text-align: center;
+  font-size: 12px;
 }
 
 .hud-title {
+  opacity: 0.6;
   display: block;
-  font-size: 11px;
-  opacity: 0.7;
 }
 
-.hud-value {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-/* =========================
-   HUD ACTIONS
-========================= */
 .hud-actions {
   display: flex;
   gap: 8px;
@@ -98,14 +136,15 @@
 
 .hud-actions button {
   flex: 1;
-  padding: 10px;
+  padding: 8px;
   border-radius: 999px;
-  background: #fff;
-  color: #000;
+  background: #222;
+  color: #fff;
+  border: none;
   font-weight: 700;
 }
 
 .hud-actions .secondary {
-  background: #222;
-  color: #fff;
+  background: #fff;
+  color: #000;
 }
