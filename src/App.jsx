@@ -13,18 +13,17 @@ function buildDeck() {
 export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [index, setIndex] = useState(0);
-  const [cardText, setCardText] = useState("Draw");
-
+  const [card, setCard] = useState("Draw");
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
-  const cardsLeft = deck.length - index;
+  const cardsLeft = 52 - index;
 
   function drawCard() {
     if (index >= deck.length) return;
     const next = deck[index];
-    setCardText(next);
+    setCard(next);
     setIndex(i => i + 1);
   }
 
@@ -35,7 +34,7 @@ export default function App() {
   function resetGame() {
     setDeck(buildDeck());
     setIndex(0);
-    setCardText("Draw");
+    setCard("Draw");
     setBeers(Object.fromEntries(PLAYERS.map(p => [p, 0])));
   }
 
@@ -43,7 +42,7 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* PLAYER GRID */}
+      {/* PLAYER GRID — LOCKED */}
       <div className="table">
         {PLAYERS.map(name => (
           <div className="player" key={name}>
@@ -55,14 +54,14 @@ export default function App() {
             </button>
           </div>
         ))}
-      </div> {/* ✅ THIS WAS MISSING */}
+      </div>
 
-      {/* HUD */}
+      {/* HUD — DOCKED, NARROW, STABLE */}
       <div className="hud">
         <div className="hud-inner">
           <div className="hud-top">
             <div className="hud-card">
-              <div className="card-title">{cardText}</div>
+              <div className="card-title">{card}</div>
               <div className="card-sub">{cardsLeft} left</div>
             </div>
 
@@ -74,7 +73,7 @@ export default function App() {
           <div className="hud-info">
             <div>
               <strong>Progress</strong>
-              <span>{52 - cardsLeft} / 52</span>
+              <span>{index} / 52</span>
             </div>
             <div>
               <strong>Thumbmaster (J)</strong>
@@ -98,3 +97,4 @@ export default function App() {
     </div>
   );
 }
+
