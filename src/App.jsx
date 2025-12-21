@@ -1,44 +1,58 @@
 import { useState, useEffect } from "react";
 
+/* =========================
+   CONSTANTS
+========================= */
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex"];
 
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 
+/* =========================
+   DECK BUILDER
+========================= */
 function buildDeck() {
   const deck = [];
-  for (const r of RANKS) {
-    for (const s of SUITS) {
-      deck.push(`${r}${s}`);
+  for (const rank of RANKS) {
+    for (const suit of SUITS) {
+      deck.push(`${rank}${suit}`);
     }
   }
   return deck.sort(() => Math.random() - 0.5);
 }
 
+/* =========================
+   APP
+========================= */
 export default function App() {
-  // core game state
+  // deck state
   const [deck, setDeck] = useState([]);
   const [drawIndex, setDrawIndex] = useState(0);
-  const [currentCard, setCurrentCard] = useState("—");
+  const [currentCard, setCurrentCard] = useState("Draw");
 
-  // player beers
+  // beer counts
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
-  // init deck ONCE
+  /* =========================
+     INIT (RUNS ONCE)
+  ========================= */
   useEffect(() => {
     const freshDeck = buildDeck();
     setDeck(freshDeck);
-    setCurrentCard("Draw");
     setDrawIndex(0);
+    setCurrentCard("Draw");
   }, []);
 
+  /* =========================
+     ACTIONS
+  ========================= */
   function drawCard() {
     if (drawIndex >= deck.length) return;
 
-    const card = deck[drawIndex];
-    setCurrentCard(card);
+    const nextCard = deck[drawIndex];
+    setCurrentCard(nextCard);
     setDrawIndex(i => i + 1);
   }
 
@@ -49,11 +63,14 @@ export default function App() {
     }));
   }
 
+  /* =========================
+     RENDER
+  ========================= */
   return (
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* PLAYERS — DO NOT MOVE */}
+      {/* PLAYERS — POSITIONS LOCKED BY CSS */}
       <div className="table">
         {PLAYERS.map(name => (
           <div className="player" key={name}>
