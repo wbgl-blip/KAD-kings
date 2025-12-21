@@ -32,23 +32,26 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* Radial table */}
+      {/* Square radial table */}
       <div
         className="table"
         style={{
           position: "relative",
-          gridTemplateColumns: "none",
-          gridAutoRows: "none",
-          display: "block",
+          width: "100%",
+          maxWidth: 360,
+          aspectRatio: "1 / 1",
+          margin: "0 auto",
         }}
       >
-        {/* Center deck */}
+        {/* Center deck (smaller) */}
         <div
           className="card"
           style={{
             position: "absolute",
             inset: 0,
             margin: "auto",
+            width: 110,
+            height: 150,
           }}
         >
           {card ? (
@@ -64,10 +67,10 @@ export default function App() {
           )}
         </div>
 
-        {/* Players around the deck */}
+        {/* Players around deck */}
         {PLAYERS.map((name, i) => {
-          const angle = (360 / count) * i - 90; // start at top
-          const radius = 140; // distance from center
+          const angle = (360 / count) * i - 90;
+          const radius = 155; // 🔑 increased spacing
 
           return (
             <div
