@@ -26,12 +26,20 @@ export default function App() {
   const [thumbmaster, setThumbmaster] = useState(null); // J
   const [heaven, setHeaven] = useState(null); // 7
 
+  const [reaction, setReaction] = useState(null);
+  // { type: "J" | "7", starter: string, reacted: Set<string> }
+
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
+  const [stats, setStats] = useState(
+    Object.fromEntries(
+      PLAYERS.map(p => [p, { started: 0, lost: 0 }])
+    )
+  );
+
   const cardsLeft = deck.length - index;
-  const activeRule = thumbmaster || heaven;
 
   function currentPlayer() {
     return PLAYERS[index % PLAYERS.length];
@@ -48,11 +56,11 @@ export default function App() {
     setIndex(i => i + 1);
 
     if (rank === "J") {
-      setThumbmaster(player); // replace
+      setThumbmaster(player);
     }
 
     if (rank === "7") {
-      setHeaven(player); // replace
+      setHeaven(player);
     }
   }
 
@@ -63,16 +71,68 @@ export default function App() {
     }));
   }
 
+  function startReaction(type) {
+    const starter = type === "J" ? thumbmaster : heaven;
+    if (!starter) return;
+
+    setStats(s => ({
+      ...s,
+      [starter]: {
+        ...s[starter],
+        started: s[starter].started + 1
+      }
+    }));
+
+    setReaction({
+      type,
+      starter,
+      reacted: new Set([starter])
+    });
+  }
+
+  function react(name) {
+    if (!reaction) return;
+    if (reaction.reacted.has(name)) return;
+
+    const updated = new Set(reaction.reacted);
+    updated.add(name);
+
+    if (updated.size === PLAYERS.length) {
+      // LAST PERSON
+      setStats(s => ({
+        ...s,
+        [name]: {
+          ...s[name],
+          lost: s[name].lost + 1
+        }
+      }));
+
+      setReaction(null);
+      return;
+    }
+
+    setReaction({
+      ...reaction,
+      reacted: updated
+    });
+  }
+
   function resetGame() {
-    if (activeRule) return;
+    if (thumbmaster || heaven) return;
 
     setDeck(buildDeck());
     setIndex(0);
     setCard(null);
     setThumbmaster(null);
     setHeaven(null);
+    setReaction(null);
     setBeers(
       Object.fromEntries(PLAYERS.map(p => [p, 0]))
+    );
+    setStats(
+      Object.fromEntries(
+        PLAYERS.map(p => [p, { started: 0, lost: 0 }])
+      )
     );
   }
 
@@ -84,22 +144,24 @@ export default function App() {
       <div className="table">
         {PLAYERS.map(name => (
           <div
-  className={[
-    "player",
-    thumbmaster === name && "thumbmaster",
-    heaven === name && "heaven",
-  ]
-    .filter(Boolean)
-    .join(" ")
-  }
-  key={name}
->
-
+            key={name}
+            className={[
+              "player",
+              thumbmaster === name && "thumbmaster",
+              heaven === name && "heaven",
+            ].filter(Boolean).join(" ")}
+          >
             <div className="avatar" />
             <div className="name">{name}</div>
             <div className="count">🍺 {beers[name]}</div>
-            <button className="beer" onClick={() => addBeer(name)}>
-              +1 Beer
+
+            <button
+              className="beer"
+              onClick={() =>
+                reaction ? react(name) : addBeer(name)
+              }
+            >
+              {reaction ? "REACT" : "+1 Beer"}
             </button>
           </div>
         ))}
@@ -144,13 +206,13 @@ export default function App() {
           </div>
 
           <div className="hud-actions">
-            <button disabled>START J</button>
-            <button disabled>START 7</button>
-            <button
-              className="reset"
-              disabled={activeRule}
-              onClick={resetGame}
-            >
+            <button onClick={() => startReaction("J")} disabled={!thumbmaster}>
+              START J
+            </button>
+            <button onClick={() => startReaction("7")} disabled={!heaven}>
+              START 7
+            </button>
+            <button className="reset" onClick={resetGame}>
               RESET
             </button>
           </div>
