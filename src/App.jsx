@@ -16,7 +16,6 @@ function buildDeck() {
     }
   }
 
-  // Fisher–Yates shuffle
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -38,11 +37,11 @@ export default function App() {
 
   const [turnIndex, setTurnIndex] = useState(0);
 
-  const [thumbmaster, setThumbmaster] = useState(null); // J
-  const [heaven, setHeaven] = useState(null); // 7
+  const [thumbmaster, setThumbmaster] = useState(null);
+  const [heaven, setHeaven] = useState(null);
 
   const [reaction, setReaction] = useState(null);
-  // { type: "J" | "7", starter: string, reacted: Set<string> }
+  // { type, starter, reacted:Set }
 
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
@@ -65,6 +64,8 @@ export default function App() {
      DRAW
   ========================= */
   function drawCard() {
+    if (reaction) return; // cannot draw during reaction
+
     setDeck(d => {
       if (d.length === 0) return d;
 
@@ -77,9 +78,7 @@ export default function App() {
       if (rank === "J") setThumbmaster(player);
       if (rank === "7") setHeaven(player);
 
-      // ADVANCE TURN (EXPLICIT)
       setTurnIndex(t => (t + 1) % PLAYERS.length);
-
       return rest;
     });
   }
@@ -98,7 +97,11 @@ export default function App() {
      REACTIONS
   ========================= */
   function startReaction(type) {
-    const starter = type === "J" ? thumbmaster : heaven;
+    if (reaction) return;
+
+    const starter =
+      type === "J" ? thumbmaster : heaven;
+
     if (!starter) return;
 
     setStats(s => ({
@@ -131,7 +134,6 @@ export default function App() {
           lost: s[name].lost + 1
         }
       }));
-
       setReaction(null);
       return;
     }
@@ -146,7 +148,7 @@ export default function App() {
      RESET
   ========================= */
   function resetGame() {
-    if (thumbmaster || heaven) return;
+    if (reaction) return;
 
     setDeck(buildDeck());
     setCard(null);
@@ -173,7 +175,6 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* PLAYERS */}
       <div className="table">
         {PLAYERS.map((name, i) => (
           <div
@@ -201,7 +202,6 @@ export default function App() {
         ))}
       </div>
 
-      {/* HUD */}
       <div className="hud">
         <div className="hud-inner">
 
@@ -218,7 +218,7 @@ export default function App() {
             <button
               className="draw"
               onClick={drawCard}
-              disabled={cardsLeft === 0}
+              disabled={cardsLeft === 0 || reaction}
             >
               {cardsLeft === 0 ? "EMPTY" : "DRAW"}
             </button>
@@ -244,10 +244,16 @@ export default function App() {
           </div>
 
           <div className="hud-actions">
-            <button onClick={() => startReaction("J")} disabled={!thumbmaster}>
+            <button
+              onClick={() => startReaction("J")}
+              disabled={!thumbmaster || reaction}
+            >
               START J
             </button>
-            <button onClick={() => startReaction("7")} disabled={!heaven}>
+            <button
+              onClick={() => startReaction("7")}
+              disabled={!heaven || reaction}
+            >
               START 7
             </button>
             <button className="reset" onClick={resetGame}>
