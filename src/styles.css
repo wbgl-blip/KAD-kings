@@ -3,167 +3,200 @@
 ========================= */
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
   margin: 0;
   padding: 0;
-}
-
-html,
-body,
-#root {
-  height: 100%;
   background: #000;
   color: #fff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow: hidden; /* lock screen */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-button {
-  font: inherit;
-  border: none;
-  cursor: pointer;
-}
-
-/* =========================
-   APP WRAPPER
-========================= */
 .app {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12px;
+  min-height: 100vh;
+  padding: 16px;
+  background: radial-gradient(circle at top, #111, #000);
+  transition: background-color 0.3s;
 }
 
-h1 {
-  font-family: Georgia, serif;
-  font-size: 28px;
-  margin-bottom: 14px;
+.app.reaction {
+  animation: bgPulse 0.6s infinite alternate;
 }
 
 /* =========================
-   PLAYER GRID (LOCKED)
+   HEADER
+========================= */
+h1 {
+  text-align: center;
+  margin: 12px 0 20px;
+  font-size: 34px;
+  letter-spacing: 1px;
+  font-weight: 900;
+}
+
+/* =========================
+   PLAYER GRID
 ========================= */
 .table {
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px;
-  align-content: start;
-  padding-bottom: 260px; /* HUD reserve */
+  margin-bottom: 20px;
+}
+
+.player {
+  background: linear-gradient(180deg, #1f1f1f, #0c0c0c);
+  border-radius: 18px;
+  padding: 16px;
+  text-align: center;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.05),
+    0 10px 20px rgba(0,0,0,0.6);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.player.active {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 0 2px #4ade80,
+    0 0 20px rgba(74,222,128,0.6);
+}
+
+.player.thumbmaster {
+  box-shadow:
+    0 0 0 2px #a855f7,
+    0 0 20px rgba(168,85,247,0.6);
+}
+
+.player.heaven {
+  box-shadow:
+    0 0 0 2px #38bdf8,
+    0 0 20px rgba(56,189,248,0.6);
+}
+
+.player.starter {
+  box-shadow:
+    0 0 0 3px #facc15,
+    0 0 26px rgba(250,204,21,0.7);
 }
 
 /* =========================
-   PLAYER CARDS
+   AVATAR / NAME / COUNT
 ========================= */
-.player {
-  background: radial-gradient(circle at top, #151515, #0b0b0b);
-  border-radius: 18px;
-  padding: 14px;
-  min-height: 130px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.05),
-    0 10px 25px rgba(0,0,0,0.6);
-}
-
 .avatar {
-  width: 40px;
-  height: 40px;
-  background: #666;
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 8px;
   border-radius: 50%;
+  background: radial-gradient(circle at top, #444, #222);
 }
 
 .name {
-  font-weight: 600;
-  font-size: 15px;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .count {
-  font-size: 13px;
+  margin-top: 4px;
+  font-size: 15px;
   opacity: 0.85;
 }
 
-.beer {
+/* =========================
+   PLAYER BUTTON
+========================= */
+.player .beer {
+  margin-top: 10px;
   width: 100%;
-  padding: 8px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 999px;
+  border: none;
   background: #fff;
   color: #000;
-  font-weight: 700;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.player .beer:active {
+  transform: scale(0.95);
+}
+
+.app.reaction .player .beer {
+  background: linear-gradient(135deg, #fb7185, #f97316);
+  color: #000;
 }
 
 /* =========================
-   HUD — DOCKED
+   HUD
 ========================= */
 .hud {
-  position: fixed;
+  position: sticky;
   bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  padding: 12px;
-  pointer-events: none; /* prevents overlap bugs */
 }
 
 .hud-inner {
-  pointer-events: auto;
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
-  background: #0b0b0b;
-  border-radius: 22px 22px 0 0;
-  padding: 12px;
-  box-shadow: 0 -8px 30px rgba(0,0,0,0.8);
+  background: linear-gradient(180deg, #111, #070707);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
 }
 
 /* =========================
-   HUD TOP (CARD + DRAW)
+   CARD AREA
 ========================= */
 .hud-top {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
 }
 
 .hud-card {
-  background: #fff;
-  color: #000;
-  border-radius: 16px;
-  padding: 10px 12px;
-  height: 56px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex: 1;
+  background: radial-gradient(circle at top, #2a2a2a, #111);
+  border-radius: 18px;
+  padding: 18px;
   text-align: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
 }
 
 .card-title {
-  font-family: Georgia, serif;
-  font-size: 16px;
-  line-height: 1.1;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 1px;
 }
 
 .card-sub {
-  font-size: 11px;
-  opacity: 0.7;
-  margin-top: 2px;
+  margin-top: 6px;
+  opacity: 0.6;
 }
 
+/* =========================
+   DRAW BUTTON
+========================= */
 .draw {
-  height: 56px;
-  border-radius: 16px;
-  background: #fff;
+  min-width: 120px;
+  border-radius: 18px;
+  border: none;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
   color: #000;
-  font-weight: 800;
-  font-size: 15px;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(34,197,94,0.4);
+  transition: transform 0.1s, box-shadow 0.1s, opacity 0.1s;
+}
+
+.draw:active {
+  transform: scale(0.96);
+}
+
+.draw:disabled {
+  opacity: 0.4;
+  box-shadow: none;
 }
 
 /* =========================
@@ -172,39 +205,40 @@ h1 {
 .hud-info {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  font-size: 11px;
-  margin-bottom: 8px;
-}
-
-.hud-info div {
-  background: #111;
-  padding: 6px;
-  border-radius: 10px;
+  gap: 10px;
+  margin: 14px 0;
   text-align: center;
+  font-size: 14px;
+  opacity: 0.8;
 }
 
-.hud-info span {
+.hud-info strong {
   display: block;
-  margin-top: 3px;
-  opacity: 0.8;
+  font-size: 11px;
+  opacity: 0.6;
 }
 
 /* =========================
    HUD ACTIONS
 ========================= */
 .hud-actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  display: flex;
+  gap: 10px;
 }
 
 .hud-actions button {
-  padding: 8px;
-  border-radius: 999px;
-  background: #222;
-  color: #fff;
-  font-weight: 700;
+  flex: 1;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.1s;
+}
+
+.hud-actions button:active {
+  transform: scale(0.96);
 }
 
 .hud-actions .reset {
@@ -212,74 +246,26 @@ h1 {
   color: #000;
 }
 
-/* =========================
-   SAFETY
-========================= */
-body {
-  overflow-x: hidden;
-}
-/* =========================
-   MOBILE HUD OFFSET
-========================= */
-@media (max-width: 767px) {
-  .hud {
-    bottom: 12px; /* lift HUD up */
-  }
-
-  .hud-inner {
-    border-radius: 22px; /* full pill when floating */
-  }
-}
-/* =========================
-   CARD REVEAL ANIMATION
-   (APPEND ONLY)
-========================= */
-.hud-card {
-  animation: cardFlip 180ms ease-out;
+.hud-actions button:not(.reset) {
+  background: #1f2937;
+  color: #fff;
 }
 
-@keyframes cardFlip {
-  from {
-    transform: translateY(6px) scale(0.96);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-}
 /* =========================
-   DESKTOP → MOBILE LOCK
+   REACTION ANIMATIONS
 ========================= */
-
-/* Center app on desktop */
-@media (min-width: 480px) {
-  body {
-    display: flex;
-    justify-content: center;
-    background: #000;
-  }
-
-  #root {
-    width: 100%;
-    max-width: 420px; /* PHONE WIDTH */
-    min-height: 100vh;
-    background: #000;
-  }
-
-  .app {
-    width: 100%;
-  }
+@keyframes bgPulse {
+  from { background-color: #000; }
+  to { background-color: #1a0000; }
 }
-/* =========================
-   MOBILE HUD LIFT (FINAL)
-========================= */
-@media (max-height: 750px) {
-  .hud {
-    padding-bottom: 28px; /* lifts HUD slightly */
-  }
 
-  .table {
-    padding-bottom: 220px; /* tighter reserve */
-  }
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-2px); }
+}
+
+.app.reaction .player {
+  animation: shake 0.35s infinite;
 }
