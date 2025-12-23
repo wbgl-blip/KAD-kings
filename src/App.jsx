@@ -2,25 +2,38 @@ import { useState } from "react";
 
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex"];
 
+/* =========================
+   DECK
+========================= */
 function buildDeck() {
   const suits = ["♠", "♥", "♦", "♣"];
   const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
   const deck = [];
+
   for (const r of ranks) {
     for (const s of suits) {
       deck.push(`${r}${s}`);
     }
   }
-  return deck.sort(() => Math.random() - 0.5);
+
+  // Fisher–Yates shuffle
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+
+  return deck;
 }
 
 function getRank(card) {
   return card.replace(/[^A-Z0-9]/g, "");
 }
 
+/* =========================
+   APP
+========================= */
 export default function App() {
   const [deck, setDeck] = useState(buildDeck);
-  const [index, setIndex] = useState(0);
   const [card, setCard] = useState(null);
 
   const [thumbmaster, setThumbmaster] = useState(null); // J
@@ -39,31 +52,36 @@ export default function App() {
     )
   );
 
-  const cardsLeft = deck.length - index;
+  const cardsLeft = deck.length;
+  const cardsDrawn = 52 - cardsLeft;
 
   function currentPlayer() {
-    return PLAYERS[index % PLAYERS.length];
+    return PLAYERS[cardsDrawn % PLAYERS.length];
   }
 
+  /* =========================
+     DRAW
+  ========================= */
   function drawCard() {
-    if (index >= deck.length) return;
+    setDeck(d => {
+      if (d.length === 0) return d;
 
-    const next = deck[index];
-    const rank = getRank(next);
-    const player = currentPlayer();
+      const [next, ...rest] = d;
+      const rank = getRank(next);
+      const player = currentPlayer();
 
-    setCard(next);
-    setIndex(i => i + 1);
+      setCard(next);
 
-    if (rank === "J") {
-      setThumbmaster(player);
-    }
+      if (rank === "J") setThumbmaster(player);
+      if (rank === "7") setHeaven(player);
 
-    if (rank === "7") {
-      setHeaven(player);
-    }
+      return rest;
+    });
   }
 
+  /* =========================
+     BEERS
+  ========================= */
   function addBeer(name) {
     setBeers(b => ({
       ...b,
@@ -71,6 +89,9 @@ export default function App() {
     }));
   }
 
+  /* =========================
+     REACTIONS
+  ========================= */
   function startReaction(type) {
     const starter = type === "J" ? thumbmaster : heaven;
     if (!starter) return;
@@ -98,7 +119,6 @@ export default function App() {
     updated.add(name);
 
     if (updated.size === PLAYERS.length) {
-      // LAST PERSON
       setStats(s => ({
         ...s,
         [name]: {
@@ -117,18 +137,22 @@ export default function App() {
     });
   }
 
+  /* =========================
+     RESET
+  ========================= */
   function resetGame() {
     if (thumbmaster || heaven) return;
 
     setDeck(buildDeck());
-    setIndex(0);
     setCard(null);
     setThumbmaster(null);
     setHeaven(null);
     setReaction(null);
+
     setBeers(
       Object.fromEntries(PLAYERS.map(p => [p, 0]))
     );
+
     setStats(
       Object.fromEntries(
         PLAYERS.map(p => [p, { started: 0, lost: 0 }])
@@ -136,6 +160,9 @@ export default function App() {
     );
   }
 
+  /* =========================
+     UI
+  ========================= */
   return (
     <div className="app">
       <h1>KAD Kings</h1>
@@ -193,7 +220,11 @@ export default function App() {
           <div className="hud-info">
             <div>
               <strong>Progress</strong>
-              <span>{52 - cardsLeft} / 52</span>
+              <span>{cardsDrawn} / 52</span>
+            </div>
+            <div>
+              <strong>Current Player</strong>
+              <span>{currentPlayer()}</span>
             </div>
             <div>
               <strong>Thumbmaster (J)</strong>
