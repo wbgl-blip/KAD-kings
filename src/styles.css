@@ -9,20 +9,20 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: #000;
+  background: #0b0b0b;
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .app {
   min-height: 100vh;
-  padding: 16px;
+  padding: 16px 16px 28px;
   background: radial-gradient(circle at top, #111, #000);
-  transition: background-color 0.3s;
+  transition: background 0.4s ease;
 }
 
 .app.reaction {
-  animation: bgPulse 0.6s infinite alternate;
+  background: radial-gradient(circle at top, #2a0000, #000);
 }
 
 /* =========================
@@ -30,10 +30,86 @@ html, body {
 ========================= */
 h1 {
   text-align: center;
-  margin: 12px 0 20px;
+  margin: 10px 0 18px;
   font-size: 34px;
-  letter-spacing: 1px;
   font-weight: 900;
+  letter-spacing: 1px;
+}
+
+/* =========================
+   DECK + CARD ZONE
+========================= */
+.deck-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+/* -------- DECK -------- */
+.deck {
+  position: relative;
+  width: 90px;
+  height: 120px;
+  cursor: pointer;
+  margin-bottom: 18px;
+  transition: transform 0.15s ease;
+}
+
+.deck:active {
+  transform: scale(0.95);
+}
+
+.deck.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.deck-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #1f1f1f, #0e0e0e);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.7);
+}
+
+.deck-card:nth-child(1) { transform: translateY(0); }
+.deck-card:nth-child(2) { transform: translateY(4px); }
+.deck-card:nth-child(3) { transform: translateY(8px); }
+
+/* -------- DRAWN CARD -------- */
+.drawn-card {
+  width: 170px;
+  background: #f5f5f5;
+  color: #000;
+  border-radius: 22px;
+  padding: 22px 18px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  animation: cardEnter 0.4s ease;
+}
+
+.card-face {
+  font-size: 56px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.card-meta {
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* =========================
@@ -43,54 +119,43 @@ h1 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .player {
-  background: linear-gradient(180deg, #1f1f1f, #0c0c0c);
-  border-radius: 18px;
-  padding: 16px;
+  background: #0e0e0e;
+  border-radius: 16px;
+  padding: 14px;
   text-align: center;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.05),
-    0 10px 20px rgba(0,0,0,0.6);
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: transform 0.15s ease, outline 0.15s ease;
 }
 
 .player.active {
-  transform: scale(1.05);
-  box-shadow:
-    0 0 0 2px #4ade80,
-    0 0 20px rgba(74,222,128,0.6);
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
 }
 
 .player.thumbmaster {
-  box-shadow:
-    0 0 0 2px #a855f7,
-    0 0 20px rgba(168,85,247,0.6);
+  outline: 2px solid #a855f7;
+  outline-offset: 2px;
 }
 
 .player.heaven {
-  box-shadow:
-    0 0 0 2px #38bdf8,
-    0 0 20px rgba(56,189,248,0.6);
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
 }
 
 .player.starter {
-  box-shadow:
-    0 0 0 3px #facc15,
-    0 0 26px rgba(250,204,21,0.7);
+  outline: 3px solid #facc15;
+  outline-offset: 2px;
 }
 
-/* =========================
-   AVATAR / NAME / COUNT
-========================= */
 .avatar {
-  width: 54px;
-  height: 54px;
+  width: 52px;
+  height: 52px;
   margin: 0 auto 8px;
   border-radius: 50%;
-  background: radial-gradient(circle at top, #444, #222);
+  background: radial-gradient(circle at top, #3a3a3a, #1a1a1a);
 }
 
 .name {
@@ -100,8 +165,8 @@ h1 {
 
 .count {
   margin-top: 4px;
-  font-size: 15px;
-  opacity: 0.85;
+  font-size: 14px;
+  opacity: 0.75;
 }
 
 /* =========================
@@ -111,105 +176,39 @@ h1 {
   margin-top: 10px;
   width: 100%;
   padding: 12px;
-  border-radius: 999px;
+  border-radius: 14px;
   border: none;
-  background: #fff;
-  color: #000;
-  font-size: 16px;
-  font-weight: 800;
+  background: #1f1f1f;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition: transform 0.1s ease;
 }
 
 .player .beer:active {
-  transform: scale(0.95);
-}
-
-.app.reaction .player .beer {
-  background: linear-gradient(135deg, #fb7185, #f97316);
-  color: #000;
-}
-
-/* =========================
-   HUD
-========================= */
-.hud {
-  position: sticky;
-  bottom: 0;
-}
-
-.hud-inner {
-  background: linear-gradient(180deg, #111, #070707);
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
-}
-
-/* =========================
-   CARD AREA
-========================= */
-.hud-top {
-  display: flex;
-  gap: 12px;
-  align-items: stretch;
-}
-
-.hud-card {
-  flex: 1;
-  background: radial-gradient(circle at top, #2a2a2a, #111);
-  border-radius: 18px;
-  padding: 18px;
-  text-align: center;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-}
-
-.card-title {
-  font-size: 42px;
-  font-weight: 900;
-  letter-spacing: 1px;
-}
-
-.card-sub {
-  margin-top: 6px;
-  opacity: 0.6;
-}
-
-/* =========================
-   DRAW BUTTON
-========================= */
-.draw {
-  min-width: 120px;
-  border-radius: 18px;
-  border: none;
-  background: linear-gradient(135deg, #4ade80, #22c55e);
-  color: #000;
-  font-size: 20px;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 10px 20px rgba(34,197,94,0.4);
-  transition: transform 0.1s, box-shadow 0.1s, opacity 0.1s;
-}
-
-.draw:active {
   transform: scale(0.96);
 }
 
-.draw:disabled {
-  opacity: 0.4;
-  box-shadow: none;
+.app.reaction .player .beer {
+  background: #7f1d1d;
+  color: #fff;
 }
 
 /* =========================
-   HUD INFO
+   HUD INFO + ACTIONS
 ========================= */
+.hud {
+  margin-top: 6px;
+}
+
 .hud-info {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  margin: 14px 0;
-  text-align: center;
-  font-size: 14px;
-  opacity: 0.8;
+  margin-bottom: 14px;
+  font-size: 13px;
+  opacity: 0.75;
 }
 
 .hud-info strong {
@@ -218,9 +217,6 @@ h1 {
   opacity: 0.6;
 }
 
-/* =========================
-   HUD ACTIONS
-========================= */
 .hud-actions {
   display: flex;
   gap: 10px;
@@ -231,19 +227,18 @@ h1 {
   padding: 14px;
   border-radius: 16px;
   border: none;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
   cursor: pointer;
-  transition: transform 0.1s, opacity 0.1s;
+  transition: transform 0.1s ease, opacity 0.1s ease;
 }
 
 .hud-actions button:active {
   transform: scale(0.96);
 }
 
-.hud-actions .reset {
-  background: #fff;
-  color: #000;
+.hud-actions button:disabled {
+  opacity: 0.35;
 }
 
 .hud-actions button:not(.reset) {
@@ -251,14 +246,14 @@ h1 {
   color: #fff;
 }
 
-/* =========================
-   REACTION ANIMATIONS
-========================= */
-@keyframes bgPulse {
-  from { background-color: #000; }
-  to { background-color: #1a0000; }
+.hud-actions .reset {
+  background: #fff;
+  color: #000;
 }
 
+/* =========================
+   REACTION MODE ANIMATION
+========================= */
 @keyframes shake {
   0% { transform: translateX(0); }
   25% { transform: translateX(-2px); }
