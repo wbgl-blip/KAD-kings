@@ -36,6 +36,8 @@ export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [card, setCard] = useState(null);
 
+  const [turnIndex, setTurnIndex] = useState(0);
+
   const [thumbmaster, setThumbmaster] = useState(null); // J
   const [heaven, setHeaven] = useState(null); // 7
 
@@ -56,7 +58,7 @@ export default function App() {
   const cardsDrawn = 52 - cardsLeft;
 
   function currentPlayer() {
-    return PLAYERS[cardsDrawn % PLAYERS.length];
+    return PLAYERS[turnIndex];
   }
 
   /* =========================
@@ -74,6 +76,9 @@ export default function App() {
 
       if (rank === "J") setThumbmaster(player);
       if (rank === "7") setHeaven(player);
+
+      // ADVANCE TURN (EXPLICIT)
+      setTurnIndex(t => (t + 1) % PLAYERS.length);
 
       return rest;
     });
@@ -145,6 +150,7 @@ export default function App() {
 
     setDeck(buildDeck());
     setCard(null);
+    setTurnIndex(0);
     setThumbmaster(null);
     setHeaven(null);
     setReaction(null);
@@ -169,11 +175,12 @@ export default function App() {
 
       {/* PLAYERS */}
       <div className="table">
-        {PLAYERS.map(name => (
+        {PLAYERS.map((name, i) => (
           <div
             key={name}
             className={[
               "player",
+              i === turnIndex && "active",
               thumbmaster === name && "thumbmaster",
               heaven === name && "heaven",
             ].filter(Boolean).join(" ")}
