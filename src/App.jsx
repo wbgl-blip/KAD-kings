@@ -34,27 +34,18 @@ function getRank(card) {
 export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [card, setCard] = useState(null);
-
   const [turnIndex, setTurnIndex] = useState(0);
 
   const [thumbmaster, setThumbmaster] = useState(null);
   const [heaven, setHeaven] = useState(null);
 
   const [reaction, setReaction] = useState(null);
-  // { type, starter, reacted:Set }
 
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
-  const [stats, setStats] = useState(
-    Object.fromEntries(
-      PLAYERS.map(p => [p, { started: 0, lost: 0 }])
-    )
-  );
-
   const cardsLeft = deck.length;
-  const cardsDrawn = 52 - cardsLeft;
 
   function currentPlayer() {
     return PLAYERS[turnIndex];
@@ -64,8 +55,7 @@ export default function App() {
      DRAW (CLICK DECK)
   ========================= */
   function drawCard() {
-    if (reaction) return;
-    if (deck.length === 0) return;
+    if (reaction || deck.length === 0) return;
 
     setDeck(d => {
       const [next, ...rest] = d;
@@ -93,79 +83,6 @@ export default function App() {
   }
 
   /* =========================
-     REACTIONS
-  ========================= */
-  function startReaction(type) {
-    if (reaction) return;
-
-    const starter = type === "J" ? thumbmaster : heaven;
-    if (!starter) return;
-
-    setStats(s => ({
-      ...s,
-      [starter]: {
-        ...s[starter],
-        started: s[starter].started + 1
-      }
-    }));
-
-    setReaction({
-      type,
-      starter,
-      reacted: new Set([starter])
-    });
-  }
-
-  function react(name) {
-    if (!reaction) return;
-    if (reaction.reacted.has(name)) return;
-
-    const updated = new Set(reaction.reacted);
-    updated.add(name);
-
-    if (updated.size === PLAYERS.length) {
-      setStats(s => ({
-        ...s,
-        [name]: {
-          ...s[name],
-          lost: s[name].lost + 1
-        }
-      }));
-      setReaction(null);
-      return;
-    }
-
-    setReaction({
-      ...reaction,
-      reacted: updated
-    });
-  }
-
-  /* =========================
-     RESET
-  ========================= */
-  function resetGame() {
-    if (reaction) return;
-
-    setDeck(buildDeck());
-    setCard(null);
-    setTurnIndex(0);
-    setThumbmaster(null);
-    setHeaven(null);
-    setReaction(null);
-
-    setBeers(
-      Object.fromEntries(PLAYERS.map(p => [p, 0]))
-    );
-
-    setStats(
-      Object.fromEntries(
-        PLAYERS.map(p => [p, { started: 0, lost: 0 }])
-      )
-    );
-  }
-
-  /* =========================
      UI
   ========================= */
   return (
@@ -175,7 +92,7 @@ export default function App() {
       {/* DECK + CARD */}
       <div className="deck-zone">
         <div
-          className={`deck ${reaction || cardsLeft === 0 ? "disabled" : ""}`}
+          className={`deck ${cardsLeft === 0 || reaction ? "disabled" : ""}`}
           onClick={drawCard}
         >
           <div className="deck-card" />
@@ -198,68 +115,19 @@ export default function App() {
         {PLAYERS.map((name, i) => (
           <div
             key={name}
-            className={[
-              "player",
-              i === turnIndex && "active",
-              thumbmaster === name && "thumbmaster",
-              heaven === name && "heaven",
-              reaction?.starter === name && "starter"
-            ].filter(Boolean).join(" ")}
+            className={`player ${i === turnIndex ? "active" : ""}`}
           >
             <div className="avatar" />
             <div className="name">{name}</div>
             <div className="count">🍺 {beers[name]}</div>
-
             <button
               className="beer"
-              onClick={() =>
-                reaction ? react(name) : addBeer(name)
-              }
+              onClick={() => addBeer(name)}
             >
-              {reaction ? "TAP!" : "+1 Beer"}
+              +1 Beer
             </button>
           </div>
         ))}
-      </div>
-
-      {/* INFO + ACTIONS */}
-      <div className="hud">
-        <div className="hud-info">
-          <div>
-            <strong>Progress</strong>
-            <span>{cardsDrawn} / 52</span>
-          </div>
-          <div>
-            <strong>Current Player</strong>
-            <span>{currentPlayer()}</span>
-          </div>
-          <div>
-            <strong>Thumbmaster (J)</strong>
-            <span>{thumbmaster ?? "None"}</span>
-          </div>
-          <div>
-            <strong>Heaven (7)</strong>
-            <span>{heaven ?? "None"}</span>
-          </div>
-        </div>
-
-        <div className="hud-actions">
-          <button
-            onClick={() => startReaction("J")}
-            disabled={!thumbmaster || reaction}
-          >
-            START J
-          </button>
-          <button
-            onClick={() => startReaction("7")}
-            disabled={!heaven || reaction}
-          >
-            START 7
-          </button>
-          <button className="reset" onClick={resetGame}>
-            RESET
-          </button>
-        </div>
       </div>
     </div>
   );
