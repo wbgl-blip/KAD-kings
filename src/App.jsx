@@ -16,6 +16,7 @@ function buildDeck() {
     }
   }
 
+  // Fisher–Yates shuffle
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -41,7 +42,7 @@ export default function App() {
   const [heaven, setHeaven] = useState(null);
 
   const [reaction, setReaction] = useState(null);
-  // { type, starter, reacted:Set }
+  // { type: "J" | "7", starter: string, reacted: Set<string> }
 
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
@@ -64,7 +65,7 @@ export default function App() {
      DRAW
   ========================= */
   function drawCard() {
-    if (reaction) return; // cannot draw during reaction
+    if (reaction) return;
 
     setDeck(d => {
       if (d.length === 0) return d;
@@ -99,9 +100,7 @@ export default function App() {
   function startReaction(type) {
     if (reaction) return;
 
-    const starter =
-      type === "J" ? thumbmaster : heaven;
-
+    const starter = type === "J" ? thumbmaster : heaven;
     if (!starter) return;
 
     setStats(s => ({
@@ -172,9 +171,10 @@ export default function App() {
      UI
   ========================= */
   return (
-    <div className="app">
+    <div className={`app ${reaction ? "reaction" : ""}`}>
       <h1>KAD Kings</h1>
 
+      {/* PLAYER GRID */}
       <div className="table">
         {PLAYERS.map((name, i) => (
           <div
@@ -184,10 +184,12 @@ export default function App() {
               i === turnIndex && "active",
               thumbmaster === name && "thumbmaster",
               heaven === name && "heaven",
+              reaction?.starter === name && "starter"
             ].filter(Boolean).join(" ")}
           >
             <div className="avatar" />
             <div className="name">{name}</div>
+
             <div className="count">🍺 {beers[name]}</div>
 
             <button
@@ -196,17 +198,18 @@ export default function App() {
                 reaction ? react(name) : addBeer(name)
               }
             >
-              {reaction ? "REACT" : "+1 Beer"}
+              {reaction ? "TAP!" : "+1 Beer"}
             </button>
           </div>
         ))}
       </div>
 
+      {/* HUD */}
       <div className="hud">
         <div className="hud-inner">
 
           <div className="hud-top">
-            <div className="hud-card">
+            <div className={`hud-card ${card ? "flip" : ""}`}>
               <div className="card-title">
                 {card ?? "Draw"}
               </div>
@@ -256,7 +259,10 @@ export default function App() {
             >
               START 7
             </button>
-            <button className="reset" onClick={resetGame}>
+            <button
+              className="reset"
+              onClick={resetGame}
+            >
               RESET
             </button>
           </div>
