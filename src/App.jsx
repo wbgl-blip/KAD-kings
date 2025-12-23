@@ -16,7 +16,6 @@ function buildDeck() {
     }
   }
 
-  // Fisher–Yates shuffle
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -42,7 +41,7 @@ export default function App() {
   const [heaven, setHeaven] = useState(null);
 
   const [reaction, setReaction] = useState(null);
-  // { type: "J" | "7", starter: string, reacted: Set<string> }
+  // { type, starter, reacted:Set }
 
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
@@ -62,14 +61,13 @@ export default function App() {
   }
 
   /* =========================
-     DRAW
+     DRAW (CLICK DECK)
   ========================= */
   function drawCard() {
     if (reaction) return;
+    if (deck.length === 0) return;
 
     setDeck(d => {
-      if (d.length === 0) return d;
-
       const [next, ...rest] = d;
       const rank = getRank(next);
       const player = currentPlayer();
@@ -174,7 +172,28 @@ export default function App() {
     <div className={`app ${reaction ? "reaction" : ""}`}>
       <h1>KAD Kings</h1>
 
-      {/* PLAYER GRID */}
+      {/* DECK + CARD */}
+      <div className="deck-zone">
+        <div
+          className={`deck ${reaction || cardsLeft === 0 ? "disabled" : ""}`}
+          onClick={drawCard}
+        >
+          <div className="deck-card" />
+          <div className="deck-card" />
+          <div className="deck-card" />
+        </div>
+
+        <div className="drawn-card">
+          <div className="card-face">
+            {card ?? "—"}
+          </div>
+          <div className="card-meta">
+            {cardsLeft} left
+          </div>
+        </div>
+      </div>
+
+      {/* PLAYERS */}
       <div className="table">
         {PLAYERS.map((name, i) => (
           <div
@@ -189,7 +208,6 @@ export default function App() {
           >
             <div className="avatar" />
             <div className="name">{name}</div>
-
             <div className="count">🍺 {beers[name]}</div>
 
             <button
@@ -204,69 +222,43 @@ export default function App() {
         ))}
       </div>
 
-      {/* HUD */}
+      {/* INFO + ACTIONS */}
       <div className="hud">
-        <div className="hud-inner">
-
-          <div className="hud-top">
-            <div className={`hud-card ${card ? "flip" : ""}`}>
-              <div className="card-title">
-                {card ?? "Draw"}
-              </div>
-              <div className="card-sub">
-                {cardsLeft} left
-              </div>
-            </div>
-
-            <button
-              className="draw"
-              onClick={drawCard}
-              disabled={cardsLeft === 0 || reaction}
-            >
-              {cardsLeft === 0 ? "EMPTY" : "DRAW"}
-            </button>
+        <div className="hud-info">
+          <div>
+            <strong>Progress</strong>
+            <span>{cardsDrawn} / 52</span>
           </div>
-
-          <div className="hud-info">
-            <div>
-              <strong>Progress</strong>
-              <span>{cardsDrawn} / 52</span>
-            </div>
-            <div>
-              <strong>Current Player</strong>
-              <span>{currentPlayer()}</span>
-            </div>
-            <div>
-              <strong>Thumbmaster (J)</strong>
-              <span>{thumbmaster ?? "None"}</span>
-            </div>
-            <div>
-              <strong>Heaven (7)</strong>
-              <span>{heaven ?? "None"}</span>
-            </div>
+          <div>
+            <strong>Current Player</strong>
+            <span>{currentPlayer()}</span>
           </div>
-
-          <div className="hud-actions">
-            <button
-              onClick={() => startReaction("J")}
-              disabled={!thumbmaster || reaction}
-            >
-              START J
-            </button>
-            <button
-              onClick={() => startReaction("7")}
-              disabled={!heaven || reaction}
-            >
-              START 7
-            </button>
-            <button
-              className="reset"
-              onClick={resetGame}
-            >
-              RESET
-            </button>
+          <div>
+            <strong>Thumbmaster (J)</strong>
+            <span>{thumbmaster ?? "None"}</span>
           </div>
+          <div>
+            <strong>Heaven (7)</strong>
+            <span>{heaven ?? "None"}</span>
+          </div>
+        </div>
 
+        <div className="hud-actions">
+          <button
+            onClick={() => startReaction("J")}
+            disabled={!thumbmaster || reaction}
+          >
+            START J
+          </button>
+          <button
+            onClick={() => startReaction("7")}
+            disabled={!heaven || reaction}
+          >
+            START 7
+          </button>
+          <button className="reset" onClick={resetGame}>
+            RESET
+          </button>
         </div>
       </div>
     </div>
