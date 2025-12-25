@@ -43,15 +43,16 @@ export default function App() {
   const [queen, setQueen] = useState(null);
 
   const [reaction, setReaction] = useState(null);
+
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
-  // MATES (directed)
+  // Directed mate links
   const [mates, setMates] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
-  const [selectMate, setSelectMate] = useState(null); // leader name
+  const [selectMate, setSelectMate] = useState(null);
 
   const cardsLeft = deck.length;
   const current = PLAYERS[turn];
@@ -64,6 +65,7 @@ export default function App() {
 
   function draw() {
     if (drawing || reaction || selectMate || cardsLeft === 0) return;
+
     setDrawing(true);
     setDeck(d => {
       const [c, ...rest] = d;
@@ -78,6 +80,7 @@ export default function App() {
       setTurn(t => (t + 1) % PLAYERS.length);
       return rest;
     });
+
     setTimeout(() => setDrawing(false), 280);
   }
 
@@ -85,55 +88,27 @@ export default function App() {
     setReaction({ type, reacted: new Set() });
   }
 
+  // ✅ FIXED TAP HANDLER (ONLY ONE)
   function tapPlayer(name) {
-  // 🔒 1. MATE SELECTION — ABSOLUTE PRIORITY
-  if (selectMate) {
-    if (name !== selectMate) {
-      setMates(m => ({
-        ...m,
-        [selectMate]: [...m[selectMate], name],
-      }));
+    // 1️⃣ Mate selection — absolute priority
+    if (selectMate) {
+      if (name !== selectMate) {
+        setMates(m => ({
+          ...m,
+          [selectMate]: [...m[selectMate], name],
+        }));
+      }
+      setSelectMate(null);
+      return;
     }
-    setSelectMate(null);
-    return;
-  }
 
-  // 🔒 2. REACTION MODE (J / 7 ACTIVE)
-  if (reaction) {
-    if (reaction.reacted.has(name)) return;
-
-    const next = new Set(reaction.reacted);
-    next.add(name);
-
-    if (next.size === PLAYERS.length) {
-      drink(name);
-      setReaction(null);
-    } else {
-      setReaction({ ...reaction, reacted: next });
-    }
-    return;
-  }
-
-  // 🔒 3. TRIGGER POWERS (TAP YOURSELF ONLY)
-  if (name === thumb) {
-    startReaction("J");
-    return;
-  }
-
-  if (name === heaven) {
-    startReaction("7");
-    return;
-  }
-
-  // 🔒 4. NORMAL DRINK
-  drink(name);
-  }
-
-    // Reaction mode
+    // 2️⃣ Reaction mode (J / 7 active)
     if (reaction) {
       if (reaction.reacted.has(name)) return;
+
       const next = new Set(reaction.reacted);
       next.add(name);
+
       if (next.size === PLAYERS.length) {
         drink(name);
         setReaction(null);
@@ -143,10 +118,18 @@ export default function App() {
       return;
     }
 
-    // Trigger J / 7 by tapping your own tile
-    if (name === thumb) return startReaction("J");
-    if (name === heaven) return startReaction("7");
+    // 3️⃣ Trigger powers (tap yourself only)
+    if (name === thumb) {
+      startReaction("J");
+      return;
+    }
 
+    if (name === heaven) {
+      startReaction("7");
+      return;
+    }
+
+    // 4️⃣ Normal drink
     drink(name);
   }
 
@@ -155,19 +138,20 @@ export default function App() {
     const chains = [];
     const visited = new Set();
 
-    function dfs(start, node, path) {
+    function dfs(node, path) {
       if (visited.has(node)) return;
       visited.add(node);
+
       const next = mates[node] || [];
-      if (next.length === 0) {
+      if (!next.length) {
         chains.push(path);
       } else {
-        next.forEach(n => dfs(start, n, [...path, n]));
+        next.forEach(n => dfs(n, [...path, n]));
       }
     }
 
     Object.keys(mates).forEach(p => {
-      if (mates[p].length) dfs(p, p, [p]);
+      if (mates[p].length) dfs(p, [p]);
     });
 
     return chains;
@@ -181,20 +165,20 @@ export default function App() {
       <div className="stage">
         {/* INFO PANEL */}
         <div className="info">
-          <div className="info-row"><span className="label">Turn</span><span>{current}</span></div>
-          <div className="info-row"><span className="label">Deck</span><span>{52 - cardsLeft}/52</span></div>
+          <div className="info-row"><span>Turn</span><span>{current}</span></div>
+          <div className="info-row"><span>Deck</span><span>{52 - cardsLeft}/52</span></div>
 
           <div className="divider" />
 
-          <div className="info-row"><span className="badge j">J</span><span>{thumb ?? "—"}</span></div>
-          <div className="info-row"><span className="badge h">7</span><span>{heaven ?? "—"}</span></div>
-          <div className="info-row"><span className="badge q">Q</span><span>{queen ?? "—"}</span></div>
+          <div className="info-row"><span>J</span><span>{thumb ?? "—"}</span></div>
+          <div className="info-row"><span>7</span><span>{heaven ?? "—"}</span></div>
+          <div className="info-row"><span>Q</span><span>{queen ?? "—"}</span></div>
 
           {mateChains.length > 0 && (
             <>
               <div className="divider" />
               {mateChains.map((c, i) => (
-                <div key={i} className="info-row chain">
+                <div key={i} className="info-row">
                   🤝 {c.join(" → ")}
                 </div>
               ))}
@@ -223,20 +207,19 @@ export default function App() {
           >
             <div className="video" />
             <div className="row">
-              <span className="name">{p}</span>
-              <span className="count">🍺 {beers[p]}</span>
+              <span>{p}</span>
+              <span>🍺 {beers[p]}</span>
             </div>
             <div className="roles">
-              {p === thumb && <span className="role j">J</span>}
-              {p === heaven && <span className="role h">7</span>}
-              {p === queen && <span className="role q">Q</span>}
+              {p === thumb && <span>J</span>}
+              {p === heaven && <span>7</span>}
+              {p === queen && <span>Q</span>}
             </div>
             {(reaction || selectMate) && <div className="tap">TAP</div>}
           </button>
         ))}
       </div>
 
-      {/* ACTION */}
       <div className="action">
         <button onClick={() => window.location.reload()}>Reset</button>
       </div>
