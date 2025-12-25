@@ -4,7 +4,7 @@ const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex", "Kyle", "Sam"]
 
 const CARD_RULES = {
   A: ["Waterfall"],
-  "2": ["You"],
+  "2": ["You", "Pick someone to drink"],
   "3": ["Me"],
   "4": ["Whores", "Everyone drinks"],
   "5": ["Guys"],
@@ -49,11 +49,13 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
-  // Directed mate graph: A -> [B, C]
+  // Directed mates
   const [mates, setMates] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
-  const [selectMate, setSelectMate] = useState(null);
+
+  const [selectMate, setSelectMate] = useState(null);     // for 8
+  const [selectTarget, setSelectTarget] = useState(null); // for 2
 
   const cardsLeft = deck.length;
   const current = PLAYERS[turn];
@@ -61,7 +63,7 @@ export default function App() {
   const cardRules = currentRank ? CARD_RULES[currentRank] : [];
 
   /* -------------------------------------------------- */
-  /* 🍺 DRINK WITH TRUE CASCADING PROPAGATION            */
+  /* 🍺 DRINK CASCADE                                  */
   /* -------------------------------------------------- */
 
   function drinkCascade(start) {
@@ -85,7 +87,7 @@ export default function App() {
   /* -------------------------------------------------- */
 
   function draw() {
-    if (drawing || reaction || selectMate || cardsLeft === 0) return;
+    if (drawing || reaction || selectMate || selectTarget || cardsLeft === 0) return;
 
     setDrawing(true);
     setDeck(d => {
@@ -97,6 +99,7 @@ export default function App() {
       if (r === "7") setHeaven(current);
       if (r === "Q") setQueen(current);
       if (r === "8") setSelectMate(current);
+      if (r === "2") setSelectTarget(current);
 
       setTurn(t => (t + 1) % PLAYERS.length);
       return rest;
@@ -119,7 +122,7 @@ export default function App() {
   /* -------------------------------------------------- */
 
   function tapPlayer(name) {
-    // 1️⃣ Mate selection (modal)
+    // 1️⃣ Pick mate (8)
     if (selectMate) {
       if (name !== selectMate) {
         setMates(m => ({
@@ -131,7 +134,16 @@ export default function App() {
       return;
     }
 
-    // 2️⃣ Reaction in progress (owner excluded)
+    // 2️⃣ Pick target (2)
+    if (selectTarget) {
+      if (name !== selectTarget) {
+        drinkCascade(name);
+      }
+      setSelectTarget(null);
+      return;
+    }
+
+    // 3️⃣ Reaction in progress (owner excluded)
     if (reaction) {
       if (name === reaction.owner) return;
       if (reaction.reacted.has(name)) return;
@@ -142,7 +154,6 @@ export default function App() {
       const racers = PLAYERS.filter(p => p !== reaction.owner);
 
       if (next.size === racers.length) {
-        // last non-owner drinks → cascade correctly
         drinkCascade(name);
         setReaction(null);
       } else {
@@ -151,7 +162,7 @@ export default function App() {
       return;
     }
 
-    // 3️⃣ Trigger powers (holder taps self)
+    // 4️⃣ Trigger powers
     if (name === thumb) {
       startReaction("J", name);
       return;
@@ -162,12 +173,12 @@ export default function App() {
       return;
     }
 
-    // 4️⃣ Normal drink → cascade
+    // 5️⃣ Normal drink
     drinkCascade(name);
   }
 
   /* -------------------------------------------------- */
-  /* 🔗 MATE CHAINS (INFO ONLY, NOT OWNERSHIP)          */
+  /* 🔗 MATE CHAINS (INFO ONLY)                         */
   /* -------------------------------------------------- */
 
   const mateChains = useMemo(() => {
@@ -245,7 +256,7 @@ export default function App() {
               {p === heaven && <span>7</span>}
               {p === queen && <span>Q</span>}
             </div>
-            {(reaction || selectMate) && <div className="tap">TAP</div>}
+            {(reaction || selectMate || selectTarget) && <div className="tap">TAP</div>}
           </button>
         ))}
       </div>
