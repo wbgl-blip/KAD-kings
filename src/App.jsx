@@ -85,23 +85,23 @@ export default function App() {
     setReaction({ type, reacted: new Set() });
   }
 
-  function tapPlayer(name) 
   function tapPlayer(name) {
-  // 🔒 1. MATE SELECTION IS ABSOLUTE
+  // 🔒 1. MATE SELECTION — ABSOLUTE PRIORITY
   if (selectMate) {
     if (name !== selectMate) {
       setMates(m => ({
         ...m,
-        [selectMate]: [...m[selectMate], name]
+        [selectMate]: [...m[selectMate], name],
       }));
     }
     setSelectMate(null);
     return;
   }
 
-  // 🔒 2. REACTION MODE (J / 7 active)
+  // 🔒 2. REACTION MODE (J / 7 ACTIVE)
   if (reaction) {
     if (reaction.reacted.has(name)) return;
+
     const next = new Set(reaction.reacted);
     next.add(name);
 
@@ -114,11 +114,12 @@ export default function App() {
     return;
   }
 
-  // 🔒 3. TRIGGER POWERS (tap YOURSELF only)
+  // 🔒 3. TRIGGER POWERS (TAP YOURSELF ONLY)
   if (name === thumb) {
     startReaction("J");
     return;
   }
+
   if (name === heaven) {
     startReaction("7");
     return;
@@ -127,10 +128,6 @@ export default function App() {
   // 🔒 4. NORMAL DRINK
   drink(name);
   }
-      }
-      setSelectMate(null);
-      return;
-    }
 
     // Reaction mode
     if (reaction) {
