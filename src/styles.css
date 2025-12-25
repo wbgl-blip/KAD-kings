@@ -2,7 +2,7 @@
 body {
   margin: 0;
   background: #0b0b0b;
-  color: white;
+  color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -13,27 +13,54 @@ body {
 
 h1 {
   text-align: center;
-  margin: 4px 0 8px;
+  margin: 4px 0 10px;
   font-size: 28px;
   font-weight: 900;
 }
 
-/* STACK */
-.stack-wrap {
-  position: relative;
+/* STAGE */
+.stage {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* INFO PANEL */
+.info {
+  font-size: 12px;
+  color: #fff;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.label {
+  opacity: 0.7;
+}
+.divider {
+  height: 8px;
+}
+.badge {
+  display: inline-block;
+  width: 18px;
+  text-align: center;
+  font-weight: 900;
+}
+.badge.j { color: #c084fc; }
+.badge.h { color: #38bdf8; }
+.badge.q { color: #facc15; }
+
+/* CARD */
+.card-wrap {
+  display: flex;
+  justify-content: center;
+}
+.card {
   width: 160px;
   height: 200px;
-  margin: 0 auto 6px;
-}
-.stack-back {
-  position: absolute;
-  inset: 0;
-  background: #111;
-  border-radius: 18px;
-}
-.stack-card {
-  position: absolute;
-  inset: 0;
   background: #f4f4f5;
   color: #000;
   border-radius: 18px;
@@ -43,21 +70,12 @@ h1 {
   align-items: center;
 }
 .card-face {
-  font-size: 46px;
+  font-size: 48px;
   font-weight: 900;
 }
 .card-meta {
   font-size: 12px;
   opacity: 0.6;
-}
-
-/* INFO */
-.info-strip {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  opacity: 0.7;
-  margin-bottom: 6px;
 }
 
 /* PLAYERS */
@@ -67,10 +85,10 @@ h1 {
   gap: 6px;
 }
 .player {
-  background: #111;
+  background: #121212;
   border-radius: 14px;
   padding: 6px;
-  text-align: left;
+  color: #fff;
 }
 .player.active {
   outline: 2px solid #22c55e;
@@ -78,7 +96,7 @@ h1 {
 .video {
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: #222;
+  background: #1e1e1e;
   border-radius: 10px;
   margin-bottom: 4px;
 }
@@ -87,44 +105,43 @@ h1 {
   justify-content: space-between;
   font-size: 12px;
 }
-.badges {
+.name {
+  font-weight: 700;
+}
+.count {
+  color: #cfcfcf;
+}
+.roles {
   font-size: 11px;
-  opacity: 0.7;
+  margin-top: 2px;
+}
+.role {
+  margin-right: 4px;
+  font-weight: 900;
+}
+.role.j { color: #c084fc; }
+.role.h { color: #38bdf8; }
+.role.q { color: #facc15; }
+
+.tap {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+  opacity: 0.9;
 }
 
-/* ACTION BAR */
-.action-bar {
+/* ACTION */
+.action {
   position: fixed;
   bottom: 8px;
-  left: 8px;
   right: 8px;
-  display: flex;
-  justify-content: space-between;
 }
-.action-bar button {
-  background: #1a1a1a;
-  color: white;
+.action button {
+  background: #f4f4f5;
+  color: #000;
   border: none;
   border-radius: 14px;
   padding: 12px 18px;
-  font-weight: 800;
-}
-
-/* OVERLAY */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: grid;
-  place-items: center;
-}
-.menu {
-  background: #111;
-  padding: 16px;
-  border-radius: 14px;
-  width: 80%;
-}
-.menu button {
-  width: 100%;
-  margin-top: 8px;
+  font-weight: 900;
 }
