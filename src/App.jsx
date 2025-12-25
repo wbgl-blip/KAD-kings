@@ -85,14 +85,48 @@ export default function App() {
     setReaction({ type, reacted: new Set() });
   }
 
+  function tapPlayer(name) 
   function tapPlayer(name) {
-    // Mate selection
-    if (selectMate) {
-      if (name !== selectMate) {
-        setMates(m => ({
-          ...m,
-          [selectMate]: [...m[selectMate], name]
-        }));
+  // 🔒 1. MATE SELECTION IS ABSOLUTE
+  if (selectMate) {
+    if (name !== selectMate) {
+      setMates(m => ({
+        ...m,
+        [selectMate]: [...m[selectMate], name]
+      }));
+    }
+    setSelectMate(null);
+    return;
+  }
+
+  // 🔒 2. REACTION MODE (J / 7 active)
+  if (reaction) {
+    if (reaction.reacted.has(name)) return;
+    const next = new Set(reaction.reacted);
+    next.add(name);
+
+    if (next.size === PLAYERS.length) {
+      drink(name);
+      setReaction(null);
+    } else {
+      setReaction({ ...reaction, reacted: next });
+    }
+    return;
+  }
+
+  // 🔒 3. TRIGGER POWERS (tap YOURSELF only)
+  if (name === thumb) {
+    startReaction("J");
+    return;
+  }
+  if (name === heaven) {
+    startReaction("7");
+    return;
+  }
+
+  // 🔒 4. NORMAL DRINK
+  drink(name);
+  }
       }
       setSelectMate(null);
       return;
