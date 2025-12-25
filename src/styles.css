@@ -21,7 +21,7 @@ h1 {
 /* STAGE */
 .stage {
   display: grid;
-  grid-template-columns: 110px 1fr;
+  grid-template-columns: 120px 1fr;
   gap: 10px;
   align-items: center;
   margin-bottom: 10px;
@@ -30,12 +30,15 @@ h1 {
 /* INFO PANEL */
 .info {
   font-size: 12px;
-  color: #fff;
 }
 .info-row {
   display: flex;
   justify-content: space-between;
   margin-bottom: 4px;
+}
+.info-row.chain {
+  font-size: 11px;
+  opacity: 0.85;
 }
 .label {
   opacity: 0.7;
@@ -44,7 +47,6 @@ h1 {
   height: 8px;
 }
 .badge {
-  display: inline-block;
   width: 18px;
   text-align: center;
   font-weight: 900;
@@ -64,18 +66,20 @@ h1 {
   background: #f4f4f5;
   color: #000;
   border-radius: 18px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 .card-face {
-  font-size: 48px;
+  font-size: 46px;
   font-weight: 900;
 }
-.card-meta {
-  font-size: 12px;
-  opacity: 0.6;
+.card-rule {
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 4px;
 }
 
 /* PLAYERS */
@@ -128,7 +132,6 @@ h1 {
   font-size: 11px;
   font-weight: 900;
   text-align: center;
-  opacity: 0.9;
 }
 
 /* ACTION */
