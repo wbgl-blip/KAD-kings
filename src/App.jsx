@@ -42,13 +42,14 @@ export default function App() {
   const [heaven, setHeaven] = useState(null);
   const [queen, setQueen] = useState(null);
 
+  // reaction = { type, owner, reacted:Set }
   const [reaction, setReaction] = useState(null);
 
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
-  // Directed mate links
+  // Directed mate graph: A -> [B, C]
   const [mates, setMates] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
@@ -59,9 +60,29 @@ export default function App() {
   const currentRank = card ? rankOf(card) : null;
   const cardRules = currentRank ? CARD_RULES[currentRank] : [];
 
-  function drink(name) {
-    setBeers(b => ({ ...b, [name]: b[name] + 1 }));
+  /* -------------------------------------------------- */
+  /* 🍺 DRINK WITH TRUE CASCADING PROPAGATION            */
+  /* -------------------------------------------------- */
+
+  function drinkCascade(start) {
+    const visited = new Set();
+
+    function walk(player) {
+      if (visited.has(player)) return;
+      visited.add(player);
+
+      setBeers(b => ({
+        ...b,
+        [player]: b[player] + 1,
+      }));
+
+      (mates[player] || []).forEach(walk);
+    }
+
+    walk(start);
   }
+
+  /* -------------------------------------------------- */
 
   function draw() {
     if (drawing || reaction || selectMate || cardsLeft === 0) return;
@@ -81,16 +102,24 @@ export default function App() {
       return rest;
     });
 
-    setTimeout(() => setDrawing(false), 280);
+    setTimeout(() => setDrawing(false), 250);
   }
 
-  function startReaction(type) {
-    setReaction({ type, reacted: new Set() });
+  function startReaction(type, owner) {
+    if (reaction) return;
+    setReaction({
+      type,
+      owner,
+      reacted: new Set(),
+    });
   }
 
-  // ✅ FIXED TAP HANDLER (ONLY ONE)
+  /* -------------------------------------------------- */
+  /* 👆 TAP HANDLER — SINGLE SOURCE OF TRUTH             */
+  /* -------------------------------------------------- */
+
   function tapPlayer(name) {
-    // 1️⃣ Mate selection — absolute priority
+    // 1️⃣ Mate selection (modal)
     if (selectMate) {
       if (name !== selectMate) {
         setMates(m => ({
@@ -102,15 +131,19 @@ export default function App() {
       return;
     }
 
-    // 2️⃣ Reaction mode (J / 7 active)
+    // 2️⃣ Reaction in progress (owner excluded)
     if (reaction) {
+      if (name === reaction.owner) return;
       if (reaction.reacted.has(name)) return;
 
       const next = new Set(reaction.reacted);
       next.add(name);
 
-      if (next.size === PLAYERS.length) {
-        drink(name);
+      const racers = PLAYERS.filter(p => p !== reaction.owner);
+
+      if (next.size === racers.length) {
+        // last non-owner drinks → cascade correctly
+        drinkCascade(name);
         setReaction(null);
       } else {
         setReaction({ ...reaction, reacted: next });
@@ -118,30 +151,29 @@ export default function App() {
       return;
     }
 
-    // 3️⃣ Trigger powers (tap yourself only)
+    // 3️⃣ Trigger powers (holder taps self)
     if (name === thumb) {
-      startReaction("J");
+      startReaction("J", name);
       return;
     }
 
     if (name === heaven) {
-      startReaction("7");
+      startReaction("7", name);
       return;
     }
 
-    // 4️⃣ Normal drink
-    drink(name);
+    // 4️⃣ Normal drink → cascade
+    drinkCascade(name);
   }
 
-  // Build mate chains for info panel
+  /* -------------------------------------------------- */
+  /* 🔗 MATE CHAINS (INFO ONLY, NOT OWNERSHIP)          */
+  /* -------------------------------------------------- */
+
   const mateChains = useMemo(() => {
     const chains = [];
-    const visited = new Set();
 
     function dfs(node, path) {
-      if (visited.has(node)) return;
-      visited.add(node);
-
       const next = mates[node] || [];
       if (!next.length) {
         chains.push(path);
@@ -157,13 +189,13 @@ export default function App() {
     return chains;
   }, [mates]);
 
+  /* -------------------------------------------------- */
+
   return (
     <div className="app">
       <h1>KAD Kings</h1>
 
-      {/* STAGE */}
       <div className="stage">
-        {/* INFO PANEL */}
         <div className="info">
           <div className="info-row"><span>Turn</span><span>{current}</span></div>
           <div className="info-row"><span>Deck</span><span>{52 - cardsLeft}/52</span></div>
@@ -186,7 +218,6 @@ export default function App() {
           )}
         </div>
 
-        {/* CARD */}
         <div className="card-wrap" onClick={draw}>
           <div className="card">
             <div className="card-face">{card ?? ""}</div>
@@ -197,7 +228,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* PLAYERS */}
       <div className="players">
         {PLAYERS.map(p => (
           <button
