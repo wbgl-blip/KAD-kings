@@ -49,13 +49,17 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
-  // Directed mates
+  // Directed mates: A -> [B]
   const [mates, setMates] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
 
-  const [selectMate, setSelectMate] = useState(null);     // for 8
-  const [selectTarget, setSelectTarget] = useState(null); // for 2
+  const [selectMate, setSelectMate] = useState(null);     // card 8
+  const [selectTarget, setSelectTarget] = useState(null); // card 2
+
+  // 🔥 VISUAL DRINK FEEDBACK
+  const [recentDrink, setRecentDrink] = useState([]);
+  const [drinkMessage, setDrinkMessage] = useState("");
 
   const cardsLeft = deck.length;
   const current = PLAYERS[turn];
@@ -63,15 +67,17 @@ export default function App() {
   const cardRules = currentRank ? CARD_RULES[currentRank] : [];
 
   /* -------------------------------------------------- */
-  /* 🍺 DRINK CASCADE                                  */
+  /* 🍺 DRINK CASCADE + VISUAL FEEDBACK                  */
   /* -------------------------------------------------- */
 
   function drinkCascade(start) {
     const visited = new Set();
+    const order = [];
 
     function walk(player) {
       if (visited.has(player)) return;
       visited.add(player);
+      order.push(player);
 
       setBeers(b => ({
         ...b,
@@ -82,6 +88,14 @@ export default function App() {
     }
 
     walk(start);
+
+    setRecentDrink(order);
+    setDrinkMessage(order.join(" → ") + " DRINK");
+
+    setTimeout(() => {
+      setRecentDrink([]);
+      setDrinkMessage("");
+    }, 900);
   }
 
   /* -------------------------------------------------- */
@@ -206,6 +220,12 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
+      {drinkMessage && (
+        <div className="drink-callout">
+          🍺 {drinkMessage}
+        </div>
+      )}
+
       <div className="stage">
         <div className="info">
           <div className="info-row"><span>Turn</span><span>{current}</span></div>
@@ -243,7 +263,7 @@ export default function App() {
         {PLAYERS.map(p => (
           <button
             key={p}
-            className={`player ${p === current ? "active" : ""}`}
+            className={`player ${recentDrink.includes(p) ? "drink" : ""}`}
             onClick={() => tapPlayer(p)}
           >
             <div className="video" />
