@@ -1,9 +1,7 @@
 /* =========================
    RESET + BASE
 ========================= */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -56,11 +54,12 @@ h2 {
   justify-content: center;
   box-shadow: 0 18px 36px rgba(0,0,0,0.6);
   cursor: pointer;
+  user-select: none;
 }
 
-.rank {
-  font-size: 42px;
-}
+.card:active { transform: scale(0.97); }
+
+.rank { font-size: 42px; }
 
 .rule {
   margin-top: 6px;
@@ -82,23 +81,37 @@ h2 {
   padding: 14px;
   border-radius: 18px;
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.08),
+    0 10px 24px rgba(0,0,0,0.6);
+  cursor: pointer;
+  user-select: none;
 }
 
-/* TURN OWNER */
+.name { font-size: 16px; font-weight: 800; }
+.beer { margin-top: 4px; font-size: 14px; opacity: 0.9; }
+
+/* TURN */
 .player.turn {
-  box-shadow: 0 0 0 2px #22c55e;
+  box-shadow:
+    0 0 0 2px #22c55e,
+    0 0 20px rgba(34,197,94,0.55);
 }
 
-/* ACTIVE DECISION */
+/* SELECTING */
 .player.active {
   animation: selectPulse 1.2s infinite;
-  box-shadow: 0 0 0 3px #eab308;
+  box-shadow:
+    0 0 0 3px #eab308,
+    0 0 28px rgba(234,179,8,0.85);
 }
 
-/* DRINK TARGET */
+/* DRINK */
 .player.drink {
   animation: drinkPulse 5s ease-out;
-  box-shadow: 0 0 0 3px #ef4444;
+  box-shadow:
+    0 0 0 3px #ef4444,
+    0 0 32px rgba(239,68,68,0.95);
 }
 
 /* =========================
@@ -112,6 +125,7 @@ h2 {
   font-size: 10px;
   font-weight: 900;
   color: #22c55e;
+  letter-spacing: 0.6px;
 }
 
 .player.active::after {
@@ -122,6 +136,7 @@ h2 {
   font-size: 10px;
   font-weight: 900;
   color: #facc15;
+  letter-spacing: 0.6px;
 }
 
 .player.drink::after {
@@ -160,19 +175,21 @@ h2 {
   color: white;
   font-size: 16px;
   font-weight: 900;
+  cursor: pointer;
 }
 
 /* =========================
    ANIMATIONS
 ========================= */
 @keyframes selectPulse {
-  0% { box-shadow: 0 0 0 3px #eab308; }
-  50% { box-shadow: 0 0 0 6px #facc15; }
-  100% { box-shadow: 0 0 0 3px #eab308; }
+  0% { box-shadow: 0 0 0 3px #eab308, 0 0 20px rgba(234,179,8,0.5); }
+  50% { box-shadow: 0 0 0 6px #facc15, 0 0 36px rgba(250,204,21,0.9); }
+  100% { box-shadow: 0 0 0 3px #eab308, 0 0 20px rgba(234,179,8,0.5); }
 }
 
 @keyframes drinkPulse {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  100% { opacity: 0; }
+  0% { transform: scale(0.96); opacity: 0; }
+  10% { transform: scale(1.05); opacity: 1; }
+  85% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
 }
