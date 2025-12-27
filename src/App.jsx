@@ -48,8 +48,8 @@ export default function App() {
   );
 
   const [phase, setPhase] = useState({
-    type: "IDLE",        // IDLE | SELECT_MATE | SELECT_DRINK | REACTION
-    owner: null          // player making the decision
+    type: "IDLE", // IDLE | SELECT_MATE | SELECT_DRINK | WAIT_REACTION | REACTION
+    owner: null
   });
 
   const [reaction, setReaction] = useState(null); // Set of reacted players
@@ -95,8 +95,7 @@ export default function App() {
     } else if (r === "2") {
       setPhase({ type: "SELECT_DRINK", owner: current });
     } else if (r === "7" || r === "J") {
-      setPhase({ type: "REACTION", owner: current });
-      setReaction(new Set());
+      setPhase({ type: "WAIT_REACTION", owner: current });
     } else {
       setPhase({ type: "IDLE", owner: null });
     }
@@ -109,9 +108,17 @@ export default function App() {
   ====================== */
   function tapPlayer(name) {
 
-    // REACTION MODE
+    // Owner taps to START reaction
+    if (phase.type === "WAIT_REACTION") {
+      if (name !== phase.owner) return;
+      setReaction(new Set());
+      setPhase({ type: "REACTION", owner: phase.owner });
+      return;
+    }
+
+    // Reaction in progress
     if (phase.type === "REACTION") {
-      if (name === phase.owner) return; // owner never reacts
+      if (name === phase.owner) return;
       if (reaction.has(name)) return;
 
       const next = new Set(reaction);
@@ -127,7 +134,7 @@ export default function App() {
       return;
     }
 
-    // ONLY OWNER CAN ACT
+    // Only owner can act during selection
     if (phase.owner && name !== phase.owner) return;
 
     if (phase.type === "SELECT_MATE") {
@@ -147,7 +154,7 @@ export default function App() {
       return;
     }
 
-    // NORMAL DRINK
+    // Normal drink
     propagateDrink(name);
   }
 
