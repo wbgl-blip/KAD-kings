@@ -52,7 +52,7 @@ export default function App() {
     owner: null
   });
 
-  const [reaction, setReaction] = useState(null); // Set of reacted players
+  const [reaction, setReaction] = useState(null);
   const [drinkFlash, setDrinkFlash] = useState([]);
 
   const current = PLAYERS[turn];
@@ -108,7 +108,7 @@ export default function App() {
   ====================== */
   function tapPlayer(name) {
 
-    // Owner taps to START reaction
+    // OWNER STARTS REACTION
     if (phase.type === "WAIT_REACTION") {
       if (name !== phase.owner) return;
       setReaction(new Set());
@@ -116,7 +116,7 @@ export default function App() {
       return;
     }
 
-    // Reaction in progress
+    // REACTION MODE
     if (phase.type === "REACTION") {
       if (name === phase.owner) return;
       if (reaction.has(name)) return;
@@ -134,7 +134,7 @@ export default function App() {
       return;
     }
 
-    // Only owner can act during selection
+    // ONLY OWNER CAN ACT
     if (phase.owner && name !== phase.owner) return;
 
     if (phase.type === "SELECT_MATE") {
@@ -154,7 +154,7 @@ export default function App() {
       return;
     }
 
-    // Normal drink
+    // NORMAL DRINK
     propagateDrink(name);
   }
 
@@ -169,9 +169,6 @@ export default function App() {
     return out;
   }, [mates]);
 
-  /* ======================
-     RENDER
-  ====================== */
   return (
     <div className="app">
       <h1>KAD Kings</h1>
