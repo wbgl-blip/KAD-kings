@@ -43,7 +43,6 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
-  // mates[A] = [B,C] → B & C drink whenever A drinks
   const [mates, setMates] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
@@ -54,7 +53,7 @@ export default function App() {
   const [reaction, setReaction] = useState(new Set());
   const [drinkFlash, setDrinkFlash] = useState([]);
 
-  // Waterfall readiness (Ace)
+  // Waterfall (Ace)
   // null | { starter: string, ready: Set<string>, go: boolean }
   const [waterfall, setWaterfall] = useState(null);
 
@@ -80,10 +79,12 @@ export default function App() {
   }
 
   /* ======================
-     DRAW CARD
+     DRAW CARD (LOCKED DURING WATERFALL)
   ====================== */
   function draw() {
+    // 🔒 HARD LOCKS
     if (phase.type !== "IDLE") return;
+    if (waterfall) return;
     if (!deck.length) return;
 
     const [c, ...rest] = deck;
@@ -189,7 +190,7 @@ export default function App() {
   }
 
   /* ======================
-     AUTO-CLEAR WATERFALL
+     AUTO-CLEAR WATERFALL (UNLOCK DRAW)
   ====================== */
   useEffect(() => {
     if (waterfall?.go) {
@@ -239,7 +240,7 @@ export default function App() {
       <h2>{current}’s Turn</h2>
       {statusText && <p className="status">{statusText}</p>}
 
-      <div className="card" onClick={draw}>
+      <div className={`card ${waterfall ? "locked" : ""}`} onClick={draw}>
         {card ? (
           <>
             <div className="rank">{card}</div>
