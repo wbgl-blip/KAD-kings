@@ -42,27 +42,31 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
+  // Directed mates graph
   const [mates, setMates] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
 
+  // Persistent power holders
   const [thumbHolder, setThumbHolder] = useState(null);
   const [heavenHolder, setHeavenHolder] = useState(null);
 
+  // Phase machine
   const [phase, setPhase] = useState({
     type: "IDLE", // IDLE | SELECT_MATE | SELECT_DRINK | WATERFALL_READY | WATERFALL_RUNNING | REACTION
     owner: null
   });
 
+  // Reaction state (J / 7)
   const [reaction, setReaction] = useState({
     active: false,
     owner: null,
     taps: new Set()
   });
 
+  // Waterfall state
   const [waterfall, setWaterfall] = useState({
     active: false,
-    started: false,
     starter: null,
     ready: new Set()
   });
@@ -94,7 +98,7 @@ export default function App() {
   }
 
   /* ======================
-     DRAW
+     DRAW CARD
   ====================== */
   function draw() {
     if (phase.type !== "IDLE") return;
@@ -110,12 +114,11 @@ export default function App() {
     if (r === "A") {
       setWaterfall({
         active: true,
-        started: false,
         starter: drawer,
         ready: new Set([drawer])
       });
       setPhase({ type: "WATERFALL_READY", owner: drawer });
-      return; // 🔒 turn does NOT advance
+      return; // 🔒 turn stays with drawer
     }
 
     if (r === "8") {
@@ -132,7 +135,7 @@ export default function App() {
   }
 
   /* ======================
-     START REACTION
+     START REACTION (J / 7)
   ====================== */
   function startReaction(owner) {
     setReaction({ active: true, owner, taps: new Set() });
@@ -157,7 +160,7 @@ export default function App() {
     /* ---- WATERFALL RUNNING ---- */
     if (phase.type === "WATERFALL_RUNNING") {
       if (name !== waterfall.starter) return;
-      setWaterfall({ active: false, started: false, starter: null, ready: new Set() });
+      setWaterfall({ active: false, starter: null, ready: new Set() });
       setPhase({ type: "IDLE", owner: null });
       setTurn(t => (t + 1) % PLAYERS.length);
       return;
@@ -178,6 +181,7 @@ export default function App() {
       const next = new Set(reaction.taps);
       next.add(name);
 
+      // Auto-lose if one player never taps
       if (next.size === eligible.length - 1) {
         const loser = eligible.find(p => !next.has(p));
         propagateDrink(loser);
@@ -189,7 +193,7 @@ export default function App() {
       return;
     }
 
-    /* ---- OWNER-ONLY ---- */
+    /* ---- OWNER-ONLY PHASES ---- */
     if (phase.owner && name !== phase.owner) return;
 
     if (phase.type === "SELECT_MATE") {
@@ -217,14 +221,14 @@ export default function App() {
   ====================== */
   const allReady = waterfall.active && waterfall.ready.size === PLAYERS.length;
 
-  function startWaterfall(p) {
+  function startWaterfall(name) {
     if (!allReady) return;
-    if (p !== waterfall.starter) return;
-    setPhase({ type: "WATERFALL_RUNNING", owner: p });
+    if (name !== waterfall.starter) return;
+    setPhase({ type: "WATERFALL_RUNNING", owner: name });
   }
 
   /* ======================
-     MATES DISPLAY
+     MATE DISPLAY
   ====================== */
   const mateChains = useMemo(() => {
     const out = [];
@@ -244,7 +248,7 @@ export default function App() {
 
       {phase.type === "WATERFALL_READY" && (
         <div className="status">
-          Waterfall — READY ({waterfall.ready.size}/{PLAYERS.length}) — {waterfall.starter} taps self to START
+          Waterfall — READY ({waterfall.ready.size}/{PLAYERS.length}) — {waterfall.starter} starts
         </div>
       )}
 
@@ -262,11 +266,10 @@ export default function App() {
 
       <div className="players">
         {PLAYERS.map(p => {
+          const isReady = waterfall.ready.has(p);
           const isActive =
             p === phase.owner ||
             (phase.type === "WATERFALL_READY" && allReady && p === waterfall.starter);
-
-          const isReady = waterfall.ready.has(p);
 
           return (
             <div
@@ -310,4 +313,4 @@ export default function App() {
       </button>
     </div>
   );
-}
+        }
