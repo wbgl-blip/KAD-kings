@@ -1,6 +1,5 @@
-// src/App.jsx
 import { useMemo, useState } from "react";
-import "./index.css";
+import "./styles.css";
 
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex", "Kyle", "Sam"];
 
@@ -50,7 +49,6 @@ export default function App() {
   );
 
   // IDLE | SELECT_MATE | SELECT_DRINK | REACTION
-  // owner = player who must make the next decision (or who triggered reaction)
   const [phase, setPhase] = useState({ type: "IDLE", owner: null });
 
   // Reaction tracking: Set of players (excluding owner) who have reacted
@@ -66,7 +64,7 @@ export default function App() {
      DRINK + PROPAGATION
   ====================== */
   function drink(name) {
-    setBeers((b) => ({ ...b, [name]: b[name] + 1 }));
+    setBeers((b) => ({ ...b, [name]: (b[name] ?? 0) + 1 }));
 
     setDrinkFlash((f) => (f.includes(name) ? f : [...f, name]));
     setTimeout(() => {
@@ -74,7 +72,6 @@ export default function App() {
     }, 5000);
   }
 
-  // Drink propagation through mate graph (avoid infinite loops)
   function propagateDrink(name, visited = new Set()) {
     if (visited.has(name)) return;
     visited.add(name);
@@ -90,21 +87,20 @@ export default function App() {
     if (phase.type !== "IDLE") return;
     if (deck.length === 0) return;
 
+    const drawer = current;
+
     const [c, ...rest] = deck;
     setDeck(rest);
     setCard(c);
 
     const r = rankOf(c);
 
-    // IMPORTANT: capture the player who drew (current BEFORE turn increments)
-    const drawer = current;
-
     if (r === "8") {
       setPhase({ type: "SELECT_MATE", owner: drawer });
     } else if (r === "2") {
       setPhase({ type: "SELECT_DRINK", owner: drawer });
     } else if (r === "7" || r === "J") {
-      // Reaction starts immediately; owner does NOT react.
+      // Reaction begins immediately; owner does NOT react.
       setReaction(new Set());
       setPhase({ type: "REACTION", owner: drawer });
     } else {
@@ -120,21 +116,17 @@ export default function App() {
   function tapPlayer(name) {
     // REACTION MODE
     if (phase.type === "REACTION") {
-      // Owner never reacts
-      if (name === phase.owner) return;
-
-      // Already reacted
+      if (name === phase.owner) return; // owner never reacts
       if (reaction.has(name)) return;
 
       const next = new Set(reaction);
       next.add(name);
 
-      // Everyone except owner must react (PLAYERS.length - 1)
+      // Everyone except owner must react
       if (next.size === PLAYERS.length - 1) {
         // Last reactor drinks (with mate propagation)
         propagateDrink(name);
 
-        // Reset to idle
         setReaction(new Set());
         setPhase({ type: "IDLE", owner: null });
       } else {
@@ -147,15 +139,11 @@ export default function App() {
     if (phase.owner && name !== phase.owner) return;
 
     if (phase.type === "SELECT_MATE") {
-      // Owner picks someone else as mate (additive; does not replace)
       if (name !== phase.owner) {
         setMates((m) => {
           const existing = m[phase.owner] || [];
           if (existing.includes(name)) return m; // no dupes
-          return {
-            ...m,
-            [phase.owner]: [...existing, name],
-          };
+          return { ...m, [phase.owner]: [...existing, name] };
         });
         setPhase({ type: "IDLE", owner: null });
       }
@@ -163,13 +151,12 @@ export default function App() {
     }
 
     if (phase.type === "SELECT_DRINK") {
-      // Owner chooses who drinks (target can be anyone, including self)
       propagateDrink(name);
       setPhase({ type: "IDLE", owner: null });
       return;
     }
 
-    // Normal mode: tapping a player triggers a drink event for that player (+ mates)
+    // Normal mode
     propagateDrink(name);
   }
 
@@ -189,7 +176,7 @@ export default function App() {
       <h1>KAD Kings</h1>
       <h2>{current}’s Turn</h2>
 
-      <div className="card" onClick={draw} role="button" tabIndex={0}>
+      <div className="card" onClick={draw}>
         {card ? (
           <>
             <div className="rank">{card}</div>
@@ -210,8 +197,6 @@ export default function App() {
               ${drinkFlash.includes(p) ? "drink" : ""}
             `}
             onClick={() => tapPlayer(p)}
-            role="button"
-            tabIndex={0}
           >
             <div className="name">{p}</div>
             <div className="beer">🍺 {beers[p]}</div>
