@@ -10,11 +10,11 @@ const CARD_RULES = {
   4: "Everyone drinks",
   5: "Guys",
   6: "Everyone drinks",
-  7: "Heaven (Reaction)",
+  7: "Heaven (Power)",
   8: "Pick a Mate",
   9: "Rhyme",
   10: "Categories",
-  J: "Thumbmaster (Reaction)",
+  J: "Thumbmaster (Power)",
   Q: "Question Master",
   K: "Make a Rule",
 };
@@ -34,6 +34,11 @@ function buildDeck() {
 
 const rankOf = c => c.replace(/[^A-Z0-9]/g, "");
 
+function leftOf(name) {
+  const i = PLAYERS.indexOf(name);
+  return PLAYERS[(i + 1) % PLAYERS.length];
+}
+
 export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [card, setCard] = useState(null);
@@ -43,6 +48,7 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
+  // Directed mates graph: mates[A] = [B,C] => B and C drink when A drinks
   const [mates, setMates] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
@@ -52,15 +58,32 @@ export default function App() {
    * IDLE
    * SELECT_MATE
    * SELECT_DRINK
-   * HOLD_REACTION
    * REACTION
    * WATERFALL_READY
    * WATERFALL_ACTIVE
    */
   const [phase, setPhase] = useState({ type: "IDLE", owner: null });
 
-  const [reactionTaps, setReactionTaps] = useState(new Set());
-  const [waterfallReady, setWaterfallReady] = useState(new Set());
+  // Persistent powers (transfer only when next same card drawn)
+  const [thumbHolder, setThumbHolder] = useState(null);   // J
+  const [heavenHolder, setHeavenHolder] = useState(null); // 7
+
+  // Reaction info
+  const [reaction, setReaction] = useState({
+    active: false,
+    type: null,     // "J" | "7"
+    owner: null,    // holder who started it (excluded)
+    taps: new Set() // tapped eligible players
+  });
+
+  // Waterfall state
+  const [waterfall, setWaterfall] = useState({
+    active: false,     // any waterfall mode
+    started: false,    // actually started
+    starter: null,     // who drew the Ace (keeps turn)
+    ready: new Set(),  // players who are ready
+  });
+
   const [drinkFlash, setDrinkFlash] = useState([]);
 
   const current = PLAYERS[turn];
@@ -81,7 +104,7 @@ export default function App() {
     if (visited.has(name)) return;
     visited.add(name);
     drink(name);
-    mates[name]?.forEach(m => propagateDrink(m, visited));
+    (mates[name] || []).forEach(m => propagateDrink(m, visited));
   }
 
   /* ======================
@@ -89,6 +112,8 @@ export default function App() {
   ====================== */
   function draw() {
     if (phase.type !== "IDLE") return;
+    if (reaction.active) return;
+    if (waterfall.active) return;
     if (!deck.length) return;
 
     const drawer = current;
@@ -99,104 +124,187 @@ export default function App() {
 
     const r = rankOf(c);
 
+    // A: Waterfall locks turn until done (turn does NOT advance now)
     if (r === "A") {
-      setWaterfallReady(new Set([drawer]));
+      setWaterfall({
+        active: true,
+        started: false,
+        starter: drawer,
+        ready: new Set([drawer]), // starter auto-ready
+      });
       setPhase({ type: "WATERFALL_READY", owner: drawer });
-      return; // DO NOT ADVANCE TURN
+      return;
     }
 
+    // J / 7: transfer power only (NO phase, NO reaction)
+    if (r === "J") setThumbHolder(drawer);
+    if (r === "7") setHeavenHolder(drawer);
+
+    // 8: select mate (additive)
     if (r === "8") {
       setPhase({ type: "SELECT_MATE", owner: drawer });
-    } else if (r === "2") {
-      setPhase({ type: "SELECT_DRINK", owner: drawer });
-    } else if (r === "7" || r === "J") {
-      setReactionTaps(new Set());
-      setPhase({ type: "HOLD_REACTION", owner: drawer });
-    } else {
-      setPhase({ type: "IDLE", owner: null });
+      setTurn(t => (t + 1) % PLAYERS.length);
+      return;
     }
 
+    // 2: select drink target
+    if (r === "2") {
+      setPhase({ type: "SELECT_DRINK", owner: drawer });
+      setTurn(t => (t + 1) % PLAYERS.length);
+      return;
+    }
+
+    // Everything else: no enforced action
+    setPhase({ type: "IDLE", owner: null });
     setTurn(t => (t + 1) % PLAYERS.length);
+  }
+
+  /* ======================
+     START REACTION (MANUAL)
+  ====================== */
+  function startReaction(type, owner) {
+    // type: "J" | "7"
+    setReaction({
+      active: true,
+      type,
+      owner,
+      taps: new Set(),
+    });
+    setPhase({ type: "REACTION", owner }); // for visuals ("SELECTING" on owner)
   }
 
   /* ======================
      TAP PLAYER
   ====================== */
   function tapPlayer(name) {
-
-    /* ----- WATERFALL READY ----- */
+    /* -------- WATERFALL READY -------- */
     if (phase.type === "WATERFALL_READY") {
-      const next = new Set(waterfallReady);
-      next.add(name);
-      setWaterfallReady(next);
+      // Ready-up should be a self-confirmation: tap your own tile
+      const isSelfTap = true; // UI is local; keep simple: allow tap any tile? NO. Self only is cleaner.
+      if (isSelfTap && name !== name) return; // no-op (kept for clarity)
 
-      if (next.size === PLAYERS.length) {
-        setPhase({ type: "WATERFALL_ACTIVE", owner: phase.owner });
-      }
+      setWaterfall(w => {
+        const next = new Set(w.ready);
+        next.add(name);
+        const allReady = next.size === PLAYERS.length;
+        return { ...w, ready: next, started: w.started, active: w.active };
+      });
+
+      // When all ready, starter must tap themselves to START (handled below)
       return;
     }
 
-    /* ----- WATERFALL ACTIVE ----- */
+    /* -------- WATERFALL ACTIVE / START -------- */
     if (phase.type === "WATERFALL_ACTIVE") {
-      if (name !== phase.owner) return;
-      setWaterfallReady(new Set());
+      // Starter taps self to END waterfall
+      if (name !== waterfall.starter) return;
+
+      setWaterfall({ active: false, started: false, starter: null, ready: new Set() });
       setPhase({ type: "IDLE", owner: null });
+      // NOW advance turn once (starter kept the turn until done)
       setTurn(t => (t + 1) % PLAYERS.length);
       return;
     }
 
-    /* ----- HOLDER STARTS REACTION ----- */
-    if (phase.type === "HOLD_REACTION") {
-      if (name !== phase.owner) return;
-      setReactionTaps(new Set());
-      setPhase({ type: "REACTION", owner: phase.owner });
-      return;
-    }
+    /* -------- REACTION ACTIVE -------- */
+    if (reaction.active && phase.type === "REACTION") {
+      if (name === reaction.owner) return; // owner excluded
+      if (reaction.taps.has(name)) return;
 
-    /* ----- REACTION RACE ----- */
-    if (phase.type === "REACTION") {
-      if (name === phase.owner) return;
-      if (reactionTaps.has(name)) return;
-
-      const eligible = PLAYERS.filter(p => p !== phase.owner);
-      const next = new Set(reactionTaps);
+      const eligible = PLAYERS.filter(p => p !== reaction.owner);
+      const next = new Set(reaction.taps);
       next.add(name);
 
+      // AUTO-LOSE: if only one eligible hasn't tapped
       if (next.size === eligible.length - 1) {
         const loser = eligible.find(p => !next.has(p));
         propagateDrink(loser);
-        setReactionTaps(new Set());
+
+        // End reaction
+        setReaction({ active: false, type: null, owner: null, taps: new Set() });
         setPhase({ type: "IDLE", owner: null });
       } else {
-        setReactionTaps(next);
+        setReaction(r => ({ ...r, taps: next }));
       }
       return;
     }
 
-    /* ----- OWNER-ONLY PHASES ----- */
-    if (phase.owner && name !== phase.owner) return;
+    /* -------- MANUAL POWER TRIGGERS (ONLY IN IDLE) -------- */
+    if (phase.type === "IDLE" && !waterfall.active && !reaction.active) {
+      // Holder taps self to start
+      if (name === thumbHolder) {
+        startReaction("J", name);
+        return;
+      }
+      if (name === heavenHolder) {
+        startReaction("7", name);
+        return;
+      }
+    }
 
+    /* -------- SELECT MATE -------- */
     if (phase.type === "SELECT_MATE") {
       if (name !== phase.owner) {
-        setMates(m => ({
-          ...m,
-          [phase.owner]: m[phase.owner].includes(name)
-            ? m[phase.owner]
-            : [...m[phase.owner], name],
-        }));
+        setMates(m => {
+          const existing = m[phase.owner] || [];
+          if (existing.includes(name)) return m;
+          return { ...m, [phase.owner]: [...existing, name] };
+        });
         setPhase({ type: "IDLE", owner: null });
       }
       return;
     }
 
+    /* -------- SELECT DRINK -------- */
     if (phase.type === "SELECT_DRINK") {
       propagateDrink(name);
       setPhase({ type: "IDLE", owner: null });
       return;
     }
 
+    /* -------- NORMAL DRINK -------- */
     propagateDrink(name);
   }
+
+  /* ======================
+     WATERFALL START CHECK
+  ====================== */
+  const allReady = waterfall.active && waterfall.ready.size === PLAYERS.length;
+
+  function tapStartWaterfall(name) {
+    if (phase.type !== "WATERFALL_READY") return;
+    if (!allReady) return;
+    if (name !== waterfall.starter) return;
+
+    setWaterfall(w => ({ ...w, started: true }));
+    setPhase({ type: "WATERFALL_ACTIVE", owner: waterfall.starter });
+  }
+
+  /* ======================
+     STATUS TEXT
+  ====================== */
+  const statusText = (() => {
+    if (phase.type === "WATERFALL_READY") {
+      if (!allReady) return `Waterfall — READY (${waterfall.ready.size}/${PLAYERS.length})`;
+      return `${waterfall.starter} — tap yourself to START Waterfall`;
+    }
+    if (phase.type === "WATERFALL_ACTIVE") {
+      return `Waterfall active — ${waterfall.starter} taps to end`;
+    }
+    if (reaction.active && phase.type === "REACTION") {
+      const eligible = PLAYERS.length - 1;
+      return `${reaction.type} Reaction — ${reaction.taps.size}/${eligible} tapped (last auto-loses)`;
+    }
+    if (phase.type === "SELECT_MATE") return `${phase.owner} — choose a mate`;
+    if (phase.type === "SELECT_DRINK") return `${phase.owner} — choose who drinks`;
+    if (thumbHolder || heavenHolder) {
+      const parts = [];
+      if (thumbHolder) parts.push(`J: ${thumbHolder}`);
+      if (heavenHolder) parts.push(`7: ${heavenHolder}`);
+      return parts.join("  •  ");
+    }
+    return "";
+  })();
 
   /* ======================
      MATES DISPLAY
@@ -204,61 +312,84 @@ export default function App() {
   const mateChains = useMemo(() => {
     const out = [];
     Object.keys(mates).forEach(a => {
-      mates[a].forEach(b => out.push(`${a} → ${b}`));
+      (mates[a] || []).forEach(b => out.push(`${a} → ${b}`));
     });
     return out;
   }, [mates]);
 
+  /* ======================
+     RENDER
+  ====================== */
   return (
     <div className="app">
       <h1>KAD Kings</h1>
       <h2>{current}’s Turn</h2>
-
-      {phase.type === "WATERFALL_READY" && (
-        <div className="status">
-          Waterfall — everyone tap READY
-        </div>
-      )}
-
-      {phase.type === "WATERFALL_ACTIVE" && (
-        <div className="status">
-          Waterfall active — {phase.owner} ends it
-        </div>
-      )}
+      {statusText && <div className="status">{statusText}</div>}
 
       <div
-        className={`card ${phase.type !== "IDLE" ? "locked" : ""}`}
+        className={`card ${
+          (phase.type !== "IDLE" && phase.type !== "WATERFALL_READY") ||
+          reaction.active ||
+          waterfall.active
+            ? "locked"
+            : ""
+        }`}
         onClick={draw}
       >
         {card ? (
           <>
             <div className="rank">{card}</div>
-            <div className="rule">{CARD_RULES[rank]}</div>
+            <div className="rule">{CARD_RULES[rank] || ""}</div>
           </>
-        ) : "DRAW"}
+        ) : (
+          "DRAW"
+        )}
       </div>
 
       <div className="players">
-        {PLAYERS.map(p => (
-          <div
-            key={p}
-            className={`player
-              ${p === current ? "turn" : ""}
-              ${p === phase.owner ? "active" : ""}
-              ${drinkFlash.includes(p) ? "drink" : ""}
-              ${waterfallReady.has(p) ? "ready" : ""}
-            `}
-            onClick={() => tapPlayer(p)}
-          >
-            <div className="name">{p}</div>
-            <div className="beer">🍺 {beers[p]}</div>
-          </div>
-        ))}
+        {PLAYERS.map(p => {
+          const isTurn = p === current;
+
+          const isSelecting =
+            (phase.type === "SELECT_MATE" && p === phase.owner) ||
+            (phase.type === "SELECT_DRINK" && p === phase.owner) ||
+            (phase.type === "REACTION" && reaction.active && p === reaction.owner) ||
+            (phase.type === "WATERFALL_READY" && p === waterfall.starter && allReady) ||
+            (phase.type === "WATERFALL_ACTIVE" && p === waterfall.starter);
+
+          const isReady = waterfall.active && waterfall.ready.has(p);
+
+          return (
+            <div
+              key={p}
+              className={`player
+                ${isTurn ? "turn" : ""}
+                ${isSelecting ? "active" : ""}
+                ${drinkFlash.includes(p) ? "drink" : ""}
+                ${isReady ? "ready" : ""}
+              `}
+              onClick={() => {
+                // Special: starter starts waterfall by tapping self AFTER all ready
+                if (phase.type === "WATERFALL_READY" && allReady && p === waterfall.starter) {
+                  tapStartWaterfall(p);
+                  return;
+                }
+                tapPlayer(p);
+              }}
+            >
+              <div className="name">{p}</div>
+              <div className="beer">🍺 {beers[p]}</div>
+              <div className="left">◀ Left: {leftOf(p)}</div>
+            </div>
+          );
+        })}
       </div>
 
       {mateChains.length > 0 && (
         <div className="mates">
-          {mateChains.map((m, i) => <div key={i}>🤝 {m}</div>)}
+          {mateChains.map((m, i) => (
+            <div key={i}>🤝 {m}</div>
+          ))}
         </div>
       )}
 
@@ -267,4 +398,4 @@ export default function App() {
       </button>
     </div>
   );
-}
+                               }
