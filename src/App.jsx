@@ -282,7 +282,7 @@ export default function App() {
           >
             <div className="name">{p}</div>
             <div className="beer">🍺 {beers[p]}</div>                   
-     <div className="left">◀ Left: {leftOf(p)}</div>
+            <div className="left">◀ Left: {leftOf(p)}</div>
         ))}
       </div>
 
