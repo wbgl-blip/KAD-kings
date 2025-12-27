@@ -313,3 +313,27 @@ h2 {
       0 0 20px rgba(56,189,248,0.6);
   }
 }
+/* =========================
+   VIDEO TILE ENHANCEMENTS
+   (Additive – does not replace existing styles)
+========================= */
+
+.player {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+/* Subtle camera-feed texture */
+.player::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(255,255,255,0.05),
+      rgba(0,0,0,0.6)
+    );
+  pointer-events: none;
+  z-index: 0;
+}
