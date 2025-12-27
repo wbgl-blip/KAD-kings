@@ -33,7 +33,10 @@ function buildDeck() {
 }
 
 const rankOf = c => c.replace(/[^A-Z0-9]/g, "");
-
+function leftOf(name) {
+  const i = PLAYERS.indexOf(name);
+  return PLAYERS[(i + 1) % PLAYERS.length];
+}
 export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [card, setCard] = useState(null);
