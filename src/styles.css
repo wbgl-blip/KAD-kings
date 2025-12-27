@@ -1,37 +1,205 @@
-.controls {
+/* =========================
+   RESET + BASE
+========================= */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at top, #0b1220, #05070c 70%);
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Lock desktop to mobile width */
+body {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
+  justify-content: center;
+}
+
+/* =========================
+   APP CONTAINER
+========================= */
+.app {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100vh;
+  padding: 14px;
+}
+
+/* =========================
+   HEADER
+========================= */
+h1 {
+  margin: 6px 0 14px;
+  text-align: center;
+  font-size: 34px;
+  letter-spacing: 0.5px;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .controls button {
-  flex: 1;
-  margin: 0 4px;
-  padding: 8px;
+  padding: 14px 10px;
+  border-radius: 14px;
+  border: none;
   font-weight: 900;
+  font-size: 14px;
+  color: #fff;
+  background: linear-gradient(145deg, #1a2336, #0f1625);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.08),
+    0 6px 16px rgba(0,0,0,0.5);
 }
 
+.controls button:active {
+  transform: scale(0.97);
+}
+
+/* Host mode ON */
+.controls button.active {
+  background: linear-gradient(145deg, #8a1e1e, #4c0d0d);
+}
+
+/* =========================
+   CARD
+========================= */
+.card {
+  margin: 14px auto 18px;
+  height: 140px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff, #eaeaea);
+  color: #000;
+  font-size: 26px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.6);
+}
+
+.card:active {
+  transform: scale(0.97);
+}
+
+/* =========================
+   PLAYERS GRID
+========================= */
+.players {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* =========================
+   PLAYER CARD
+========================= */
+.player {
+  position: relative;
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #0f1626, #0a0f1b);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.07),
+    0 10px 24px rgba(0,0,0,0.6);
+  text-align: left;
+}
+
+.player:active {
+  transform: scale(0.98);
+}
+
+/* Name + beers */
+.player .name {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.player .count {
+  margin-top: 4px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* =========================
+   CURRENT TURN HIGHLIGHT
+========================= */
+.player.current {
+  box-shadow:
+    0 0 0 2px #2cff8a,
+    0 0 24px rgba(44,255,138,0.7);
+}
+
+/* =========================
+   SMOKO BUTTON
+========================= */
+.player .smoko {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 12px;
+  border: none;
+  color: #fff;
+  background: linear-gradient(145deg, #5a4632, #2f2418);
+}
+
+.player .smoko:disabled {
+  opacity: 0.35;
+}
+
+/* =========================
+   OVERLAY (SMOKO / WATERFALL)
+========================= */
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
-  color: white;
-  font-size: 22px;
-  font-weight: 900;
+  background: rgba(5,7,12,0.95);
+  z-index: 999;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 900;
 }
 
 .overlay button {
-  margin-top: 16px;
-  padding: 10px 20px;
+  margin-top: 20px;
+  padding: 12px 20px;
+  border-radius: 14px;
+  border: none;
   font-size: 16px;
+  font-weight: 800;
 }
 
-.smoko {
-  margin-top: 6px;
-  font-size: 11px;
+/* =========================
+   RESET BUTTON
+========================= */
+.action {
+  margin-top: 18px;
+}
+
+.action button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  font-weight: 900;
+  background: #1f2937;
+  color: #fff;
 }
