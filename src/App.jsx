@@ -8,7 +8,7 @@ const CARD_RULES = {
   2: "Pick someone to drink",
   3: "Me",
   4: "Everyone drinks",
-  5: "Guys",
+  5: "Guys drink",
   6: "Everyone drinks",
   7: "Heaven",
   8: "Pick a Mate",
@@ -22,6 +22,8 @@ const CARD_RULES = {
 const suits = ["♠", "♥", "♦", "♣"];
 const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 
+const rankOf = c => c.replace(/[^A-Z0-9]/g, "");
+
 function buildDeck() {
   const d = [];
   ranks.forEach(r => suits.forEach(s => d.push(`${r}${s}`)));
@@ -31,8 +33,6 @@ function buildDeck() {
   }
   return d;
 }
-
-const rankOf = c => c.replace(/[^A-Z0-9]/g, "");
 
 export default function App() {
   const [deck, setDeck] = useState(buildDeck);
@@ -47,38 +47,23 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
 
-  /**
-   * PHASES
-   * IDLE
-   * SELECT_MATE
-   * SELECT_DRINK
-   * WATERFALL_READY
-   * WATERFALL_RUNNING
-   * REACTION_READY
-   * REACTION_RUNNING
-   */
   const [phase, setPhase] = useState({ type: "IDLE", owner: null });
+  const [reaction, setReaction] = useState(null);
+  const [drinkFlash, setDrinkFlash] = useState([]);
 
-  const [ready, setReady] = useState(new Set());
-  const [reaction, setReaction] = useState(new Set());
-
+  // 🔒 BADGE HOLDERS (PERSISTENT)
   const [thumbHolder, setThumbHolder] = useState(null);
   const [heavenHolder, setHeavenHolder] = useState(null);
-
-  const [drinkFlash, setDrinkFlash] = useState([]);
 
   const current = PLAYERS[turn];
   const rank = card ? rankOf(card) : null;
 
   /* ======================
-     HELPERS
+     DRINKING
   ====================== */
-  const leftOf = (p) =>
-    PLAYERS[(PLAYERS.indexOf(p) + 1) % PLAYERS.length];
-
   function drink(name) {
     setBeers(b => ({ ...b, [name]: b[name] + 1 }));
-    setDrinkFlash(f => f.includes(name) ? f : [...f, name]);
+    setDrinkFlash(f => [...new Set([...f, name])]);
     setTimeout(() => {
       setDrinkFlash(f => f.filter(n => n !== name));
     }, 5000);
@@ -95,90 +80,57 @@ export default function App() {
      DRAW
   ====================== */
   function draw() {
-    if (phase.type !== "IDLE") return;
-    if (deck.length === 0) return;
+    if (phase.type !== "IDLE" || deck.length === 0) return;
 
     const [c, ...rest] = deck;
-    setDeck(rest);
-    setCard(c);
-
     const r = rankOf(c);
     const drawer = current;
 
-    if (r === "A") {
-      setReady(new Set());
-      setPhase({ type: "WATERFALL_READY", owner: drawer });
-    } else if (r === "8") {
+    setDeck(rest);
+    setCard(c);
+
+    if (r === "8") {
       setPhase({ type: "SELECT_MATE", owner: drawer });
     } else if (r === "2") {
       setPhase({ type: "SELECT_DRINK", owner: drawer });
     } else if (r === "J") {
-      setThumbHolder(drawer);
-      setReaction(new Set());
-      setPhase({ type: "REACTION_READY", owner: drawer });
+      setThumbHolder(drawer); // 🔒 TRANSFER
     } else if (r === "7") {
-      setHeavenHolder(drawer);
-      setReaction(new Set());
-      setPhase({ type: "REACTION_READY", owner: drawer });
-    } else {
-      setPhase({ type: "IDLE", owner: null });
+      setHeavenHolder(drawer); // 🔒 TRANSFER
     }
 
-    // turn advances, but Waterfall / J / 7 owner retains control
     setTurn(t => (t + 1) % PLAYERS.length);
-  }
-
-  /* ======================
-     WATERFALL
-  ====================== */
-  function tapStartWaterfall(p) {
-    if (phase.type !== "WATERFALL_READY") return;
-
-    // Toggle READY
-    if (!ready.has(p)) {
-      const next = new Set(ready);
-      next.add(p);
-      setReady(next);
-      return;
-    }
-
-    // Owner starts once all ready
-    if (p === phase.owner && ready.size === PLAYERS.length) {
-      setPhase({ type: "WATERFALL_RUNNING", owner: phase.owner });
-    }
   }
 
   /* ======================
      TAP PLAYER
   ====================== */
   function tapPlayer(name) {
-    // WATERFALL RUNNING: no UI interaction
-    if (phase.type === "WATERFALL_RUNNING") return;
 
-    // REACTION READY: holder taps to start
-    if (phase.type === "REACTION_READY") {
-      if (name !== phase.owner) return;
+    // 🔥 START THUMBMASTER
+    if (name === thumbHolder && phase.type === "IDLE") {
       setReaction(new Set());
-      setPhase({ type: "REACTION_RUNNING", owner: phase.owner });
+      setPhase({ type: "REACTION", owner: thumbHolder });
       return;
     }
 
-    // REACTION RUNNING
-    if (phase.type === "REACTION_RUNNING") {
+    // ☁️ START HEAVEN
+    if (name === heavenHolder && phase.type === "IDLE") {
+      setReaction(new Set());
+      setPhase({ type: "REACTION", owner: heavenHolder });
+      return;
+    }
+
+    // ⚡ REACTION MODE
+    if (phase.type === "REACTION") {
       if (name === phase.owner) return;
-      if (reaction.has(name)) return;
 
       const next = new Set(reaction);
       next.add(name);
 
       if (next.size === PLAYERS.length - 1) {
-        // One person never tapped → auto-lose
-        const loser = PLAYERS.find(
-          p => p !== phase.owner && !next.has(p)
-        );
-        if (loser) propagateDrink(loser);
-
-        setReaction(new Set());
+        propagateDrink(name); // LAST TO TAP
+        setReaction(null);
         setPhase({ type: "IDLE", owner: null });
       } else {
         setReaction(next);
@@ -186,7 +138,6 @@ export default function App() {
       return;
     }
 
-    // OWNER-ONLY ACTIONS
     if (phase.owner && name !== phase.owner) return;
 
     if (phase.type === "SELECT_MATE") {
@@ -206,13 +157,17 @@ export default function App() {
       return;
     }
 
-    // NORMAL TAP
     propagateDrink(name);
   }
 
   /* ======================
-     MATES DISPLAY
+     LEFT-OF
   ====================== */
+  const leftOf = p => {
+    const i = PLAYERS.indexOf(p);
+    return PLAYERS[(i + 1) % PLAYERS.length];
+  };
+
   const mateChains = useMemo(() => {
     const out = [];
     Object.keys(mates).forEach(a =>
@@ -229,59 +184,37 @@ export default function App() {
       <h1>KAD Kings</h1>
       <h2>{current}’s Turn</h2>
 
-      {phase.type === "WATERFALL_READY" && (
-        <div className="status">
-          {phase.owner} — tap players to READY, then tap yourself to START
-        </div>
-      )}
-
-      <div
-        className={`card ${phase.type !== "IDLE" ? "locked" : ""}`}
-        onClick={draw}
-      >
+      <div className="card" onClick={draw}>
         {card ? (
           <>
             <div className="rank">{card}</div>
             <div className="rule">{CARD_RULES[rank]}</div>
           </>
-        ) : (
-          "DRAW"
-        )}
+        ) : "DRAW"}
       </div>
 
       <div className="players">
-        {PLAYERS.map(p => {
-          const isTurn = p === current;
-          const isActive = p === phase.owner;
-          const isReady = ready.has(p);
+        {PLAYERS.map(p => (
+          <div
+            key={p}
+            className={`player
+              ${p === current ? "turn" : ""}
+              ${p === phase.owner ? "active" : ""}
+              ${drinkFlash.includes(p) ? "drink" : ""}
+            `}
+            onClick={() => tapPlayer(p)}
+          >
+            <div className="name">{p}</div>
 
-          return (
-            <div
-              key={p}
-              className={`player
-                ${isTurn ? "turn" : ""}
-                ${isActive ? "active" : ""}
-                ${drinkFlash.includes(p) ? "drink" : ""}
-                ${isReady ? "ready" : ""}
-              `}
-              onClick={() =>
-                phase.type === "WATERFALL_READY"
-                  ? tapStartWaterfall(p)
-                  : tapPlayer(p)
-              }
-            >
-              <div className="name">{p}</div>
-
-              <div className="badges">
-                {p === thumbHolder && <span className="badge">J</span>}
-                {p === heavenHolder && <span className="badge">7</span>}
-              </div>
-
-              <div className="beer">🍺 {beers[p]}</div>
-              <div className="left">◀ Left: {leftOf(p)}</div>
+            <div className="badges">
+              {p === thumbHolder && <span className="badge">🫳 Thumb</span>}
+              {p === heavenHolder && <span className="badge">☁️ Heaven</span>}
             </div>
-          );
-        })}
+
+            <div className="beer">🍺 {beers[p]}</div>
+            <div className="left">◀ Left: {leftOf(p)}</div>
+          </div>
+        ))}
       </div>
 
       {mateChains.length > 0 && (
