@@ -84,18 +84,18 @@ h2 {
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
 }
 
-/* TURN */
+/* TURN OWNER */
 .player.turn {
   box-shadow: 0 0 0 2px #22c55e;
 }
 
-/* SELECTING */
+/* ACTIVE DECISION */
 .player.active {
   animation: selectPulse 1.2s infinite;
   box-shadow: 0 0 0 3px #eab308;
 }
 
-/* DRINK */
+/* DRINK TARGET */
 .player.drink {
   animation: drinkPulse 5s ease-out;
   box-shadow: 0 0 0 3px #ef4444;
