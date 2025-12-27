@@ -27,7 +27,6 @@ h1 {
   text-align: center;
   margin: 6px 0 4px;
   font-size: 32px;
-  letter-spacing: 0.5px;
 }
 
 h2 {
@@ -59,10 +58,6 @@ h2 {
   cursor: pointer;
 }
 
-.card:active {
-  transform: scale(0.97);
-}
-
 .rank {
   font-size: 42px;
 }
@@ -71,11 +66,10 @@ h2 {
   margin-top: 6px;
   font-size: 14px;
   font-weight: 700;
-  opacity: 0.85;
 }
 
 /* =========================
-   PLAYERS GRID
+   PLAYERS
 ========================= */
 .players {
   display: grid;
@@ -83,69 +77,67 @@ h2 {
   gap: 12px;
 }
 
-/* =========================
-   PLAYER TILE
-========================= */
 .player {
   position: relative;
   padding: 14px;
   border-radius: 18px;
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.08),
-    0 10px 24px rgba(0,0,0,0.6);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.player:active {
-  transform: scale(0.98);
-}
-
-.name {
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.beer {
-  margin-top: 4px;
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-/* =========================
-   TURN OWNER (GREEN)
-   Calm, persistent
-========================= */
+/* TURN */
 .player.turn {
-  box-shadow:
-    0 0 0 2px #22c55e,
-    0 0 20px rgba(34,197,94,0.55);
+  box-shadow: 0 0 0 2px #22c55e;
 }
 
-/* =========================
-   ACTIVE DECISION MAKER (YELLOW)
-   Loud, demands attention
-========================= */
+/* SELECTING */
 .player.active {
   animation: selectPulse 1.2s infinite;
-  box-shadow:
-    0 0 0 3px #eab308,
-    0 0 28px rgba(234,179,8,0.85);
+  box-shadow: 0 0 0 3px #eab308;
 }
 
-/* =========================
-   DRINK TARGET (RED)
-   Aggressive, temporary
-========================= */
+/* DRINK */
 .player.drink {
   animation: drinkPulse 5s ease-out;
-  box-shadow:
-    0 0 0 3px #ef4444,
-    0 0 32px rgba(239,68,68,0.95);
+  box-shadow: 0 0 0 3px #ef4444;
 }
 
 /* =========================
-   MATE CHAINS
+   LABELS (PRIORITY SAFE)
+========================= */
+.player.turn:not(.active):not(.drink)::after {
+  content: "TURN";
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #22c55e;
+}
+
+.player.active::after {
+  content: "SELECTING";
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #facc15;
+}
+
+.player.drink::after {
+  content: "YOU DRINK";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(239,68,68,0.9);
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-weight: 900;
+}
+
+/* =========================
+   MATES
 ========================= */
 .mates {
   margin-top: 14px;
@@ -155,22 +147,17 @@ h2 {
   font-size: 13px;
 }
 
-.mates div {
-  margin-top: 4px;
-  opacity: 0.9;
-}
-
 /* =========================
-   RESET BUTTON
+   RESET
 ========================= */
 .reset {
   width: 100%;
   margin-top: 16px;
   padding: 14px;
   border-radius: 16px;
-  border: none;
   background: #1f2937;
-  color: #ffffff;
+  border: none;
+  color: white;
   font-size: 16px;
   font-weight: 900;
 }
@@ -179,96 +166,13 @@ h2 {
    ANIMATIONS
 ========================= */
 @keyframes selectPulse {
-  0% {
-    box-shadow:
-      0 0 0 3px #eab308,
-      0 0 20px rgba(234,179,8,0.5);
-  }
-  50% {
-    box-shadow:
-      0 0 0 6px #facc15,
-      0 0 36px rgba(250,204,21,0.9);
-  }
-  100% {
-    box-shadow:
-      0 0 0 3px #eab308,
-      0 0 20px rgba(234,179,8,0.5);
-  }
+  0% { box-shadow: 0 0 0 3px #eab308; }
+  50% { box-shadow: 0 0 0 6px #facc15; }
+  100% { box-shadow: 0 0 0 3px #eab308; }
 }
 
 @keyframes drinkPulse {
-  0% {
-    transform: scale(0.96);
-    opacity: 0;
-  }
-  10% {
-    transform: scale(1.05);
-    opacity: 1;
-  }
-  85% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-  }
-}
-.player.turn::after {
-  content: "TURN";
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  font-size: 10px;
-  font-weight: 900;
-  color: #22c55e;
-  letter-spacing: 0.6px;
-} 
-.player.active::after {
-  content: "SELECTING";
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  font-size: 10px;
-  font-weight: 900;
-  color: #facc15;
-  letter-spacing: 0.6px;
-}
-.player.drink::after {
-  content: "YOU DRINK";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 14px;
-  font-weight: 900;
-  color: #ffffff;
-  background: rgba(239,68,68,0.9);
-  padding: 6px 10px;
-  border-radius: 10px;
-}
-/* =========================
-   LABEL PRIORITY OVERRIDES
-========================= */
-
-/* If drinking, hide other labels */
-.player.drink::after {
-  z-index: 3;
-}
-
-.player.drink.turn::after,
-.player.drink.active::after {
-  content: "YOU DRINK";
-}
-
-/* If selecting, hide TURN */
-.player.active.turn::after {
-  content: "SELECTING";
-  color: #facc15;
-}
-
-/* Ensure TURN only shows when idle */
-.player.turn:not(.active):not(.drink)::after {
-  content: "TURN";
-  color: #22c55e;
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  100% { opacity: 0; }
 }
