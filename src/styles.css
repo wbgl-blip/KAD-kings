@@ -390,6 +390,14 @@ h2 {
   filter: grayscale(0.4);
 }
 /* =========================
+   CARD – BALANCED SIZE
+========================= */
+
+.card {
+  min-height: 120px;
+  max-height: 140px;
+}
+/* =========================
    ONE-SCREEN MOBILE LOCK
 ========================= */
 
@@ -401,4 +409,27 @@ h2 {
 
 .players {
   flex: 1;
+}
+/* =========================
+   PLAYER GRID – HARD FIT
+========================= */
+
+.players {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(4, 1fr);
+  gap: 10px;
+  min-height: 0;
+}
+.player {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+html,
+body {
+  height: 100%;
+  overflow: hidden;
 }
