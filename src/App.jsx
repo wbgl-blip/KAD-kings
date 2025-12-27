@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import "./index.css";
+import "./styles.css";
 
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex", "Kyle", "Sam"];
 
