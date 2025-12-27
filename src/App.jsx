@@ -70,7 +70,7 @@ export default function App() {
       setDrinkPulse(m);
     });
 
-    setTimeout(() => setDrinkPulse(null), 700);
+    setTimeout(() => setDrinkPulse(null), 5000);
   }
 
   function draw() {
