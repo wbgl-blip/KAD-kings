@@ -173,16 +173,30 @@ export default function App() {
     drinkEvent(name);
   }
 
-  const mateChains = useMemo(() => {
-    // show direct edges as chains for now
-    const chains = [];
-    Object.keys(mates).forEach(a => {
-      (mates[a] || []).forEach(b => {
-        chains.push([a, b]);
-      });
+const mateChains = useMemo(() => {
+  const chains = [];
+
+  function walk(node, path) {
+    const next = mates[node] || [];
+    if (!next.length && path.length > 1) {
+      chains.push(path);
+      return;
+    }
+    next.forEach(n => {
+      if (!path.includes(n)) {
+        walk(n, [...path, n]);
+      }
     });
-    return chains;
-  }, [mates]);
+  }
+
+  Object.keys(mates).forEach(p => {
+    if (mates[p]?.length) {
+      walk(p, [p]);
+    }
+  });
+
+  return chains;
+}, [mates]);
 
   return (
     <div className="app">
