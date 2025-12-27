@@ -378,9 +378,14 @@ export default function App() {
               }}
             >
               <div className="name">{p}</div>
-              <div className="beer">🍺 {beers[p]}</div>
-              <div className="left">◀ Left: {leftOf(p)}</div>
-            </div>
+
+<div className="badges">
+  {p === thumbHolder && <span className="badge j">J</span>}
+  {p === heavenHolder && <span className="badge h">7</span>}
+</div>
+
+<div className="beer">🍺 {beers[p]}</div>
+<div className="left">◀ Left: {leftOf(p)}</div>
           );
         })}
       </div>
