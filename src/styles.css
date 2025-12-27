@@ -378,3 +378,27 @@ h2 {
 .badge.turn {
   background: #22c55e;
 }
+/* =========================
+   CARD – STAGE POLISH
+========================= */
+
+.card {
+  max-height: 120px;
+}
+
+.card.locked {
+  filter: grayscale(0.4);
+}
+/* =========================
+   ONE-SCREEN MOBILE LOCK
+========================= */
+
+.app {
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.players {
+  flex: 1;
+}
