@@ -64,10 +64,9 @@ export default function App() {
   function drink(name) {
     setBeers(b => ({ ...b, [name]: b[name] + 1 }));
     setDrinkFlash(f => [...f, name]);
-    setTimeout(
-      () => setDrinkFlash(f => f.filter(n => n !== name)),
-      5000
-    );
+    setTimeout(() => {
+      setDrinkFlash(f => f.filter(n => n !== name));
+    }, 5000);
   }
 
   function propagateDrink(name, visited = new Set()) {
