@@ -16,7 +16,7 @@ const CARD_RULES = {
   10: "Categories",
   J: "Thumbmaster",
   Q: "Question Master",
-  K: "Make a Rule",
+  K: "Make a Rule"
 };
 
 const suits = ["♠", "♥", "♦", "♣"];
@@ -47,48 +47,42 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
 
-  const [thumb, setThumb] = useState(null);
-  const [heaven, setHeaven] = useState(null);
-
-  const [reaction, setReaction] = useState(null);
-
   const [phase, setPhase] = useState({
-    type: "IDLE", // IDLE | SELECT_MATE | SELECT_DRINK | WAIT_REACTION | REACTION
-    turnOwner: null,
-    activePlayer: null,
+    type: "IDLE",        // IDLE | SELECT_MATE | SELECT_DRINK | REACTION
+    owner: null          // player making the decision
   });
 
+  const [reaction, setReaction] = useState(null); // Set of reacted players
   const [drinkFlash, setDrinkFlash] = useState([]);
 
   const current = PLAYERS[turn];
   const rank = card ? rankOf(card) : null;
 
-  /* =====================
-     DRINKING + MATES
+  /* ======================
+     DRINK + PROPAGATION
   ====================== */
-
   function drink(name) {
     setBeers(b => ({ ...b, [name]: b[name] + 1 }));
     setDrinkFlash(f => [...f, name]);
-    setTimeout(() => {
-      setDrinkFlash(f => f.filter(n => n !== name));
-    }, 5000);
+    setTimeout(
+      () => setDrinkFlash(f => f.filter(n => n !== name)),
+      5000
+    );
   }
 
-  function propagateDrink(start, visited = new Set()) {
-    if (visited.has(start)) return;
-    visited.add(start);
-    drink(start);
-    mates[start]?.forEach(m => propagateDrink(m, visited));
+  function propagateDrink(name, visited = new Set()) {
+    if (visited.has(name)) return;
+    visited.add(name);
+    drink(name);
+    mates[name]?.forEach(m => propagateDrink(m, visited));
   }
 
-  /* =====================
+  /* ======================
      DRAW CARD
   ====================== */
-
   function draw() {
     if (phase.type !== "IDLE") return;
-    if (!deck.length) return;
+    if (deck.length === 0) return;
 
     const [c, ...rest] = deck;
     setDeck(rest);
@@ -97,39 +91,27 @@ export default function App() {
     const r = rankOf(c);
 
     if (r === "8") {
-      setPhase({ type: "SELECT_MATE", turnOwner: current, activePlayer: current });
+      setPhase({ type: "SELECT_MATE", owner: current });
     } else if (r === "2") {
-      setPhase({ type: "SELECT_DRINK", turnOwner: current, activePlayer: current });
-    } else if (r === "7") {
-      setHeaven(current);
-      setPhase({ type: "WAIT_REACTION", turnOwner: current, activePlayer: current });
-    } else if (r === "J") {
-      setThumb(current);
-      setPhase({ type: "WAIT_REACTION", turnOwner: current, activePlayer: current });
+      setPhase({ type: "SELECT_DRINK", owner: current });
+    } else if (r === "7" || r === "J") {
+      setPhase({ type: "REACTION", owner: current });
+      setReaction(new Set());
     } else {
-      setPhase({ type: "IDLE", turnOwner: null, activePlayer: null });
+      setPhase({ type: "IDLE", owner: null });
     }
 
     setTurn(t => (t + 1) % PLAYERS.length);
   }
 
-  /* =====================
-     REACTION
+  /* ======================
+     TAP PLAYER
   ====================== */
-
-  function startReaction() {
-    setReaction(new Set());
-    setPhase({ type: "REACTION", turnOwner: null, activePlayer: null });
-  }
-
-  /* =====================
-     PLAYER TAP
-  ====================== */
-
   function tapPlayer(name) {
 
-    // Reaction taps (holder excluded)
-    if (reaction) {
+    // REACTION MODE
+    if (phase.type === "REACTION") {
+      if (name === phase.owner) return; // owner never reacts
       if (reaction.has(name)) return;
 
       const next = new Set(reaction);
@@ -138,92 +120,55 @@ export default function App() {
       if (next.size === PLAYERS.length - 1) {
         propagateDrink(name);
         setReaction(null);
-        setPhase({ type: "IDLE", turnOwner: null, activePlayer: null });
+        setPhase({ type: "IDLE", owner: null });
       } else {
         setReaction(next);
       }
       return;
     }
 
-    // Only active player may act during phases
-    if (phase.activePlayer && name !== phase.activePlayer) return;
+    // ONLY OWNER CAN ACT
+    if (phase.owner && name !== phase.owner) return;
 
-    // 8 — Pick a mate (additive)
     if (phase.type === "SELECT_MATE") {
-      if (name !== phase.turnOwner) {
+      if (name !== phase.owner) {
         setMates(m => ({
           ...m,
-          [phase.turnOwner]: m[phase.turnOwner].includes(name)
-            ? m[phase.turnOwner]
-            : [...m[phase.turnOwner], name],
+          [phase.owner]: [...m[phase.owner], name]
         }));
-        setPhase({ type: "IDLE", turnOwner: null, activePlayer: null });
+        setPhase({ type: "IDLE", owner: null });
       }
       return;
     }
 
-    // 2 — Pick someone to drink
     if (phase.type === "SELECT_DRINK") {
       propagateDrink(name);
-      setPhase({ type: "IDLE", turnOwner: null, activePlayer: null });
+      setPhase({ type: "IDLE", owner: null });
       return;
     }
 
-    // 7 / J — Start reaction (only holder)
-    if (phase.type === "WAIT_REACTION") {
-      if (
-        (rank === "7" && name === heaven) ||
-        (rank === "J" && name === thumb)
-      ) {
-        startReaction();
-      }
-      return;
-    }
-
-    // Normal tap = drink + mates
+    // NORMAL DRINK
     propagateDrink(name);
   }
 
-  /* =====================
-     MATE CHAINS (DISPLAY)
+  /* ======================
+     MATE LIST
   ====================== */
-
   const mateChains = useMemo(() => {
-    const chains = [];
-
-    function walk(node, path) {
-      const next = mates[node] || [];
-      if (!next.length && path.length > 1) {
-        chains.push(path);
-        return;
-      }
-      next.forEach(n => {
-        if (!path.includes(n)) walk(n, [...path, n]);
-      });
-    }
-
-    Object.keys(mates).forEach(p => {
-      if (mates[p]?.length) walk(p, [p]);
+    const out = [];
+    Object.keys(mates).forEach(a => {
+      mates[a].forEach(b => out.push(`${a} → ${b}`));
     });
-
-    return chains;
+    return out;
   }, [mates]);
 
-  /* =====================
+  /* ======================
      RENDER
   ====================== */
-
   return (
     <div className="app">
       <h1>KAD Kings</h1>
-
-      <h2>
-        {phase.type === "IDLE" && `${current}’s Turn`}
-        {phase.type === "SELECT_MATE" && `${phase.turnOwner} — Pick a Mate`}
-        {phase.type === "SELECT_DRINK" && `${phase.turnOwner} — Pick Someone to Drink`}
-        {phase.type === "WAIT_REACTION" && `${phase.activePlayer} — Start Reaction`}
-        {phase.type === "REACTION" && `REACTION — TAP FAST`}
-      </h2>
+      <h2>{current}’s Turn</h2>
 
       <div className="card" onClick={draw}>
         {card ? (
@@ -240,7 +185,7 @@ export default function App() {
             key={p}
             className={`player
               ${p === current ? "turn" : ""}
-              ${p === phase.activePlayer ? "active" : ""}
+              ${p === phase.owner ? "active" : ""}
               ${drinkFlash.includes(p) ? "drink" : ""}
             `}
             onClick={() => tapPlayer(p)}
@@ -253,8 +198,8 @@ export default function App() {
 
       {mateChains.length > 0 && (
         <div className="mates">
-          {mateChains.map((c, i) => (
-            <div key={i}>🤝 {c.join(" → ")}</div>
+          {mateChains.map((m, i) => (
+            <div key={i}>🤝 {m}</div>
           ))}
         </div>
       )}
