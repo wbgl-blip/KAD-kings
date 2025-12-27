@@ -155,13 +155,35 @@ h1 {
   justify-content: center;
   border-radius: 16px;
   z-index: 10;
-  animation: pulseShake 0.7s ease-out;
+  animation: pulseShake 5s ease-out;
 }
 
 @keyframes pulseShake {
-  0% { transform: scale(0.9); opacity: 0; }
-  20% { transform: scale(1.05) rotate(-2deg); opacity: 1; }
-  40% { transform: scale(1.05) rotate(2deg); }
-  60% { transform: scale(1.05) rotate(-2deg); }
-  100% { transform: scale(1); opacity: 0; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  10% {
+    transform: scale(1.05) rotate(-2deg);
+    opacity: 1;
+  }
+
+  15% {
+    transform: scale(1.05) rotate(2deg);
+  }
+
+  20% {
+    transform: scale(1);
+  }
+
+  85% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
 }
