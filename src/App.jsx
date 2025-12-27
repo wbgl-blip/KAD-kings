@@ -42,18 +42,10 @@ export default function App() {
   const [selectMate, setSelectMate] = useState(null);
   const [pickDrink, setPickDrink] = useState(null);
 
-  const [hostMode, setHostMode] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [waterfall, setWaterfall] = useState(false);
-
   const [drinkPulse, setDrinkPulse] = useState(null);
 
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
-  );
-
-  const [smoko, setSmoko] = useState(
-    Object.fromEntries(PLAYERS.map(p => [p, 2]))
   );
 
   const [mates, setMates] = useState(
@@ -73,7 +65,7 @@ export default function App() {
   }
 
   function draw() {
-    if (paused || reaction || selectMate || pickDrink) return;
+    if (reaction || selectMate || pickDrink) return;
     if (!deck.length) return;
 
     const [c, ...rest] = deck;
@@ -85,7 +77,6 @@ export default function App() {
     if (r === "Q") setQueen(current);
     if (r === "8") setSelectMate(current);
     if (r === "2") setPickDrink(current);
-    if (r === "A") setWaterfall(true);
 
     setTurn(t => (t + 1) % PLAYERS.length);
     setDeck(rest);
@@ -96,7 +87,7 @@ export default function App() {
   }
 
   function tapPlayer(name) {
-    // Mate selection
+    // 1️⃣ Mate selection (absolute)
     if (selectMate) {
       if (name !== selectMate) {
         setMates(m => ({
@@ -108,19 +99,21 @@ export default function App() {
       return;
     }
 
-    // Pick someone to drink (2)
+    // 2️⃣ Pick someone to drink (2)
     if (pickDrink) {
       if (name !== pickDrink) drink(name);
       setPickDrink(null);
       return;
     }
 
-    // Reaction mode
+    // 3️⃣ Reaction mode (J / 7)
     if (reaction) {
       if (reaction.reacted.has(name)) return;
+
       const next = new Set(reaction.reacted);
       next.add(name);
 
+      // holder is NOT included
       if (next.size === PLAYERS.length - 1) {
         drink(name);
         setReaction(null);
@@ -130,7 +123,7 @@ export default function App() {
       return;
     }
 
-    // Start J / 7 reaction (holder taps ONCE)
+    // 4️⃣ Start reaction (holder taps once)
     if (name === thumb && !reaction) {
       startReaction("J");
       return;
@@ -140,36 +133,27 @@ export default function App() {
       return;
     }
 
-    // Normal drink
+    // 5️⃣ Normal drink
     drink(name);
   }
 
   const mateChains = useMemo(() => {
     const chains = [];
-    const walk = (start, node, path) => {
+    const walk = (node, path) => {
       if (!mates[node]?.length) {
         chains.push(path);
         return;
       }
-      mates[node].forEach(n => walk(start, n, [...path, n]));
+      mates[node].forEach(n => walk(n, [...path, n]));
     };
-    Object.keys(mates).forEach(p => mates[p].length && walk(p, p, [p]));
+    Object.keys(mates).forEach(p => mates[p].length && walk(p, [p]));
     return chains;
   }, [mates]);
 
   return (
     <div className="app">
       <h1>KAD Kings</h1>
-
-      <div className="controls">
-        <button
-          className={hostMode ? "active" : ""}
-          onClick={() => setHostMode(h => !h)}
-        >
-          HOST MODE
-        </button>
-        <button onClick={() => setWaterfall(true)}>START WATERFALL</button>
-      </div>
+      <h2>{current}’s Turn</h2>
 
       <div className="card" onClick={draw}>
         {card ? (
@@ -177,7 +161,7 @@ export default function App() {
             <div>{card}</div>
             <small>{CARD_RULES[rank]}</small>
           </>
-        ) : "DRAW"}
+        ) : "Tap Card to Draw"}
       </div>
 
       <div className="players">
@@ -194,19 +178,6 @@ export default function App() {
 
             {selectMate && <div className="hint">Pick Mate</div>}
             {pickDrink && <div className="hint">Pick to Drink</div>}
-
-            <button
-              className="smoko"
-              disabled={smoko[p] === 0}
-              onClick={e => {
-                e.stopPropagation();
-                if (!smoko[p]) return;
-                setPaused(true);
-                setSmoko(s => ({ ...s, [p]: s[p] - 1 }));
-              }}
-            >
-              SMOKO ({smoko[p]})
-            </button>
           </div>
         ))}
       </div>
@@ -219,23 +190,9 @@ export default function App() {
         </div>
       )}
 
-      {paused && (
-        <div className="overlay" onClick={() => setPaused(false)}>
-          🚬 SMOKO
-          <button>Resume</button>
-        </div>
-      )}
-
-      {waterfall && (
-        <div className="overlay" onClick={() => setWaterfall(false)}>
-          💧 WATERFALL
-          <button>End</button>
-        </div>
-      )}
-
-      <div className="action">
-        <button onClick={() => window.location.reload()}>Reset</button>
-      </div>
+      <button className="reset" onClick={() => window.location.reload()}>
+        Reset
+      </button>
     </div>
   );
 }
