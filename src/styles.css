@@ -218,7 +218,7 @@ h2 {
    DRINK TARGET
 ========================= */
 .player.drink {
-  animation: drinkPulse 5s ease-out;
+  animation: drinkPulse 2.5s ease-out;
   box-shadow:
     0 0 0 3px #ef4444,
     0 0 28px rgba(239,68,68,0.9);
@@ -336,4 +336,45 @@ h2 {
     );
   pointer-events: none;
   z-index: 0;
+}
+/* =========================
+   BADGES – VIDEO OVERLAY STYLE
+========================= */
+
+.badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  z-index: 3;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+  color: #020617;
+}
+
+/* Variants */
+.badge.thumb {
+  background: #facc15;
+}
+
+.badge.heaven {
+  background: #38bdf8;
+}
+
+.badge.host {
+  background: #60a5fa;
+}
+
+.badge.turn {
+  background: #22c55e;
 }
