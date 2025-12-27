@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useMemo, useState } from "react";
 import "./styles.css";
 
@@ -48,21 +47,23 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
 
-  // PHASES:
-  // IDLE
-  // SELECT_MATE
-  // SELECT_DRINK
-  // WATERFALL_READY
-  // WATERFALL_RUNNING
-  // REACTION_READY
-  // REACTION_RUNNING
+  /**
+   * PHASES
+   * IDLE
+   * SELECT_MATE
+   * SELECT_DRINK
+   * WATERFALL_READY
+   * WATERFALL_RUNNING
+   * REACTION_READY
+   * REACTION_RUNNING
+   */
   const [phase, setPhase] = useState({ type: "IDLE", owner: null });
 
   const [ready, setReady] = useState(new Set());
   const [reaction, setReaction] = useState(new Set());
 
-  const [thumbHolder, setThumbHolder] = useState(null);   // J
-  const [heavenHolder, setHeavenHolder] = useState(null); // 7
+  const [thumbHolder, setThumbHolder] = useState(null);
+  const [heavenHolder, setHeavenHolder] = useState(null);
 
   const [drinkFlash, setDrinkFlash] = useState([]);
 
@@ -123,6 +124,7 @@ export default function App() {
       setPhase({ type: "IDLE", owner: null });
     }
 
+    // turn advances, but Waterfall / J / 7 owner retains control
     setTurn(t => (t + 1) % PLAYERS.length);
   }
 
@@ -132,6 +134,7 @@ export default function App() {
   function tapStartWaterfall(p) {
     if (phase.type !== "WATERFALL_READY") return;
 
+    // Toggle READY
     if (!ready.has(p)) {
       const next = new Set(ready);
       next.add(p);
@@ -139,6 +142,7 @@ export default function App() {
       return;
     }
 
+    // Owner starts once all ready
     if (p === phase.owner && ready.size === PLAYERS.length) {
       setPhase({ type: "WATERFALL_RUNNING", owner: phase.owner });
     }
@@ -148,10 +152,10 @@ export default function App() {
      TAP PLAYER
   ====================== */
   function tapPlayer(name) {
-    // WATERFALL RUNNING: taps do nothing (physical drinking IRL)
+    // WATERFALL RUNNING: no UI interaction
     if (phase.type === "WATERFALL_RUNNING") return;
 
-    // REACTION READY (holder taps to start)
+    // REACTION READY: holder taps to start
     if (phase.type === "REACTION_READY") {
       if (name !== phase.owner) return;
       setReaction(new Set());
@@ -168,7 +172,7 @@ export default function App() {
       next.add(name);
 
       if (next.size === PLAYERS.length - 1) {
-        // Last person to tap loses
+        // One person never tapped → auto-lose
         const loser = PLAYERS.find(
           p => p !== phase.owner && !next.has(p)
         );
@@ -182,7 +186,7 @@ export default function App() {
       return;
     }
 
-    // OWNER-ONLY PHASES
+    // OWNER-ONLY ACTIONS
     if (phase.owner && name !== phase.owner) return;
 
     if (phase.type === "SELECT_MATE") {
@@ -207,7 +211,7 @@ export default function App() {
   }
 
   /* ======================
-     MATE LIST
+     MATES DISPLAY
   ====================== */
   const mateChains = useMemo(() => {
     const out = [];
@@ -269,8 +273,8 @@ export default function App() {
               <div className="name">{p}</div>
 
               <div className="badges">
-                {p === thumbHolder && <span className="badge j">J</span>}
-                {p === heavenHolder && <span className="badge h">7</span>}
+                {p === thumbHolder && <span className="badge">J</span>}
+                {p === heavenHolder && <span className="badge">7</span>}
               </div>
 
               <div className="beer">🍺 {beers[p]}</div>
@@ -293,4 +297,4 @@ export default function App() {
       </button>
     </div>
   );
-                }
+}
