@@ -49,12 +49,11 @@ export default function App() {
 
   const [thumb, setThumb] = useState(null);
   const [heaven, setHeaven] = useState(null);
-  const [queen, setQueen] = useState(null);
 
   const [reaction, setReaction] = useState(null);
 
   const [phase, setPhase] = useState({
-    type: "IDLE",          // IDLE | SELECT_MATE | SELECT_DRINK | WAIT_REACTION | REACTION
+    type: "IDLE", // IDLE | SELECT_MATE | SELECT_DRINK | WAIT_REACTION | REACTION
     turnOwner: null,
     activePlayer: null,
   });
@@ -71,10 +70,9 @@ export default function App() {
   function drink(name) {
     setBeers(b => ({ ...b, [name]: b[name] + 1 }));
     setDrinkFlash(f => [...f, name]);
-    setTimeout(
-      () => setDrinkFlash(f => f.filter(n => n !== name)),
-      5000
-    );
+    setTimeout(() => {
+      setDrinkFlash(f => f.filter(n => n !== name));
+    }, 5000);
   }
 
   function propagateDrink(start, visited = new Set()) {
@@ -130,7 +128,7 @@ export default function App() {
 
   function tapPlayer(name) {
 
-    // 🔴 Reaction taps (holder NOT included)
+    // Reaction taps (holder excluded)
     if (reaction) {
       if (reaction.has(name)) return;
 
@@ -147,10 +145,10 @@ export default function App() {
       return;
     }
 
-    // 🔒 Only active player can act during phases
+    // Only active player may act during phases
     if (phase.activePlayer && name !== phase.activePlayer) return;
 
-    // 🤝 Pick mate (8)
+    // 8 — Pick a mate (additive)
     if (phase.type === "SELECT_MATE") {
       if (name !== phase.turnOwner) {
         setMates(m => ({
@@ -164,14 +162,14 @@ export default function App() {
       return;
     }
 
-    // 🍺 Pick someone to drink (2)
+    // 2 — Pick someone to drink
     if (phase.type === "SELECT_DRINK") {
       propagateDrink(name);
       setPhase({ type: "IDLE", turnOwner: null, activePlayer: null });
       return;
     }
 
-    // ⚡ Start reaction (ONLY correct holder)
+    // 7 / J — Start reaction (only holder)
     if (phase.type === "WAIT_REACTION") {
       if (
         (rank === "7" && name === heaven) ||
@@ -182,7 +180,7 @@ export default function App() {
       return;
     }
 
-    // 🍺 Normal drink
+    // Normal tap = drink + mates
     propagateDrink(name);
   }
 
