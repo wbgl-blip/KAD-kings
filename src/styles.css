@@ -1,150 +1,283 @@
-* { box-sizing: border-box; }
+/* ============================= */
+/* 🌍 GLOBAL RESET               */
+/* ============================= */
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   margin: 0;
-  background: #0b0b0b;
-  color: #fff;
+  padding: 0;
+  background: radial-gradient(circle, #0f172a, #020617);
+  color: #e5e7eb;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+/* ============================= */
+/* 📱 APP CONTAINER (LOCK WIDTH) */
+/* ============================= */
+
 .app {
-  padding: 12px;
+  max-width: 420px;              /* PHONE WIDTH — DO NOT CHANGE */
+  margin: 0 auto;
+  padding: 10px;
+  background: #020617;
+  border-radius: 18px;
   min-height: 100vh;
 }
 
+/* ============================= */
+/* 🏷 HEADER                     */
+/* ============================= */
+
 h1 {
   text-align: center;
-  margin: 4px 0 10px;
-  font-size: 28px;
-  font-weight: 900;
+  margin: 6px 0 10px;
+  font-size: 22px;
+  letter-spacing: 1px;
 }
 
-/* STAGE */
+/* ============================= */
+/* 🍺 DRINK CALLOUT              */
+/* ============================= */
+
+.drink-callout {
+  position: fixed;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  padding: 12px 20px;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 18px;
+  z-index: 999;
+  pointer-events: none;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+}
+
+/* ============================= */
+/* 📊 INFO STRIP                 */
+/* ============================= */
+
 .stage {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-/* INFO PANEL */
-.info {
-  font-size: 12px;
-}
-.info-row {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
+  flex-direction: column;
+  gap: 8px;
 }
-.info-row.chain {
-  font-size: 11px;
-  opacity: 0.85;
-}
-.label {
-  opacity: 0.7;
-}
-.divider {
-  height: 8px;
-}
-.badge {
-  width: 18px;
-  text-align: center;
-  font-weight: 900;
-}
-.badge.j { color: #c084fc; }
-.badge.h { color: #38bdf8; }
-.badge.q { color: #facc15; }
 
-/* CARD */
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: space-between;
+}
+
+.info-row {
+  background: #0f172a;
+  padding: 4px 6px;
+  border-radius: 8px;
+  font-size: 12px;
+  display: flex;
+  gap: 4px;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: #1e293b;
+  margin: 4px 0;
+}
+
+/* ============================= */
+/* 🃏 CARD DECK                  */
+/* ============================= */
+
 .card-wrap {
   display: flex;
   justify-content: center;
+  margin: 8px 0;
+  cursor: pointer;
 }
+
 .card {
-  width: 160px;
-  height: 200px;
-  background: #f4f4f5;
-  color: #000;
-  border-radius: 18px;
-  padding: 10px;
+  width: 140px;
+  height: 190px;
+  background: linear-gradient(135deg, #1e293b, #020617);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.12);
+  transition: transform 0.12s ease;
 }
+
+.card-wrap:active .card {
+  transform: scale(0.96);
+}
+
 .card-face {
-  font-size: 46px;
+  font-size: 32px;
   font-weight: 900;
 }
+
 .card-rule {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 11px;
+  opacity: 0.8;
   margin-top: 4px;
-}
-
-/* PLAYERS */
-.players {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-.player {
-  background: #121212;
-  border-radius: 14px;
-  padding: 6px;
-  color: #fff;
-}
-.player.active {
-  outline: 2px solid #22c55e;
-}
-.video {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  background: #1e1e1e;
-  border-radius: 10px;
-  margin-bottom: 4px;
-}
-.row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-}
-.name {
-  font-weight: 700;
-}
-.count {
-  color: #cfcfcf;
-}
-.roles {
-  font-size: 11px;
-  margin-top: 2px;
-}
-.role {
-  margin-right: 4px;
-  font-weight: 900;
-}
-.role.j { color: #c084fc; }
-.role.h { color: #38bdf8; }
-.role.q { color: #facc15; }
-
-.tap {
-  margin-top: 2px;
-  font-size: 11px;
-  font-weight: 900;
   text-align: center;
 }
 
-/* ACTION */
-.action {
-  position: fixed;
-  bottom: 8px;
-  right: 8px;
-}
-.action button {
-  background: #f4f4f5;
-  color: #000;
-  border: none;
-  border-radius: 14px;
-  padding: 12px 18px;
+/* ============================= */
+/* ⚡ MODE BANNER                */
+/* ============================= */
+
+.mode {
+  text-align: center;
   font-weight: 900;
+  padding: 6px;
+  border-radius: 12px;
+  margin: 6px 0;
+  letter-spacing: 1px;
+}
+
+.mode.mate {
+  background: #16a34a;
+}
+
+.mode.target {
+  background: #f97316;
+}
+
+.mode.reaction {
+  background: #7c3aed;
+}
+
+/* ============================= */
+/* 👥 PLAYERS GRID               */
+/* ============================= */
+
+.players {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* SAME ON MOBILE + DESKTOP */
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.player {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  min-height: 90px;
+  cursor: pointer;
+}
+
+/* Video placeholder (future video slot) */
+.video {
+  background: #000;
+  border-radius: 10px;
+  height: 40px;
+  margin-bottom: 4px;
+}
+
+/* Name + beer row */
+.player .row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Roles (J / 7 / Q) */
+.roles {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* ============================= */
+/* 🍺 DRINK VISUAL               */
+/* ============================= */
+
+@keyframes drinkPulse {
+  0% { box-shadow: 0 0 0 rgba(34,197,94,0); }
+  50% { box-shadow: 0 0 16px rgba(34,197,94,0.9); }
+  100% { box-shadow: 0 0 0 rgba(34,197,94,0); }
+}
+
+.player.drink {
+  animation: drinkPulse 0.6s ease;
+  border-color: #22c55e;
+}
+
+/* ============================= */
+/* 👆 TAP PROMPT                 */
+/* ============================= */
+
+.tap {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  letter-spacing: 1px;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+/* ============================= */
+/* 🚫 DISABLED PLAYER            */
+/* ============================= */
+
+.player.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ============================= */
+/* 🔘 ACTIONS                    */
+/* ============================= */
+
+.action {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.action button {
+  background: #1e293b;
+  color: #e5e7eb;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-weight: 700;
+}
+
+/* ============================= */
+/* 🖱 OPTIONAL HOVER (DESKTOP)    */
+/* ============================= */
+
+@media (hover: hover) {
+  .player:hover {
+    background: #020617;
+    border-color: #38bdf8;
+  }
 }
