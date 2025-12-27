@@ -433,3 +433,30 @@ body {
   height: 100%;
   overflow: hidden;
 }
+/* =========================
+   STAGE WIDTH EXPANSION
+========================= */
+
+.app {
+  max-width: 520px;
+}
+/* =========================
+   CARD STAGE LAYOUT
+========================= */
+
+.card {
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+}
+.info {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.players {
+  padding-left: 6px;
+  padding-right: 6px;
+}
