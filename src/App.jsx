@@ -33,10 +33,12 @@ function buildDeck() {
 }
 
 const rankOf = c => c.replace(/[^A-Z0-9]/g, "");
+
 function leftOf(name) {
   const i = PLAYERS.indexOf(name);
   return PLAYERS[(i + 1) % PLAYERS.length];
 }
+
 export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [card, setCard] = useState(null);
@@ -46,6 +48,7 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
+  // Directed mate graph
   const [mates, setMates] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
@@ -54,7 +57,7 @@ export default function App() {
   const [phase, setPhase] = useState({ type: "IDLE", owner: null });
 
   // Waterfall (Ace)
-  // null | { starter, ready:Set, canStart:boolean }
+  // null | { starter, ready:Set, canStart:boolean|"GO" }
   const [waterfall, setWaterfall] = useState(null);
 
   const [reaction, setReaction] = useState(new Set());
@@ -82,7 +85,7 @@ export default function App() {
   }
 
   /* ======================
-     DRAW (LOCKED DURING WATERFALL)
+     DRAW (LOCKED)
   ====================== */
   function draw() {
     if (phase.type !== "IDLE") return;
@@ -122,25 +125,21 @@ export default function App() {
 
     /* 🟦 WATERFALL READY / START */
     if (waterfall) {
-      // READY phase
       if (!waterfall.canStart) {
         setWaterfall(w => {
           if (w.ready.has(name)) return w;
-
-          const nextReady = new Set(w.ready);
-          nextReady.add(name);
-
+          const next = new Set(w.ready);
+          next.add(name);
           return {
             ...w,
-            ready: nextReady,
-            canStart: nextReady.size === PLAYERS.length,
+            ready: next,
+            canStart: next.size === PLAYERS.length,
           };
         });
         return;
       }
 
-      // START phase — only starter can start
-      if (waterfall.canStart && name === waterfall.starter) {
+      if (waterfall.canStart === true && name === waterfall.starter) {
         setWaterfall(w => ({ ...w, canStart: "GO" }));
         return;
       }
@@ -202,7 +201,7 @@ export default function App() {
   }
 
   /* ======================
-     CLEAR WATERFALL AFTER GO
+     CLEAR WATERFALL
   ====================== */
   useEffect(() => {
     if (waterfall?.canStart === "GO") {
@@ -281,8 +280,9 @@ export default function App() {
             onClick={() => tapPlayer(p)}
           >
             <div className="name">{p}</div>
-            <div className="beer">🍺 {beers[p]}</div>                   
+            <div className="beer">🍺 {beers[p]}</div>
             <div className="left">◀ Left: {leftOf(p)}</div>
+          </div>
         ))}
       </div>
 
