@@ -50,12 +50,12 @@ export default function App() {
   // IDLE | SELECT_MATE | SELECT_DRINK | WAIT_REACTION | REACTION
   const [phase, setPhase] = useState({ type: "IDLE", owner: null });
 
+  // Waterfall (Ace)
+  // null | { starter, ready:Set, canStart:boolean }
+  const [waterfall, setWaterfall] = useState(null);
+
   const [reaction, setReaction] = useState(new Set());
   const [drinkFlash, setDrinkFlash] = useState([]);
-
-  // Waterfall (Ace)
-  // null | { starter: string, ready: Set<string>, go: boolean }
-  const [waterfall, setWaterfall] = useState(null);
 
   const current = PLAYERS[turn];
   const rank = card ? rankOf(card) : null;
@@ -79,10 +79,9 @@ export default function App() {
   }
 
   /* ======================
-     DRAW CARD (LOCKED DURING WATERFALL)
+     DRAW (LOCKED DURING WATERFALL)
   ====================== */
   function draw() {
-    // 🔒 HARD LOCKS
     if (phase.type !== "IDLE") return;
     if (waterfall) return;
     if (!deck.length) return;
@@ -98,9 +97,8 @@ export default function App() {
       setWaterfall({
         starter: drawer,
         ready: new Set(),
-        go: false,
+        canStart: false,
       });
-      setPhase({ type: "IDLE", owner: null });
     } else if (r === "8") {
       setPhase({ type: "SELECT_MATE", owner: drawer });
     } else if (r === "2") {
@@ -119,20 +117,31 @@ export default function App() {
   ====================== */
   function tapPlayer(name) {
 
-    /* 🟦 WATERFALL READY MODE */
-    if (waterfall && !waterfall.go) {
-      setWaterfall(w => {
-        if (w.ready.has(name)) return w;
+    /* 🟦 WATERFALL READY / START */
+    if (waterfall) {
+      // READY phase
+      if (!waterfall.canStart) {
+        setWaterfall(w => {
+          if (w.ready.has(name)) return w;
 
-        const nextReady = new Set(w.ready);
-        nextReady.add(name);
+          const nextReady = new Set(w.ready);
+          nextReady.add(name);
 
-        if (nextReady.size === PLAYERS.length) {
-          return { ...w, ready: nextReady, go: true };
-        }
+          return {
+            ...w,
+            ready: nextReady,
+            canStart: nextReady.size === PLAYERS.length,
+          };
+        });
+        return;
+      }
 
-        return { ...w, ready: nextReady };
-      });
+      // START phase — only starter can start
+      if (waterfall.canStart && name === waterfall.starter) {
+        setWaterfall(w => ({ ...w, canStart: "GO" }));
+        return;
+      }
+
       return;
     }
 
@@ -190,10 +199,10 @@ export default function App() {
   }
 
   /* ======================
-     AUTO-CLEAR WATERFALL (UNLOCK DRAW)
+     CLEAR WATERFALL AFTER GO
   ====================== */
   useEffect(() => {
-    if (waterfall?.go) {
+    if (waterfall?.canStart === "GO") {
       const t = setTimeout(() => setWaterfall(null), 2000);
       return () => clearTimeout(t);
     }
@@ -203,12 +212,18 @@ export default function App() {
      STATUS TEXT
   ====================== */
   const statusText = (() => {
-    if (waterfall && !waterfall.go) {
-      return `Waterfall — tap READY (${waterfall.ready.size}/${PLAYERS.length})`;
+    if (waterfall) {
+      if (!waterfall.canStart) {
+        return `Waterfall — READY (${waterfall.ready.size}/${PLAYERS.length})`;
+      }
+      if (waterfall.canStart === true) {
+        return `${waterfall.starter} — tap to START`;
+      }
+      if (waterfall.canStart === "GO") {
+        return `GO — ${waterfall.starter} starts!`;
+      }
     }
-    if (waterfall?.go) {
-      return `GO — ${waterfall.starter} starts!`;
-    }
+
     switch (phase.type) {
       case "SELECT_MATE":
         return `${phase.owner} — choose a mate`;
@@ -258,7 +273,7 @@ export default function App() {
               ${p === phase.owner ? "active" : ""}
               ${drinkFlash.includes(p) ? "drink" : ""}
               ${waterfall?.ready.has(p) ? "ready" : ""}
-              ${waterfall?.go && p === waterfall.starter ? "waterfall-start" : ""}
+              ${waterfall?.canStart === "GO" && p === waterfall.starter ? "waterfall-start" : ""}
             `}
             onClick={() => tapPlayer(p)}
           >
