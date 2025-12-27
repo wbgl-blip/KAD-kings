@@ -142,3 +142,26 @@ h1 {
   font-size: 16px;
   font-weight: 800;
 }
+
+.drink-pulse {
+  position: absolute;
+  inset: 0;
+  background: rgba(220, 38, 38, 0.92);
+  color: white;
+  font-weight: 900;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  z-index: 10;
+  animation: pulseShake 0.7s ease-out;
+}
+
+@keyframes pulseShake {
+  0% { transform: scale(0.9); opacity: 0; }
+  20% { transform: scale(1.05) rotate(-2deg); opacity: 1; }
+  40% { transform: scale(1.05) rotate(2deg); }
+  60% { transform: scale(1.05) rotate(-2deg); }
+  100% { transform: scale(1); opacity: 0; }
+}
