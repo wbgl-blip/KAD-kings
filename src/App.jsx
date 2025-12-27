@@ -1,16 +1,21 @@
 import { useMemo, useState } from "react";
-import "./styles.css";
 
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex", "Kyle", "Sam"];
 
 const CARD_RULES = {
+  A: ["Waterfall"],
   "2": ["Pick someone to drink"],
-  "4": ["Whores — everyone drinks"],
-  "6": ["Dicks — everyone drinks"],
+  "3": ["Me"],
+  "4": ["Whores — Everyone drinks"],
+  "5": ["Guys"],
+  "6": ["Dicks — Everyone drinks"],
   "7": ["Heaven"],
   "8": ["Pick a Mate"],
+  "9": ["Rhyme"],
+  "10": ["Categories"],
   J: ["Thumbmaster"],
   Q: ["Question Master"],
+  K: ["Make a Rule"],
 };
 
 function buildDeck() {
@@ -31,13 +36,13 @@ export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [card, setCard] = useState(null);
   const [turn, setTurn] = useState(0);
+  const [drawing, setDrawing] = useState(false);
 
   const [thumb, setThumb] = useState(null);
   const [heaven, setHeaven] = useState(null);
   const [queen, setQueen] = useState(null);
 
   const [reaction, setReaction] = useState(null);
-  const [selectMate, setSelectMate] = useState(null);
 
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
@@ -47,15 +52,22 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
 
+  const [selectMate, setSelectMate] = useState(null);
+
   const current = PLAYERS[turn];
   const currentRank = card ? rankOf(card) : null;
+  const cardRules = currentRank ? CARD_RULES[currentRank] : [];
 
   function drink(name) {
     setBeers(b => ({ ...b, [name]: b[name] + 1 }));
+    (mates[name] || []).forEach(m => {
+      setBeers(b => ({ ...b, [m]: b[m] + 1 }));
+    });
   }
 
   function draw() {
-    if (reaction || selectMate || deck.length === 0) return;
+    if (drawing || reaction || selectMate || deck.length === 0) return;
+    setDrawing(true);
 
     setDeck(d => {
       const [c, ...rest] = d;
@@ -70,14 +82,16 @@ export default function App() {
       setTurn(t => (t + 1) % PLAYERS.length);
       return rest;
     });
+
+    setTimeout(() => setDrawing(false), 250);
   }
 
   function startReaction(type) {
-    setReaction({ type, reacted: new Set() });
+    setReaction({ type, reacted: new Set([type === "J" ? thumb : heaven]) });
   }
 
   function tapPlayer(name) {
-    // 🔒 1. MATE SELECTION
+    // 1️⃣ Mate selection
     if (selectMate) {
       if (name !== selectMate) {
         setMates(m => ({
@@ -89,14 +103,14 @@ export default function App() {
       return;
     }
 
-    // 🔒 2. REACTION MODE
+    // 2️⃣ Reaction mode
     if (reaction) {
       if (reaction.reacted.has(name)) return;
 
       const next = new Set(reaction.reacted);
       next.add(name);
 
-      if (next.size === PLAYERS.length - 1) {
+      if (next.size === PLAYERS.length) {
         drink(name);
         setReaction(null);
       } else {
@@ -105,27 +119,29 @@ export default function App() {
       return;
     }
 
-    // 🔒 3. START REACTION (holder taps once)
-    if (name === thumb) return startReaction("J");
-    if (name === heaven) return startReaction("7");
+    // 3️⃣ Start reaction (card holder taps ONCE)
+    if (name === thumb) {
+      startReaction("J");
+      return;
+    }
+    if (name === heaven) {
+      startReaction("7");
+      return;
+    }
 
-    // 🔒 4. NORMAL DRINK
+    // 4️⃣ Normal drink
     drink(name);
   }
 
   const mateChains = useMemo(() => {
     const chains = [];
-    const visited = new Set();
-
-    function dfs(node, path) {
-      if (visited.has(node)) return;
-      visited.add(node);
-      const next = mates[node];
-      if (!next.length) chains.push(path);
-      else next.forEach(n => dfs(n, [...path, n]));
+    function walk(start, path) {
+      (mates[start] || []).forEach(n => {
+        chains.push([...path, n]);
+        walk(n, [...path, n]);
+      });
     }
-
-    Object.keys(mates).forEach(p => mates[p].length && dfs(p, [p]));
+    Object.keys(mates).forEach(p => walk(p, [p]));
     return chains;
   }, [mates]);
 
@@ -133,17 +149,36 @@ export default function App() {
     <div className="app">
       <h1>KAD Kings</h1>
 
-      <div className="mode">
+      <div className="mode-banner">
         {selectMate && <>🤝 {selectMate} — PICK A MATE</>}
         {!selectMate && reaction && <>⚡ REACTION — TAP FAST</>}
         {!selectMate && !reaction && <>{current}’s Turn</>}
       </div>
 
-      <div className="card" onClick={draw}>
-        <div className="card-face">{card ?? "—"}</div>
-        {CARD_RULES[currentRank]?.map((r, i) => (
-          <div key={i} className="rule">{r}</div>
-        ))}
+      <div className="info-panel">
+        <div className="info-row"><span>Turn</span><strong>{current}</strong></div>
+        <div className="info-row"><span>Deck</span><strong>{52 - deck.length}/52</strong></div>
+        <div className="info-row"><span>J</span><strong>{thumb ?? "—"}</strong></div>
+        <div className="info-row"><span>7</span><strong>{heaven ?? "—"}</strong></div>
+        <div className="info-row"><span>Q</span><strong>{queen ?? "—"}</strong></div>
+
+        {mateChains.length > 0 && (
+          <>
+            <div className="info-divider" />
+            {mateChains.map((c, i) => (
+              <div key={i} className="mate-chain">🤝 {c.join(" → ")}</div>
+            ))}
+          </>
+        )}
+      </div>
+
+      <div className="card-wrap" onClick={draw}>
+        <div className="card">
+          <div className="card-face">{card ?? "—"}</div>
+          {cardRules.map((r, i) => (
+            <div key={i} className="card-rule">{r}</div>
+          ))}
+        </div>
       </div>
 
       <div className="players">
@@ -154,20 +189,16 @@ export default function App() {
           return (
             <button
               key={p}
-              className={`player
-                ${isTurn ? "turn" : ""}
-                ${selectMate && p === selectMate ? "disabled" : ""}
-                ${selectable ? "selectable" : ""}
-              `}
+              className={`player ${isTurn ? "active" : ""} ${selectable ? "selectable" : ""}`}
               onClick={() => tapPlayer(p)}
             >
               {isTurn && <div className="turn-badge">YOUR TURN</div>}
               <div className="name">{p}</div>
-              <div className="beer">🍺 {beers[p]}</div>
+              <div className="count">🍺 {beers[p]}</div>
               <div className="roles">
-                {p === thumb && "J "}
-                {p === heaven && "7 "}
-                {p === queen && "Q"}
+                {p === thumb && <span className="role j">J</span>}
+                {p === heaven && <span className="role h">7</span>}
+                {p === queen && <span className="role q">Q</span>}
               </div>
             </button>
           );
