@@ -247,3 +247,28 @@ h2 {
   padding: 6px 10px;
   border-radius: 10px;
 }
+/* =========================
+   LABEL PRIORITY OVERRIDES
+========================= */
+
+/* If drinking, hide other labels */
+.player.drink::after {
+  z-index: 3;
+}
+
+.player.drink.turn::after,
+.player.drink.active::after {
+  content: "YOU DRINK";
+}
+
+/* If selecting, hide TURN */
+.player.active.turn::after {
+  content: "SELECTING";
+  color: #facc15;
+}
+
+/* Ensure TURN only shows when idle */
+.player.turn:not(.active):not(.drink)::after {
+  content: "TURN";
+  color: #22c55e;
+}
