@@ -1,5 +1,5 @@
 /* ============================= */
-/* 🌍 GLOBAL RESET               */
+/* 🌍 RESET + BASE               */
 /* ============================= */
 
 * {
@@ -10,22 +10,27 @@
 body {
   margin: 0;
   padding: 0;
-  background: radial-gradient(circle, #0f172a, #020617);
-  color: #e5e7eb;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #e5e7eb;
+  background: radial-gradient(
+    circle at top,
+    #1e293b 0%,
+    #020617 55%,
+    #020617 100%
+  );
 }
 
 /* ============================= */
-/* 📱 APP CONTAINER (LOCK WIDTH) */
+/* 📱 APP CONTAINER              */
 /* ============================= */
 
 .app {
-  max-width: 420px;              /* PHONE WIDTH — DO NOT CHANGE */
+  max-width: 420px;              /* MOBILE LOCK */
   margin: 0 auto;
   padding: 10px;
+  min-height: 100vh;
   background: #020617;
   border-radius: 18px;
-  min-height: 100vh;
 }
 
 /* ============================= */
@@ -48,14 +53,14 @@ h1 {
   top: 18%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0,0,0,0.85);
   padding: 12px 20px;
   border-radius: 14px;
   font-weight: 900;
   font-size: 18px;
   z-index: 999;
   pointer-events: none;
-  box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+  box-shadow: 0 0 30px rgba(34,197,94,0.8);
 }
 
 /* ============================= */
@@ -76,23 +81,33 @@ h1 {
 }
 
 .info-row {
-  background: #0f172a;
-  padding: 4px 6px;
-  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  padding: 6px 8px;
+  border-radius: 10px;
   font-size: 12px;
   display: flex;
-  gap: 4px;
+  gap: 6px;
+  align-items: center;
+}
+
+.info-row span:first-child {
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+.info-row span:last-child {
+  font-weight: 800;
 }
 
 .divider {
   width: 100%;
   height: 1px;
-  background: #1e293b;
+  background: rgba(255,255,255,0.08);
   margin: 4px 0;
 }
 
 /* ============================= */
-/* 🃏 CARD DECK                  */
+/* 🃏 CARD (MAIN FOCUS)          */
 /* ============================= */
 
 .card-wrap {
@@ -103,15 +118,18 @@ h1 {
 }
 
 .card {
-  width: 140px;
-  height: 190px;
-  background: linear-gradient(135deg, #1e293b, #020617);
-  border-radius: 16px;
+  width: 150px;
+  height: 210px;
+  background: linear-gradient(135deg, #f8fafc, #e5e7eb);
+  color: #020617;
+  border-radius: 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.6),
+    0 0 30px rgba(255,255,255,0.25);
   transition: transform 0.12s ease;
 }
 
@@ -120,40 +138,15 @@ h1 {
 }
 
 .card-face {
-  font-size: 32px;
+  font-size: 40px;
   font-weight: 900;
 }
 
 .card-rule {
-  font-size: 11px;
-  opacity: 0.8;
+  font-size: 12px;
+  opacity: 0.85;
   margin-top: 4px;
   text-align: center;
-}
-
-/* ============================= */
-/* ⚡ MODE BANNER                */
-/* ============================= */
-
-.mode {
-  text-align: center;
-  font-weight: 900;
-  padding: 6px;
-  border-radius: 12px;
-  margin: 6px 0;
-  letter-spacing: 1px;
-}
-
-.mode.mate {
-  background: #16a34a;
-}
-
-.mode.target {
-  background: #f97316;
-}
-
-.mode.reaction {
-  background: #7c3aed;
 }
 
 /* ============================= */
@@ -162,47 +155,54 @@ h1 {
 
 .players {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* SAME ON MOBILE + DESKTOP */
-  gap: 8px;
-  margin-top: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .player {
-  background: #020617;
+  background: linear-gradient(180deg, #020617, #020617);
   border: 1px solid #1e293b;
-  border-radius: 14px;
-  padding: 6px;
+  border-radius: 16px;
+  padding: 8px;
+  min-height: 95px;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  position: relative;
-  min-height: 90px;
-  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
 }
 
-/* Video placeholder (future video slot) */
+/* Video placeholder */
 .video {
-  background: #000;
+  background: linear-gradient(180deg, #0f172a, #020617);
   border-radius: 10px;
   height: 40px;
   margin-bottom: 4px;
 }
 
-/* Name + beer row */
+/* Name + beer */
 .player .row {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
+}
+
+.player .row span:first-child {
+  font-weight: 800;
+}
+
+.player .row span:last-child {
   font-weight: 700;
 }
 
-/* Roles (J / 7 / Q) */
+/* Roles */
 .roles {
   position: absolute;
-  top: 4px;
-  right: 6px;
+  top: 6px;
+  right: 8px;
   font-size: 12px;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 /* ============================= */
@@ -211,24 +211,29 @@ h1 {
 
 @keyframes drinkPulse {
   0% { box-shadow: 0 0 0 rgba(34,197,94,0); }
-  50% { box-shadow: 0 0 16px rgba(34,197,94,0.9); }
+  50% { box-shadow: 0 0 18px rgba(34,197,94,0.9); }
   100% { box-shadow: 0 0 0 rgba(34,197,94,0); }
 }
 
 .player.drink {
   animation: drinkPulse 0.6s ease;
   border-color: #22c55e;
+  background: radial-gradient(
+    circle at center,
+    rgba(34,197,94,0.25),
+    #020617
+  );
 }
 
 /* ============================= */
-/* 👆 TAP PROMPT                 */
+/* 👆 TAP OVERLAY                */
 /* ============================= */
 
 .tap {
   position: absolute;
   inset: 0;
   background: rgba(0,0,0,0.55);
-  border-radius: 14px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -248,12 +253,12 @@ h1 {
 /* ============================= */
 
 .player.disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   pointer-events: none;
 }
 
 /* ============================= */
-/* 🔘 ACTIONS                    */
+/* 🔘 RESET BUTTON               */
 /* ============================= */
 
 .action {
@@ -263,21 +268,20 @@ h1 {
 }
 
 .action button {
-  background: #1e293b;
+  background: #334155;
   color: #e5e7eb;
   border: none;
-  border-radius: 12px;
-  padding: 8px 16px;
-  font-weight: 700;
+  border-radius: 14px;
+  padding: 10px 20px;
+  font-weight: 800;
 }
 
 /* ============================= */
-/* 🖱 OPTIONAL HOVER (DESKTOP)    */
+/* 🖱 OPTIONAL DESKTOP HOVER      */
 /* ============================= */
 
 @media (hover: hover) {
   .player:hover {
-    background: #020617;
     border-color: #38bdf8;
   }
 }
