@@ -17,7 +17,7 @@ body {
 .app {
   width: 100%;
   max-width: 420px;
-  padding: 16px;
+  padding: 12px 14px 16px;
 }
 
 /* =========================
@@ -25,14 +25,14 @@ body {
 ========================= */
 h1 {
   text-align: center;
-  margin: 6px 0 4px;
-  font-size: 32px;
+  margin: 4px 0 2px;
+  font-size: 30px;
 }
 
 h2 {
   text-align: center;
-  margin: 6px 0 10px;
-  font-size: 15px;
+  margin: 4px 0 6px;
+  font-size: 14px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -41,34 +41,78 @@ h2 {
 
 .status {
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   opacity: 0.85;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 /* =========================
-   CARD
+   TOP AREA (INFO + CARD)
+========================= */
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+
+/* =========================
+   INFO PILLS
+========================= */
+.pill {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  background: #1f2937;
+  color: #e5e7eb;
+  white-space: nowrap;
+}
+
+.pill.mate {
+  background: #0f766e;
+  color: #ecfeff;
+}
+
+.pill.action {
+  background: #facc15;
+  color: #1f2937;
+  cursor: pointer;
+}
+
+.pill.action:active {
+  transform: scale(0.96);
+}
+
+.pill.muted {
+  opacity: 0.6;
+}
+
+/* =========================
+   CARD (DECK)
 ========================= */
 .card {
-  margin: 14px auto 18px;
-  height: 140px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, #ffffff, #ececec);
+  margin: 10px auto 14px;
+  height: 120px;
+  max-width: 170px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, #e5e7eb);
   color: #020617;
   font-weight: 900;
-  font-size: 26px;
+  font-size: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 18px 36px rgba(0,0,0,0.6);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.6);
   cursor: pointer;
   user-select: none;
 }
 
 .card.locked {
-  opacity: 0.6;
+  opacity: 0.55;
   pointer-events: none;
 }
 
@@ -77,63 +121,14 @@ h2 {
 }
 
 .rank {
-  font-size: 42px;
+  font-size: 40px;
 }
 
 .rule {
-  margin-top: 6px;
-  font-size: 14px;
+  margin-top: 4px;
+  font-size: 13px;
   font-weight: 700;
-}
-
-/* =========================
-   INFO PILLS
-========================= */
-.info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin: 10px 0 12px;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-  background: rgba(15,23,42,0.65);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
-  color: #e5e7eb;
-}
-
-.pill.muted {
-  opacity: 0.75;
-}
-
-.pill.mate {
-  background: rgba(30,41,59,0.7);
-}
-
-.pill.action {
-  border: none;
-  cursor: pointer;
-  background: rgba(56,189,248,0.25);
-  box-shadow: inset 0 0 0 1px rgba(56,189,248,0.35);
-}
-
-.pill.action:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pill.action.danger {
-  background: rgba(239,68,68,0.25);
-  box-shadow: inset 0 0 0 1px rgba(239,68,68,0.35);
+  opacity: 0.85;
 }
 
 /* =========================
@@ -142,7 +137,7 @@ h2 {
 .players {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 /* =========================
@@ -150,168 +145,109 @@ h2 {
 ========================= */
 .player {
   position: relative;
-  padding: 14px;
-  border-radius: 18px;
+  padding: 12px;
+  border-radius: 16px;
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,0.08),
-    0 10px 24px rgba(0,0,0,0.6);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+    0 10px 22px rgba(0,0,0,0.55);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .player:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 .name {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
 }
 
 .beer {
-  margin-top: 6px;
-  font-size: 14px;
+  margin-top: 4px;
+  font-size: 13px;
   opacity: 0.9;
-}
-
-/* =========================
-   TURN OWNER (GREEN)
-========================= */
-.player.turn {
-  box-shadow:
-    0 0 0 2px #22c55e,
-    0 0 20px rgba(34,197,94,0.55);
-}
-
-/* =========================
-   ACTIVE DECISION MAKER (YELLOW)
-========================= */
-.player.active {
-  animation: selectPulse 1.2s infinite;
-  box-shadow:
-    0 0 0 3px #eab308,
-    0 0 28px rgba(234,179,8,0.85);
-}
-
-/* =========================
-   DRAWER HIGHLIGHT (BRIEF)
-========================= */
-.player.drawer {
-  box-shadow:
-    0 0 0 2px rgba(148,163,184,0.9),
-    0 0 18px rgba(148,163,184,0.45);
-}
-
-/* =========================
-   DRINK TARGET (RED)
-========================= */
-.player.drink {
-  animation: drinkPulse 5s ease-out;
-  box-shadow:
-    0 0 0 3px #ef4444,
-    0 0 32px rgba(239,68,68,0.95);
-}
-
-/* =========================
-   LABELS (PRIORITY SAFE)
-========================= */
-.player.turn:not(.active):not(.drink)::after {
-  content: "TURN";
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  font-size: 10px;
-  font-weight: 900;
-  color: #22c55e;
-  letter-spacing: 0.6px;
-}
-
-.player.active::after {
-  content: "SELECTING";
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  font-size: 10px;
-  font-weight: 900;
-  color: #facc15;
-  letter-spacing: 0.6px;
-}
-
-.player.drink::after {
-  content: "YOU DRINK";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(239,68,68,0.9);
-  padding: 6px 10px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 900;
-  color: #ffffff;
 }
 
 /* =========================
    BADGES
 ========================= */
 .badges {
+  position: absolute;
+  top: 6px;
+  left: 6px;
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
+  gap: 4px;
 }
 
 .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
+  font-size: 9px;
   font-weight: 900;
+  padding: 3px 6px;
+  border-radius: 6px;
   letter-spacing: 0.4px;
-  color: #0b1220;
-  background: #e5e7eb;
 }
 
 .badge.thumb {
   background: #facc15;
+  color: #1f2937;
 }
 
 .badge.heaven {
   background: #38bdf8;
+  color: #020617;
 }
 
-.badge.readyBadge {
-  background: #60a5fa;
+/* =========================
+   TURN / ACTIVE STATES
+========================= */
+.player.turn {
+  box-shadow:
+    0 0 0 2px #22c55e,
+    0 0 18px rgba(34,197,94,0.55);
 }
 
-.badge.wfBadge {
-  background: #34d399;
+.player.active {
+  animation: selectPulse 1.1s infinite;
+  box-shadow:
+    0 0 0 3px #eab308,
+    0 0 26px rgba(234,179,8,0.85);
+}
+
+/* =========================
+   DRINK TARGET
+========================= */
+.player.drink {
+  animation: drinkPulse 5s ease-out;
+  box-shadow:
+    0 0 0 3px #ef4444,
+    0 0 28px rgba(239,68,68,0.9);
+}
+
+.player.drink::after {
+  content: "YOU DRINK";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  background: rgba(239,68,68,0.85);
+  border-radius: 16px;
 }
 
 /* =========================
    WATERFALL STATES
 ========================= */
-.player.ready {
+.player.waterfall-ready {
   box-shadow:
     0 0 0 2px #60a5fa,
     0 0 18px rgba(96,165,250,0.6);
 }
 
-.player.ready::after {
-  content: "READY";
-  position: absolute;
-  bottom: 8px;
-  right: 10px;
-  font-size: 10px;
-  font-weight: 900;
-  color: #60a5fa;
-  letter-spacing: 0.6px;
-}
-
-.player.waterfall-start {
-  animation: selectPulse 1s infinite;
+.player.waterfall-active {
+  animation: waterfallPulse 1s infinite;
   box-shadow:
     0 0 0 3px #38bdf8,
     0 0 30px rgba(56,189,248,0.9);
@@ -322,13 +258,13 @@ h2 {
 ========================= */
 .reset {
   width: 100%;
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: 16px;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
   border: none;
   background: #1f2937;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
 }
 
@@ -339,35 +275,41 @@ h2 {
   0% {
     box-shadow:
       0 0 0 3px #eab308,
-      0 0 20px rgba(234,179,8,0.5);
+      0 0 18px rgba(234,179,8,0.5);
   }
   50% {
     box-shadow:
       0 0 0 6px #facc15,
-      0 0 36px rgba(250,204,21,0.9);
+      0 0 34px rgba(250,204,21,0.9);
   }
   100% {
     box-shadow:
       0 0 0 3px #eab308,
-      0 0 20px rgba(234,179,8,0.5);
+      0 0 18px rgba(234,179,8,0.5);
   }
 }
 
 @keyframes drinkPulse {
+  0% { opacity: 0; transform: scale(0.96); }
+  10% { opacity: 1; transform: scale(1.05); }
+  85% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes waterfallPulse {
   0% {
-    transform: scale(0.96);
-    opacity: 0;
+    box-shadow:
+      0 0 0 3px #38bdf8,
+      0 0 20px rgba(56,189,248,0.6);
   }
-  10% {
-    transform: scale(1.05);
-    opacity: 1;
-  }
-  85% {
-    transform: scale(1);
-    opacity: 1;
+  50% {
+    box-shadow:
+      0 0 0 6px #7dd3fc,
+      0 0 36px rgba(125,211,252,1);
   }
   100% {
-    transform: scale(1);
-    opacity: 0;
+    box-shadow:
+      0 0 0 3px #38bdf8,
+      0 0 20px rgba(56,189,248,0.6);
   }
 }
