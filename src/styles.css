@@ -1,46 +1,47 @@
 * {
   box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
 }
 
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #0b1220, #05070c);
-  color: #fff;
-  font-family: system-ui, sans-serif;
-  display: flex;
-  justify-content: center;
+  background: radial-gradient(circle at top, #111827, #020617);
+  color: white;
 }
 
 .app {
-  width: 100%;
   max-width: 420px;
-  padding: 14px;
+  margin: 0 auto;
+  padding: 16px;
+  text-align: center;
 }
 
 h1 {
-  text-align: center;
-  margin-bottom: 4px;
+  margin: 8px 0;
 }
 
 h2 {
-  text-align: center;
-  margin-bottom: 10px;
-  font-weight: 700;
-  opacity: 0.9;
+  opacity: 0.8;
+  margin-bottom: 12px;
 }
 
 .card {
-  margin: 14px auto;
-  height: 140px;
-  border-radius: 20px;
-  background: #fff;
-  color: #000;
-  font-weight: 900;
-  font-size: 26px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  background: white;
+  color: black;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.rank {
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.rule {
+  margin-top: 8px;
+  font-weight: 600;
 }
 
 .players {
@@ -51,54 +52,51 @@ h2 {
 
 .player {
   background: #0f172a;
+  border-radius: 14px;
   padding: 14px;
-  border-radius: 18px;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
 }
 
-.player.current {
-  box-shadow: 0 0 0 2px #22c55e;
+.player.turn {
+  border-color: #22c55e;
+}
+
+.player.active {
+  box-shadow: 0 0 0 3px #eab308;
+}
+
+.player.drink {
+  animation: pulse 1s infinite;
+  border-color: #ef4444;
 }
 
 .name {
-  font-weight: 800;
+  font-weight: 700;
 }
 
-.count {
-  opacity: 0.85;
-}
-
-.hint {
+.beer {
   margin-top: 6px;
-  font-size: 12px;
-  color: #38bdf8;
 }
 
-.drink-pulse {
-  animation: pulseShake 5s ease-out;
-  background: #7c2d12;
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+  100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
 }
 
-@keyframes pulseShake {
-  0% { transform: scale(0.95); opacity: 0; }
-  10% { transform: scale(1.05); opacity: 1; }
-  85% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-.chains {
-  margin-top: 12px;
-  font-size: 13px;
-  opacity: 0.85;
+.mates {
+  margin-top: 14px;
+  opacity: 0.9;
 }
 
 .reset {
-  margin-top: 16px;
+  margin-top: 18px;
   width: 100%;
-  padding: 14px;
-  border-radius: 16px;
+  padding: 12px;
+  border-radius: 12px;
   border: none;
   background: #1f2937;
-  color: #fff;
-  font-weight: 900;
+  color: white;
+  font-size: 16px;
 }
