@@ -1,273 +1,110 @@
-/* ============================= */
-/* 🌍 RESET + BASE               */
-/* ============================= */
-
 * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #e5e7eb;
-  background: radial-gradient(
-    circle at top,
-    #1e293b 0%,
-    #020617 55%,
-    #020617 100%
-  );
+  background: radial-gradient(circle at top, #020617, #000);
+  font-family: system-ui, sans-serif;
+  color: #f8fafc;
 }
-
-/* ============================= */
-/* 📱 APP CONTAINER              */
-/* ============================= */
 
 .app {
   max-width: 420px;
-  margin: 0 auto;
-  padding: 10px;
-  min-height: 100vh;
-  background: #020617;
-  border-radius: 18px;
+  margin: auto;
+  padding: 12px;
 }
-
-/* ============================= */
-/* 🏷 HEADER                     */
-/* ============================= */
 
 h1 {
   text-align: center;
-  margin: 6px 0 10px;
-  font-size: 22px;
-  letter-spacing: 1px;
-  color: #f8fafc;
+  margin: 6px 0;
 }
 
-/* ============================= */
-/* 🍺 DRINK CALLOUT              */
-/* ============================= */
-
-.drink-callout {
-  position: fixed;
-  top: 18%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.85);
-  padding: 12px 20px;
-  border-radius: 14px;
+.mode {
+  text-align: center;
   font-weight: 900;
-  font-size: 18px;
-  z-index: 999;
-  pointer-events: none;
-  color: #f8fafc;
-  box-shadow: 0 0 30px rgba(34,197,94,0.8);
-}
-
-/* ============================= */
-/* 📊 INFO STRIP                 */
-/* ============================= */
-
-.stage {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: space-between;
-}
-
-.info-row {
-  background: rgba(255,255,255,0.08);
-  padding: 6px 8px;
-  border-radius: 10px;
-  font-size: 12px;
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  color: #e5e7eb;
-}
-
-.info-row span:first-child {
-  opacity: 0.75;
-  font-weight: 600;
-}
-
-.info-row span:last-child {
-  font-weight: 800;
-  color: #f8fafc;
-}
-
-.divider {
-  width: 100%;
-  height: 1px;
-  background: rgba(255,255,255,0.12);
-  margin: 4px 0;
-}
-
-/* ============================= */
-/* 🃏 CARD                       */
-/* ============================= */
-
-.card-wrap {
-  display: flex;
-  justify-content: center;
-  margin: 8px 0;
-  cursor: pointer;
+  margin-bottom: 8px;
 }
 
 .card {
-  width: 150px;
-  height: 210px;
-  background: linear-gradient(135deg, #f8fafc, #e5e7eb);
+  background: #f8fafc;
   color: #020617;
-  border-radius: 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.6),
-    0 0 30px rgba(255,255,255,0.25);
-}
-
-.card-face {
-  font-size: 40px;
-  font-weight: 900;
-}
-
-.card-rule {
-  font-size: 12px;
-  opacity: 0.85;
-  margin-top: 4px;
+  border-radius: 16px;
+  padding: 24px;
   text-align: center;
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 12px;
 }
 
-/* ============================= */
-/* 👥 PLAYERS GRID               */
-/* ============================= */
+.rule {
+  font-size: 12px;
+  margin-top: 6px;
+}
 
 .players {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
-  margin-top: 6px;
+  gap: 8px;
 }
 
-/* 🔑 KEY FIX IS HERE */
 .player {
-  background: linear-gradient(
-    180deg,
-    rgba(15,23,42,0.95),
-    rgba(2,6,23,0.95)
-  );
-  border: 1px solid #1e293b;
-  border-radius: 16px;
-  padding: 8px;
-  min-height: 95px;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  color: #f8fafc; /* 🔥 FORCE TEXT VISIBLE */
-}
-
-/* Video placeholder */
-.video {
-  background: linear-gradient(180deg, #020617, #020617);
-  border-radius: 10px;
-  height: 40px;
-  margin-bottom: 4px;
-}
-
-/* Name + beer row */
-.player .row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  font-weight: 700;
-  color: #f8fafc;
-}
-
-.player .row span:last-child {
+  background: linear-gradient(180deg, #020617, #020617cc);
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid #1e293b;
   color: #e5e7eb;
 }
 
-/* Roles */
-.roles {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  font-size: 12px;
-  opacity: 0.85;
-  color: #f8fafc;
-}
-
-/* ============================= */
-/* 🍺 DRINK VISUAL               */
-/* ============================= */
-
-@keyframes drinkPulse {
-  0% { box-shadow: 0 0 0 rgba(34,197,94,0); }
-  50% { box-shadow: 0 0 18px rgba(34,197,94,0.9); }
-  100% { box-shadow: 0 0 0 rgba(34,197,94,0); }
-}
-
-.player.drink {
-  animation: drinkPulse 0.6s ease;
+.player.turn {
   border-color: #22c55e;
-  background: radial-gradient(
-    circle at center,
-    rgba(34,197,94,0.25),
-    rgba(2,6,23,0.95)
-  );
+  box-shadow: 0 0 12px rgba(34,197,94,0.8);
 }
 
-/* ============================= */
-/* 👆 TAP OVERLAY                */
-/* ============================= */
-
-.tap {
+.turn-badge {
   position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #22c55e;
+  color: #020617;
+  font-size: 10px;
   font-weight: 900;
-  letter-spacing: 1px;
-  color: #f8fafc;
-  animation: pulse 1s infinite;
+  padding: 3px 8px;
+  border-radius: 999px;
 }
 
-@keyframes pulse {
-  0% { opacity: 0.4; }
-  50% { opacity: 1; }
-  100% { opacity: 0.4; }
+.player.disabled {
+  opacity: 0.35;
+  pointer-events: none;
 }
 
-/* ============================= */
-/* 🔘 RESET BUTTON               */
-/* ============================= */
-
-.action {
-  display: flex;
-  justify-content: center;
-  margin: 12px 0;
+.player.selectable {
+  box-shadow: 0 0 16px rgba(34,197,94,0.9);
 }
 
-.action button {
-  background: #334155;
-  color: #f8fafc;
+.name {
+  font-weight: 700;
+}
+
+.beer {
+  margin-top: 6px;
+}
+
+.roles {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.reset {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
   border: none;
-  border-radius: 14px;
-  padding: 10px 20px;
-  font-weight: 800;
+  background: #1e293b;
+  color: #f8fafc;
+  font-weight: 700;
 }
-
