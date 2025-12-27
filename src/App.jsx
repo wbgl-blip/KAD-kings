@@ -48,6 +48,7 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
+  // Directed mates: leader -> [mates]
   const [mates, setMates] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
@@ -55,13 +56,43 @@ export default function App() {
   const current = PLAYERS[turn];
   const rank = card ? rankOf(card) : null;
 
-  function drink(name) {
-    setBeers(b => ({ ...b, [name]: b[name] + 1 }));
-    setDrinkPulse(name);
-    setTimeout(() => setDrinkPulse(null), 5000);
+  // Build the full chain of drinkers (including multi-hop mates)
+  function collectMateClosure(start) {
+    const seen = new Set();
+    const stack = [start];
+    seen.add(start);
 
-    // Mate propagation
-    mates[name]?.forEach(m => drink(m));
+    while (stack.length) {
+      const node = stack.pop();
+      const next = mates[node] || [];
+      for (const n of next) {
+        if (!seen.has(n)) {
+          seen.add(n);
+          stack.push(n);
+        }
+      }
+    }
+    return Array.from(seen); // includes start
+  }
+
+  function pulse(names) {
+    // show the last person who must drink (good enough for now)
+    const last = names[names.length - 1];
+    setDrinkPulse(last);
+    setTimeout(() => setDrinkPulse(null), 5000);
+  }
+
+  function drinkEvent(starter) {
+    const all = collectMateClosure(starter);
+
+    // Increment beers for everyone in this event exactly once
+    setBeers(b => {
+      const next = { ...b };
+      for (const p of all) next[p] = next[p] + 1;
+      return next;
+    });
+
+    pulse(all);
   }
 
   function draw() {
@@ -87,13 +118,18 @@ export default function App() {
   }
 
   function tapPlayer(name) {
-    // 1️⃣ Mate selection (absolute)
+    // 1️⃣ Mate selection (additive)
     if (selectMate) {
       if (name !== selectMate) {
-        setMates(m => ({
-          ...m,
-          [selectMate]: [...m[selectMate], name],
-        }));
+        setMates(m => {
+          // Prevent duplicates
+          const existing = m[selectMate] || [];
+          if (existing.includes(name)) return m;
+          return {
+            ...m,
+            [selectMate]: [...existing, name],
+          };
+        });
       }
       setSelectMate(null);
       return;
@@ -101,21 +137,21 @@ export default function App() {
 
     // 2️⃣ Pick someone to drink (2)
     if (pickDrink) {
-      if (name !== pickDrink) drink(name);
+      if (name !== pickDrink) drinkEvent(name);
       setPickDrink(null);
       return;
     }
 
-    // 3️⃣ Reaction mode (J / 7)
+    // 3️⃣ Reaction mode (holder NOT included)
     if (reaction) {
       if (reaction.reacted.has(name)) return;
 
       const next = new Set(reaction.reacted);
       next.add(name);
 
-      // holder is NOT included
+      // last person to react drinks
       if (next.size === PLAYERS.length - 1) {
-        drink(name);
+        drinkEvent(name);
         setReaction(null);
       } else {
         setReaction({ ...reaction, reacted: next });
@@ -133,20 +169,18 @@ export default function App() {
       return;
     }
 
-    // 5️⃣ Normal drink
-    drink(name);
+    // 5️⃣ Normal drink event (with mate chain)
+    drinkEvent(name);
   }
 
   const mateChains = useMemo(() => {
+    // show direct edges as chains for now
     const chains = [];
-    const walk = (node, path) => {
-      if (!mates[node]?.length) {
-        chains.push(path);
-        return;
-      }
-      mates[node].forEach(n => walk(n, [...path, n]));
-    };
-    Object.keys(mates).forEach(p => mates[p].length && walk(p, [p]));
+    Object.keys(mates).forEach(a => {
+      (mates[a] || []).forEach(b => {
+        chains.push([a, b]);
+      });
+    });
     return chains;
   }, [mates]);
 
@@ -178,6 +212,7 @@ export default function App() {
 
             {selectMate && <div className="hint">Pick Mate</div>}
             {pickDrink && <div className="hint">Pick to Drink</div>}
+            {reaction && <div className="hint">Reaction!</div>}
           </div>
         ))}
       </div>
