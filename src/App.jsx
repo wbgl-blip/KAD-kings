@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import "./index.css";
 
 const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex", "Kyle", "Sam"];
@@ -16,7 +16,7 @@ const CARD_RULES = {
   10: "Categories",
   J: "Thumbmaster",
   Q: "Question Master",
-  K: "Make a Rule"
+  K: "Make a Rule",
 };
 
 const suits = ["♠", "♥", "♦", "♣"];
@@ -54,15 +54,19 @@ export default function App() {
   const [reaction, setReaction] = useState(null);
 
   const [phase, setPhase] = useState({
-    type: "IDLE",
+    type: "IDLE",          // IDLE | SELECT_MATE | SELECT_DRINK | WAIT_REACTION | REACTION
     turnOwner: null,
-    activePlayer: null
+    activePlayer: null,
   });
 
   const [drinkFlash, setDrinkFlash] = useState([]);
 
   const current = PLAYERS[turn];
   const rank = card ? rankOf(card) : null;
+
+  /* =====================
+     DRINKING + MATES
+  ====================== */
 
   function drink(name) {
     setBeers(b => ({ ...b, [name]: b[name] + 1 }));
@@ -73,15 +77,21 @@ export default function App() {
     );
   }
 
-  function propagateDrink(name, visited = new Set()) {
-    if (visited.has(name)) return;
-    visited.add(name);
-    drink(name);
-    mates[name]?.forEach(m => propagateDrink(m, visited));
+  function propagateDrink(start, visited = new Set()) {
+    if (visited.has(start)) return;
+    visited.add(start);
+    drink(start);
+    mates[start]?.forEach(m => propagateDrink(m, visited));
   }
+
+  /* =====================
+     DRAW CARD
+  ====================== */
 
   function draw() {
     if (phase.type !== "IDLE") return;
+    if (!deck.length) return;
+
     const [c, ...rest] = deck;
     setDeck(rest);
     setCard(c);
@@ -105,18 +115,28 @@ export default function App() {
     setTurn(t => (t + 1) % PLAYERS.length);
   }
 
+  /* =====================
+     REACTION
+  ====================== */
+
   function startReaction() {
     setReaction(new Set());
     setPhase({ type: "REACTION", turnOwner: null, activePlayer: null });
   }
 
+  /* =====================
+     PLAYER TAP
+  ====================== */
+
   function tapPlayer(name) {
 
-    // Reaction taps
+    // 🔴 Reaction taps (holder NOT included)
     if (reaction) {
       if (reaction.has(name)) return;
+
       const next = new Set(reaction);
       next.add(name);
+
       if (next.size === PLAYERS.length - 1) {
         propagateDrink(name);
         setReaction(null);
@@ -127,46 +147,85 @@ export default function App() {
       return;
     }
 
-    // Phase-locked actions
+    // 🔒 Only active player can act during phases
     if (phase.activePlayer && name !== phase.activePlayer) return;
 
+    // 🤝 Pick mate (8)
     if (phase.type === "SELECT_MATE") {
       if (name !== phase.turnOwner) {
         setMates(m => ({
           ...m,
-          [phase.turnOwner]: [...m[phase.turnOwner], name]
+          [phase.turnOwner]: m[phase.turnOwner].includes(name)
+            ? m[phase.turnOwner]
+            : [...m[phase.turnOwner], name],
         }));
         setPhase({ type: "IDLE", turnOwner: null, activePlayer: null });
       }
       return;
     }
 
+    // 🍺 Pick someone to drink (2)
     if (phase.type === "SELECT_DRINK") {
       propagateDrink(name);
       setPhase({ type: "IDLE", turnOwner: null, activePlayer: null });
       return;
     }
 
+    // ⚡ Start reaction (ONLY correct holder)
     if (phase.type === "WAIT_REACTION") {
-      startReaction();
+      if (
+        (rank === "7" && name === heaven) ||
+        (rank === "J" && name === thumb)
+      ) {
+        startReaction();
+      }
       return;
     }
 
+    // 🍺 Normal drink
     propagateDrink(name);
   }
 
+  /* =====================
+     MATE CHAINS (DISPLAY)
+  ====================== */
+
   const mateChains = useMemo(() => {
-    const out = [];
-    Object.keys(mates).forEach(a => {
-      mates[a].forEach(b => out.push(`${a} → ${b}`));
+    const chains = [];
+
+    function walk(node, path) {
+      const next = mates[node] || [];
+      if (!next.length && path.length > 1) {
+        chains.push(path);
+        return;
+      }
+      next.forEach(n => {
+        if (!path.includes(n)) walk(n, [...path, n]);
+      });
+    }
+
+    Object.keys(mates).forEach(p => {
+      if (mates[p]?.length) walk(p, [p]);
     });
-    return out;
+
+    return chains;
   }, [mates]);
+
+  /* =====================
+     RENDER
+  ====================== */
 
   return (
     <div className="app">
       <h1>KAD Kings</h1>
-      <h2>{current}’s Turn</h2>
+
+      <h2>
+        {phase.type === "IDLE" && `${current}’s Turn`}
+        {phase.type === "SELECT_MATE" && `${phase.turnOwner} — Pick a Mate`}
+        {phase.type === "SELECT_DRINK" && `${phase.turnOwner} — Pick Someone to Drink`}
+        {phase.type === "WAIT_REACTION" && `${phase.activePlayer} — Start Reaction`}
+        {phase.type === "REACTION" && `REACTION — TAP FAST`}
+      </h2>
 
       <div className="card" onClick={draw}>
         {card ? (
@@ -196,7 +255,9 @@ export default function App() {
 
       {mateChains.length > 0 && (
         <div className="mates">
-          {mateChains.map((m, i) => <div key={i}>🤝 {m}</div>)}
+          {mateChains.map((c, i) => (
+            <div key={i}>🤝 {c.join(" → ")}</div>
+          ))}
         </div>
       )}
 
