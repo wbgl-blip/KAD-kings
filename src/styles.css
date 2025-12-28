@@ -21,6 +21,7 @@ body {
    APP LAYOUT (ONE SCREEN)
 ========================= */
 .app {
+  position: relative;
   width: 100%;
   max-width: 520px;
   height: 100svh;
