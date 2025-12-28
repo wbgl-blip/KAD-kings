@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import "./styles.css";
 
 /* =========================
@@ -26,10 +26,6 @@ const CARD_RULES = {
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
-/* =========================
-   DECK
-========================= */
-
 function buildDeck() {
   const deck = [];
   RANKS.forEach(r => SUITS.forEach(s => deck.push(`${r}${s}`)));
@@ -40,11 +36,7 @@ function buildDeck() {
   return deck;
 }
 
-const rankOf = card => card.replace(/[^A-Z0-9]/g, "");
-
-/* =========================
-   APP
-========================= */
+const rankOf = c => c.replace(/[^A-Z0-9]/g, "");
 
 export default function App() {
   const [deck, setDeck] = useState(buildDeck);
@@ -61,7 +53,6 @@ export default function App() {
 
   const [phase, setPhase] = useState({ type: "IDLE", owner: null });
   const [drinkFlash, setDrinkFlash] = useState([]);
-  const [lastLoser, setLastLoser] = useState(null);
 
   const [thumbHolder, setThumbHolder] = useState(null);
   const [heavenHolder, setHeavenHolder] = useState(null);
@@ -74,33 +65,24 @@ export default function App() {
   const currentPlayer = PLAYERS[turn];
   const currentRank = card ? rankOf(card) : null;
 
-  /* =========================
-     DRINK LOGIC
-  ========================= */
-
   function drink(name) {
     setBeers(b => ({ ...b, [name]: b[name] + 1 }));
     setDrinkFlash(f => [...f, name]);
-    setTimeout(
-      () => setDrinkFlash(f => f.filter(x => x !== name)),
-      900
-    );
+    setTimeout(() => {
+      setDrinkFlash(f => f.filter(x => x !== name));
+    }, 900);
   }
 
-  function propagateDrink(name, visited = new Set()) {
-    if (visited.has(name)) return;
-    visited.add(name);
+  function propagateDrink(name, seen = new Set()) {
+    if (seen.has(name)) return;
+    seen.add(name);
     drink(name);
-    mates[name].forEach(m => propagateDrink(m, visited));
+    mates[name].forEach(m => propagateDrink(m, seen));
   }
 
   function drinkAll() {
     PLAYERS.forEach(p => propagateDrink(p));
   }
-
-  /* =========================
-     DRAW
-  ========================= */
 
   function drawCard() {
     if (phase.type !== "IDLE" || qPenaltyMode || deck.length === 0) return;
@@ -116,22 +98,15 @@ export default function App() {
     if (r === "2") return setPhase({ type: "SELECT_DRINK", owner: drawer });
 
     if (r === "3") propagateDrink(drawer);
-    if (r === "4") drinkAll();
-    if (r === "5") drinkAll();
-    if (r === "6") drinkAll();
+    if (["4", "5", "6"].includes(r)) drinkAll();
 
     if (r === "7") setHeavenHolder(drawer);
     if (r === "J") setThumbHolder(drawer);
     if (r === "Q") setQuestionHolder(drawer);
-
     if (r === "K") return setPhase({ type: "MAKE_RULE", owner: drawer });
 
     setTurn(t => (t + 1) % PLAYERS.length);
   }
-
-  /* =========================
-     TAP PLAYER
-  ========================= */
 
   function tapPlayer(name) {
     if (qPenaltyMode) {
@@ -154,49 +129,16 @@ export default function App() {
       propagateDrink(name);
       setPhase({ type: "IDLE", owner: null });
       setTurn(t => (t + 1) % PLAYERS.length);
-      return;
     }
   }
 
-  /* =========================
-     SAVE RULE
-  ========================= */
-
   function saveRule() {
     if (!ruleDraft.trim()) return;
-    setHouseRules(r => [
-      ...r,
-      { id: Date.now(), text: ruleDraft.trim() }
-    ]);
+    setHouseRules(r => [...r, { id: Date.now(), text: ruleDraft.trim() }]);
     setRuleDraft("");
     setPhase({ type: "IDLE", owner: null });
     setTurn(t => (t + 1) % PLAYERS.length);
   }
-
-  /* =========================
-     RESET
-  ========================= */
-
-  function resetGame() {
-    setDeck(buildDeck());
-    setCard(null);
-    setTurn(0);
-    setBeers(Object.fromEntries(PLAYERS.map(p => [p, 0])));
-    setMates(Object.fromEntries(PLAYERS.map(p => [p, []])));
-    setPhase({ type: "IDLE", owner: null });
-    setDrinkFlash([]);
-    setLastLoser(null);
-    setThumbHolder(null);
-    setHeavenHolder(null);
-    setQuestionHolder(null);
-    setQPenaltyMode(false);
-    setHouseRules([]);
-    setRuleDraft("");
-  }
-
-  /* =========================
-     DERIVED
-  ========================= */
 
   const matePills = useMemo(
     () =>
@@ -206,20 +148,42 @@ export default function App() {
     [mates]
   );
 
-  const statusText =
-    phase.type === "MAKE_RULE"
-      ? `Make a Rule: ${phase.owner} types it (persists)`
-      : CARD_RULES[currentRank] || "Draw a card";
-
-  /* =========================
-     RENDER
-  ========================= */
-
   return (
     <div className="app">
       <h1>KAD Kings</h1>
       <h2>{currentPlayer}’s Turn</h2>
-      <div className="status">{statusText}</div>
+      <div className="status">
+        {phase.type === "MAKE_RULE"
+          ? `Make a Rule: ${phase.owner} types it (persists)`
+          : CARD_RULES[currentRank] || "Draw a card"}
+      </div>
+
+      {/* RIGHT EDGE CONTEXT */}
+      <div className="edge-rail">
+        <div className="rail-section">
+          <div className="rail-title">🤝 Mates</div>
+          <div className="rail-scroll">
+            {matePills.length === 0
+              ? <span className="pill muted">No mates</span>
+              : matePills.map((m,i)=>(
+                  <span key={i} className="pill mate">{m}</span>
+                ))
+            }
+          </div>
+        </div>
+
+        <div className="rail-section">
+          <div className="rail-title">📜 Rules</div>
+          <div className="rail-scroll">
+            {houseRules.length === 0
+              ? <span className="pill muted">No rules</span>
+              : houseRules.map(r=>(
+                  <span key={r.id} className="pill small">📌 {r.text}</span>
+                ))
+            }
+          </div>
+        </div>
+      </div>
 
       {/* CONTROL */}
       <div className="control-bar">
@@ -262,10 +226,7 @@ export default function App() {
         {PLAYERS.map(p => (
           <div
             key={p}
-            className={`player
-              ${p === currentPlayer ? "turn" : ""}
-              ${drinkFlash.includes(p) ? "drink" : ""}
-            `}
+            className={`player ${p===currentPlayer?"turn":""} ${drinkFlash.includes(p)?"drink":""}`}
             onClick={() => tapPlayer(p)}
           >
             <div className="name">{p}</div>
@@ -274,34 +235,9 @@ export default function App() {
         ))}
       </div>
 
-      {/* CONTEXT BAR */}
-      <div className="context-bar">
-        <div className="context-section">
-          <div className="context-title">🤝 Mates</div>
-          <div className="context-scroll">
-            {matePills.length === 0
-              ? <span className="pill muted">No mates yet</span>
-              : matePills.map((m,i)=>(
-                  <span key={i} className="pill mate">{m}</span>
-                ))
-            }
-          </div>
-        </div>
-
-        <div className="context-section">
-          <div className="context-title">📜 Rules</div>
-          <div className="context-scroll">
-            {houseRules.length === 0
-              ? <span className="pill muted">No rules yet</span>
-              : houseRules.map(r=>(
-                  <span key={r.id} className="pill small">📌 {r.text}</span>
-                ))
-            }
-          </div>
-        </div>
-      </div>
-
-      <button className="reset" onClick={resetGame}>Reset Game</button>
+      <button className="reset" onClick={() => window.location.reload()}>
+        Reset Game
+      </button>
     </div>
   );
 }
