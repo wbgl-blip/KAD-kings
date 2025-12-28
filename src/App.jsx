@@ -48,51 +48,36 @@ const rankOf = card => card.replace(/[^A-Z0-9]/g, "");
 ========================= */
 
 export default function App() {
-  /* ---------- CORE ---------- */
   const [deck, setDeck] = useState(buildDeck);
   const [card, setCard] = useState(null);
   const [turn, setTurn] = useState(0);
 
-  /* ---------- COUNTS ---------- */
   const [beers, setBeers] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
-  /* ---------- MATES ---------- */
   const [mates, setMates] = useState(
     Object.fromEntries(PLAYERS.map(p => [p, []]))
   );
 
-  /* ---------- PHASE ---------- */
   const [phase, setPhase] = useState({ type: "IDLE", owner: null });
-
-  /* ---------- EFFECTS ---------- */
   const [drinkFlash, setDrinkFlash] = useState([]);
-
-  /* ---------- HOLDERS ---------- */
   const [thumbHolder, setThumbHolder] = useState(null);
   const [heavenHolder, setHeavenHolder] = useState(null);
 
-  /* ---------- RACE ---------- */
   const [race, setRace] = useState({
     type: null,
     holder: null,
     reacted: new Set(),
   });
 
-  /* ---------- WATERFALL ---------- */
   const [waterfallReady, setWaterfallReady] = useState(new Set());
   const [waterfallIndex, setWaterfallIndex] = useState(null);
 
-  /* ---------- UI FOCUS ---------- */
-  const [focusPlayers, setFocusPlayers] = useState(new Set()); // 🔹 ADDED
+  const [focusPlayers, setFocusPlayers] = useState(new Set());
 
   const currentPlayer = PLAYERS[turn];
   const currentRank = card ? rankOf(card) : null;
-
-  /* =========================
-     DRINK LOGIC
-  ========================= */
 
   const DRINK_FLASH_MS = 2500;
 
@@ -111,10 +96,6 @@ export default function App() {
     drink(name);
     (mates[name] || []).forEach(m => propagateDrink(m, visited));
   }
-
-  /* =========================
-     WATERFALL
-  ========================= */
 
   function startWaterfall() {
     if (phase.type !== "WATERFALL_READY") return;
@@ -135,10 +116,6 @@ export default function App() {
       ? PLAYERS[waterfallIndex]
       : null;
   }
-
-  /* =========================
-     DRAW
-  ========================= */
 
   function drawCard() {
     if (phase.type !== "IDLE" || deck.length === 0) return;
@@ -173,10 +150,6 @@ export default function App() {
     setTurn(t => (t + 1) % PLAYERS.length);
   }
 
-  /* =========================
-     RACES
-  ========================= */
-
   function startRace(type, holder) {
     setRace({ type, holder, reacted: new Set() });
     setPhase({ type: `RACE_${type}`, owner: holder });
@@ -199,26 +172,13 @@ export default function App() {
     setRace(r => ({ ...r, reacted: next }));
   }
 
-  /* =========================
-     TAP PLAYER
-  ========================= */
-
   function tapPlayer(name) {
     if (phase.type === "IDLE") {
-      if (name === thumbHolder) {
-        startRace("THUMB", name);
-        return;
-      }
-      if (name === heavenHolder) {
-        startRace("HEAVEN", name);
-        return;
-      }
+      if (name === thumbHolder) return startRace("THUMB", name);
+      if (name === heavenHolder) return startRace("HEAVEN", name);
     }
 
-    if (phase.type.startsWith("RACE")) {
-      handleRaceTap(name);
-      return;
-    }
+    if (phase.type.startsWith("RACE")) return handleRaceTap(name);
 
     if (phase.type === "WATERFALL_READY") {
       setWaterfallReady(r => new Set(r).add(name));
@@ -249,19 +209,11 @@ export default function App() {
     propagateDrink(name);
   }
 
-  /* =========================
-     MATE FOCUS (UI)
-  ========================= */
-
-  function focusPair(label) { // 🔹 ADDED
+  function focusPair(label) {
     const [a, b] = label.split("→").map(s => s.trim());
     setFocusPlayers(new Set([a, b]));
     setTimeout(() => setFocusPlayers(new Set()), 1500);
   }
-
-  /* =========================
-     INFO
-  ========================= */
 
   const matePills = useMemo(
     () =>
@@ -270,26 +222,6 @@ export default function App() {
       ),
     [mates]
   );
-
-  /* =========================
-     RESET GAME
-  ========================= */
-
-  function resetGame() {
-    setDeck(buildDeck());
-    setCard(null);
-    setTurn(0);
-    setPhase({ type: "IDLE", owner: null });
-    setWaterfallReady(new Set());
-    setWaterfallIndex(null);
-    setRace({ type: null, holder: null, reacted: new Set() });
-    setThumbHolder(null);
-    setHeavenHolder(null);
-  }
-
-  /* =========================
-     RENDER
-  ========================= */
 
   const drawLocked = phase.type !== "IDLE";
   const allReady = waterfallReady.size === PLAYERS.length;
@@ -320,42 +252,52 @@ export default function App() {
           <span className="pill">👍 Thumb: {thumbHolder || "—"}</span>
           <span className="pill">☁️ Heaven: {heavenHolder || "—"}</span>
 
-          {matePills.length > 0 ? (
-            matePills.map((m, i) => (
-              <button
-                key={i}
-                type="button"
-                className="pill mate"
-                onClick={() => focusPair(m)} // 🔹 ADDED
-              >
-                {m}
-              </button>
-            ))
-          ) : (
-            <span className="pill muted">🤝 No mates yet</span>
-          )}
+          {matePills.map((m, i) => (
+            <button
+              key={i}
+              className="pill mate"
+              onClick={() => focusPair(m)}
+            >
+              {m}
+            </button>
+          ))}
         </div>
       </div>
 
       <div className="players">
-        {PLAYERS.map(p => (
-          <div
-            key={p}
-            className={`player
-              ${p === currentPlayer ? "turn" : ""}
-              ${drinkFlash.includes(p) ? "drink" : ""}
-              ${focusPlayers.has(p) ? "focus" : ""}   // 🔹 ADDED
-            `}
-            onClick={() => tapPlayer(p)}
-          >
-            <div className="badges">
-              {p === thumbHolder && <span className="badge thumb">THUMB</span>}
-              {p === heavenHolder && <span className="badge heaven">HEAVEN</span>}
+        {PLAYERS.map(p => {
+          const isWaterfallActive =
+            phase.type === "WATERFALL_ACTIVE" &&
+            p === currentWaterfallDrinker();
+
+          return (
+            <div
+              key={p}
+              className={`player
+                ${p === currentPlayer ? "turn" : ""}
+                ${drinkFlash.includes(p) ? "drink" : ""}
+                ${waterfallReady.has(p) ? "ready" : ""}
+                ${isWaterfallActive ? "waterfall-active" : ""}
+                ${phase.owner === p &&
+                  (phase.type === "SELECT_MATE" ||
+                   phase.type === "SELECT_DRINK")
+                  ? "active"
+                  : ""}
+                ${focusPlayers.has(p) ? "active" : ""}
+              `}
+              onClick={() => tapPlayer(p)}
+            >
+              <div className="badges">
+                {p === currentPlayer && <span className="badge turn">TURN</span>}
+                {p === thumbHolder && <span className="badge thumb">THUMB</span>}
+                {p === heavenHolder && <span className="badge heaven">HEAVEN</span>}
+              </div>
+
+              <div className="name">{p}</div>
+              <div className="beer">🍺 {beers[p]}</div>
             </div>
-            <div className="name">{p}</div>
-            <div className="beer">🍺 {beers[p]}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {phase.type === "WATERFALL_READY" && (
