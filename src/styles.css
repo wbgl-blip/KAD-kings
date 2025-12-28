@@ -62,9 +62,9 @@ h2 {
   opacity: 0.85;
   margin: 0;
 }
-
 .card-wrapper {
   position: relative;
+  margin-bottom: 42px; /* reserves space for HUD pills */
 }
 .card {
   justify-self: center;
