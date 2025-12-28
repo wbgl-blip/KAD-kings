@@ -113,15 +113,6 @@ h2 {
   pointer-events: auto;
 }
 
-  display: flex;
-  flex-wrap: nowrap;        /* prevents it from taking extra vertical space */
-  overflow: hidden;
-  gap: 8px;
-  justify-content: center;
-  align-items: center;
-  min-height: 28px;
-}
-
 .pill {
   padding: 6px 10px;
   border-radius: 999px;
