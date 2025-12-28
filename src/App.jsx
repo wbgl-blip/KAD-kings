@@ -459,9 +459,7 @@ export default function App() {
       Start HEAVEN race (holder: {heavenHolder})
     </div>
   )}
-
-</div>
-
+   
 </div>
       {/* INFO PILLS (always) */}
       <div className="info">
