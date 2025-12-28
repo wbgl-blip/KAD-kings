@@ -6,7 +6,7 @@ import "./styles.css";
    CONSTANTS
 ========================= */
 
-const PLAYERS = ["Beau", "Sean", "Mike", "Emily", "Jess", "Alex", "Kyle", "Sam"];
+const PLAYERS = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];;
 
 const CARD_RULES = {
   A: "Waterfall",
