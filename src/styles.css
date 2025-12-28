@@ -132,7 +132,7 @@ h2 {
 ========================= */
 .card {
   justify-self: center;
-  width: 180px;
+  width: 150px;
   height: 76px;          /* ← taller card */
   border-radius: 14px;
 
