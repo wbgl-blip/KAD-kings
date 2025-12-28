@@ -1,18 +1,15 @@
 /* =========================
-   RESET + BASE
+   RESET + BASE (NO SCROLL)
 ========================= */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html,
-body {
+html, body {
   height: 100%;
-  overflow: hidden;
+  margin: 0;
+  overflow: hidden; /* hard lock */
 }
 
 body {
-  margin: 0;
   background: radial-gradient(circle at top, #0b1220, #05070c);
   color: #ffffff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -21,15 +18,20 @@ body {
 }
 
 /* =========================
-   APP CONTAINER (ONE SCREEN)
+   APP LAYOUT (ONE SCREEN)
 ========================= */
 .app {
   width: 100%;
   max-width: 520px;
   height: 100svh;
-  padding: 12px 14px 16px;
-  display: flex;
-  flex-direction: column;
+  padding: 10px 12px 12px;
+
+  display: grid;
+  grid-template-rows: auto auto auto auto 1fr auto; 
+  /* h1, h2, status, card, players, reset */
+  gap: 8px;
+
+  min-height: 0; /* critical for grid children to shrink */
 }
 
 /* =========================
@@ -37,14 +39,15 @@ body {
 ========================= */
 h1 {
   text-align: center;
-  margin: 4px 0 2px;
+  margin: 4px 0 0;
   font-size: 30px;
+  line-height: 1.05;
 }
 
 h2 {
   text-align: center;
-  margin: 4px 0 6px;
-  font-size: 14px;
+  margin: 0;
+  font-size: 13px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -56,52 +59,20 @@ h2 {
   font-size: 12px;
   font-weight: 700;
   opacity: 0.85;
-  margin-bottom: 6px;
+  margin: 0;
 }
 
 /* =========================
-   INFO PILLS
-========================= */
-.info {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.pill {
-  padding: 5px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 800;
-  background: #1f2937;
-  color: #e5e7eb;
-  white-space: nowrap;
-}
-
-.pill.mate {
-  background: #0f766e;
-  color: #ecfeff;
-}
-
-.pill.muted {
-  opacity: 0.6;
-}
-
-/* =========================
-   CARD (DECK) – SINGLE SOURCE
+   CARD (DECK) — BIGGER BUT CONTROLLED
 ========================= */
 .card {
-  margin: 8px auto 10px;
-  width: 70%;
-  min-height: 120px;
-  max-height: 140px;
+  justify-self: center;
+  width: min(92%, 440px);
+  height: 128px;             /* bigger than before */
   border-radius: 18px;
   background: linear-gradient(180deg, #ffffff, #e5e7eb);
   color: #020617;
   font-weight: 900;
-  font-size: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -114,17 +85,12 @@ h2 {
 .card.locked {
   opacity: 0.55;
   pointer-events: none;
-  filter: grayscale(0.4);
+  filter: grayscale(0.35);
 }
 
-.card:active {
-  transform: scale(0.97);
-}
+.card:active { transform: scale(0.98); }
 
-.rank {
-  font-size: 40px;
-}
-
+.rank { font-size: 44px; line-height: 1; }
 .rule {
   margin-top: 4px;
   font-size: 13px;
@@ -133,78 +99,110 @@ h2 {
 }
 
 /* =========================
-   PLAYERS GRID (HARD FIT)
+   INFO PILLS ROW (STAYS TIGHT)
+========================= */
+.info {
+  display: flex;
+  flex-wrap: nowrap;        /* prevents it from taking extra vertical space */
+  overflow: hidden;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  min-height: 28px;
+}
+
+.pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  background: #1f2937;
+  color: #e5e7eb;
+  white-space: nowrap;
+}
+
+.pill.mate { background: #0f766e; color: #ecfeff; }
+.pill.muted { opacity: 0.6; }
+
+/* =========================
+   PLAYERS GRID — MUST FIT
 ========================= */
 .players {
-  flex: 1;
+  min-height: 0;                 /* critical */
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(4, 1fr);
+  grid-auto-rows: minmax(0, 1fr);/* each row shrinks to fit */
   gap: 10px;
-  padding: 0 6px;
-  min-height: 0;
+  padding: 2px;
 }
 
 /* =========================
-   PLAYER TILE (VIDEO-READY)
+   PLAYER TILE (VIDEO-LIKE, NOT SQUARE)
 ========================= */
 .player {
   position: relative;
-  padding: 12px;
   border-radius: 16px;
-  aspect-ratio: 1 / 1;
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,0.08),
     0 10px 22px rgba(0,0,0,0.55);
+
+  padding: 10px;
+  min-height: 0;
+  overflow: hidden;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden;
+
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.player:active {
-  transform: scale(0.97);
-}
+.player:active { transform: scale(0.98); }
 
-/* Camera texture */
+/* subtle camera texture */
 .player::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    circle at top,
-    rgba(255,255,255,0.05),
-    rgba(0,0,0,0.6)
-  );
+  background: radial-gradient(circle at top, rgba(255,255,255,0.05), rgba(0,0,0,0.65));
   pointer-events: none;
   z-index: 0;
 }
 
+.name, .beer, .mini, .badges { position: relative; z-index: 1; }
+
 .name {
   font-size: 15px;
   font-weight: 800;
-  z-index: 1;
+  line-height: 1.1;
 }
 
 .beer {
-  font-size: 13px;
+  font-size: 12px;
   opacity: 0.9;
-  z-index: 1;
+}
+
+/* “tap to READY” / race hints — keep small so tiles can shrink */
+.mini {
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.55;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 /* =========================
-   BADGES (VIDEO OVERLAY)
+   BADGES — OVERLAY STYLE
 ========================= */
 .badges {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  left: 8px;
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  z-index: 3;
+  z-index: 2;
 }
 
 .badge {
@@ -218,15 +216,13 @@ h2 {
   color: #020617;
 }
 
-.badge.thumb { background: #facc15; {
-  animation: thumbGlow 2s infinite;
-}
+.badge.thumb { background: #facc15; animation: thumbGlow 2s infinite; }
 .badge.heaven { background: #38bdf8; }
 .badge.host { background: #60a5fa; }
 .badge.turn { background: #22c55e; }
 
 /* =========================
-   TURN / ACTIVE STATES
+   STATES
 ========================= */
 .player.turn {
   box-shadow:
@@ -236,11 +232,11 @@ h2 {
 
 .player.active {
   animation: selectPulse 1.1s infinite;
+  box-shadow:
+    0 0 0 3px #eab308,
+    0 0 26px rgba(234,179,8,0.85);
 }
 
-/* =========================
-   DRINK TARGET
-========================= */
 .player.drink {
   animation: drinkPulse 2.5s ease-out;
   box-shadow:
@@ -259,20 +255,22 @@ h2 {
   font-weight: 900;
   background: rgba(239,68,68,0.85);
   border-radius: 16px;
-  z-index: 4;
+  z-index: 3;
 }
 
-/* =========================
-   WATERFALL STATES
-========================= */
-.player.waterfall-ready {
+/* your JSX uses "ready" (not "waterfall-ready") */
+.player.ready {
   box-shadow:
     0 0 0 2px #60a5fa,
     0 0 18px rgba(96,165,250,0.6);
 }
 
+/* your JSX uses "waterfall-active" */
 .player.waterfall-active {
   animation: waterfallPulse 1s infinite;
+  box-shadow:
+    0 0 0 3px #38bdf8,
+    0 0 30px rgba(56,189,248,0.9);
 }
 
 /* =========================
@@ -280,8 +278,7 @@ h2 {
 ========================= */
 .reset {
   width: 100%;
-  margin-top: 10px;
-  padding: 12px;
+  height: 46px;
   border-radius: 14px;
   border: none;
   background: #1f2937;
@@ -307,30 +304,19 @@ h2 {
 
 @keyframes drinkPulse {
   0% { opacity: 0; transform: scale(0.96); }
-  10% { opacity: 1; transform: scale(1.05); }
+  10% { opacity: 1; transform: scale(1.03); }
   85% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(1); }
 }
 
 @keyframes waterfallPulse {
-  0% {
-    box-shadow: 0 0 0 3px #38bdf8, 0 0 20px rgba(56,189,248,0.6);
-  }
-  50% {
-    box-shadow: 0 0 0 6px #7dd3fc, 0 0 36px rgba(125,211,252,1);
-  }
-  100% {
-    box-shadow: 0 0 0 3px #38bdf8, 0 0 20px rgba(56,189,248,0.6);
-  }
+  0% { box-shadow: 0 0 0 3px #38bdf8, 0 0 20px rgba(56,189,248,0.6); }
+  50% { box-shadow: 0 0 0 6px #7dd3fc, 0 0 36px rgba(125,211,252,1); }
+  100% { box-shadow: 0 0 0 3px #38bdf8, 0 0 20px rgba(56,189,248,0.6); }
 }
+
 @keyframes thumbGlow {
-  0% {
-    box-shadow: 0 0 0 rgba(250, 204, 21, 0.0);
-  }
-  50% {
-    box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
-  }
-  100% {
-    box-shadow: 0 0 0 rgba(250, 204, 21, 0.0);
-  }
+  0%   { box-shadow: 0 0 0 rgba(250, 204, 21, 0.0); }
+  50%  { box-shadow: 0 0 14px rgba(250, 204, 21, 0.9); }
+  100% { box-shadow: 0 0 0 rgba(250, 204, 21, 0.0); }
 }
