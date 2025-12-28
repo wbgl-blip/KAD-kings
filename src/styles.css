@@ -1,29 +1,22 @@
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   background: radial-gradient(circle at top, #0f172a, #020617);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
-  color: #fff;
+  font-family: system-ui;
+  color: white;
 }
 
 .app {
   padding: 16px;
   max-width: 420px;
   margin: 0 auto;
+  position: relative;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 4px;
-}
-
-h2 {
+h1, h2 {
   text-align: center;
   margin: 0;
-  opacity: 0.8;
 }
 
 .status {
@@ -33,14 +26,48 @@ h2 {
 }
 
 /* =========================
-   CONTROL BAR
+   RIGHT EDGE RAIL
+========================= */
+
+.edge-rail {
+  position: absolute;
+  top: 90px;
+  right: -4px;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rail-section {
+  background: rgba(255,255,255,0.05);
+  border-radius: 14px 0 0 14px;
+  padding: 8px;
+}
+
+.rail-title {
+  font-size: 11px;
+  opacity: 0.6;
+  margin-bottom: 6px;
+}
+
+.rail-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* =========================
+   CONTROL
 ========================= */
 
 .control-bar {
   display: grid;
   grid-template-columns: 90px 1fr;
   gap: 12px;
-  align-items: center;
+  margin-top: 12px;
 }
 
 .power-col {
@@ -57,35 +84,26 @@ h2 {
   font-size: 12px;
 }
 
-.power.armed {
-  background: #7c3aed;
-}
+.power.armed { background: #7c3aed; }
 
 /* =========================
    CARD
 ========================= */
 
 .card {
-  height: 96px;
-  border-radius: 18px;
+  height: 100px;
+  border-radius: 20px;
   background: linear-gradient(180deg, #fff, #e5e7eb);
   color: #020617;
   font-weight: 800;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  cursor: pointer;
+  justify-content: center;
 }
 
-.rank {
-  font-size: 22px;
-}
-
-.rule {
-  font-size: 12px;
-  opacity: 0.7;
-}
+.rank { font-size: 22px; }
+.rule { font-size: 12px; opacity: 0.7; }
 
 /* =========================
    RULE INPUT
@@ -104,12 +122,6 @@ h2 {
   border: none;
 }
 
-.rulebar button {
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: none;
-}
-
 /* =========================
    PLAYERS
 ========================= */
@@ -118,14 +130,14 @@ h2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
 .player {
   background: rgba(255,255,255,0.04);
   border-radius: 16px;
   padding: 14px;
-  min-height: 80px;
+  min-height: 86px;
   position: relative;
 }
 
@@ -145,10 +157,7 @@ h2 {
   border-radius: inherit;
 }
 
-.name {
-  font-weight: 700;
-}
-
+.name { font-weight: 700; }
 .beer {
   position: absolute;
   bottom: 10px;
@@ -156,53 +165,19 @@ h2 {
 }
 
 /* =========================
-   CONTEXT BAR
+   PILLS
 ========================= */
 
-.context-bar {
-  margin-top: 12px;
-  padding: 10px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.04);
-  display: flex;
-  gap: 12px;
-}
-
-.context-section {
-  flex: 1;
-}
-
-.context-title {
-  font-size: 11px;
-  opacity: 0.6;
-  margin-bottom: 6px;
-}
-
-.context-scroll {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-}
-
 .pill {
-  padding: 6px 10px;
-  background: #0ea5e9;
+  padding: 6px 8px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
-.pill.mate {
-  background: #10b981;
-}
-
-.pill.small {
-  background: #6366f1;
-}
-
-.pill.muted {
-  background: rgba(255,255,255,0.1);
-}
+.pill.mate { background: #10b981; }
+.pill.small { background: #6366f1; }
+.pill.muted { background: rgba(255,255,255,0.12); }
 
 /* =========================
    RESET
@@ -219,7 +194,7 @@ h2 {
 }
 
 /* =========================
-   ANIMATIONS
+   ANIMATION
 ========================= */
 
 @keyframes drinkFlash {
