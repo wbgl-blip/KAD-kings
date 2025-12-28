@@ -167,8 +167,8 @@ if (r === "7") {
   return;
 }
 
-setTurn(t => (t + 1) % PLAYERS.length);
-
+  }setTurn(t => (t + 1) % PLAYERS.length);
+}
   /* =========================
      RACES
   ========================= */
