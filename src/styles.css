@@ -133,7 +133,7 @@ h2 {
 .card {
   justify-self: center;
   width: 130px;
-  height: 100px;          /* ← taller card */
+  height: 120px;          /* ← taller card */
   border-radius: 14px;
 
   background: linear-gradient(180deg, #ffffff, #f1f5f9);
