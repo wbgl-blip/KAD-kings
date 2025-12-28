@@ -1,7 +1,5 @@
-/* src/styles.css */
-
 /* =========================
-   RESET + BASE (NO SCROLL)
+   RESET + BASE
 ========================= */
 * {
   box-sizing: border-box;
@@ -15,7 +13,7 @@ body {
 }
 
 body {
-  background: radial-gradient(circle at top, #0b1220, #05070c);
+  background: radial-gradient(circle at top, #0b1220 0%, #05070c 65%);
   color: #ffffff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   display: flex;
@@ -23,39 +21,25 @@ body {
 }
 
 /* =========================
-   APP LAYOUT (ONE SCREEN)
+   APP LAYOUT
 ========================= */
 .app {
-  position: relative;
   width: 100%;
   max-width: 520px;
   height: 100svh;
   padding: 10px 12px 12px;
 
   display: grid;
-  grid-template-rows: auto auto auto auto auto 1fr auto; /* topbar, h1, h2, status, control, players, button */
+  grid-template-rows:
+    auto   /* topbar */
+    auto   /* title */
+    auto   /* subtitle */
+    auto   /* status */
+    auto   /* control bar */
+    1fr    /* players */
+    auto;  /* bottom button */
+
   gap: 8px;
-
-  min-height: 0;
-}
-
-.app.starting {
-  animation: roomStart 980ms ease-out forwards;
-}
-
-@keyframes roomStart {
-  0% {
-    filter: saturate(1) brightness(1);
-    transform: scale(1);
-  }
-  35% {
-    filter: saturate(1.15) brightness(1.08);
-    transform: scale(1.01);
-  }
-  100% {
-    filter: saturate(1) brightness(1);
-    transform: scale(1);
-  }
 }
 
 /* =========================
@@ -63,50 +47,43 @@ body {
 ========================= */
 .topbar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  align-items: center;
 }
 
 .roomchip {
   display: flex;
-  align-items: baseline;
   gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
 
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 8px 10px;
-  border-radius: 14px;
-
-  cursor: pointer;
-  user-select: none;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .roomlabel {
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.5px;
-  opacity: 0.8;
+  opacity: 0.6;
 }
 
 .roomcode {
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
 }
 
 .roomhint {
+  opacity: 0.4;
   font-size: 11px;
-  opacity: 0.6;
 }
 
 .hostbtn {
   height: 36px;
-  padding: 0 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: white;
   font-weight: 900;
 }
 
@@ -117,7 +94,7 @@ h1 {
   text-align: center;
   margin: 0;
   font-size: 28px;
-  line-height: 1.05;
+  letter-spacing: 0.4px;
 }
 
 h2 {
@@ -125,27 +102,25 @@ h2 {
   margin: 0;
   font-size: 13px;
   font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.7px;
-  color: #e5e7eb;
+  letter-spacing: 0.6px;
+  opacity: 0.9;
 }
 
 .status {
   text-align: center;
   font-size: 12px;
-  font-weight: 800;
-  opacity: 0.86;
-  margin: 0;
+  font-weight: 700;
+  opacity: 0.75;
 }
 
 /* =========================
-   CONTROL BAR (CARD CENTER + PILLS RIGHT)
+   CONTROL BAR
 ========================= */
 .control-bar {
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .control-spacer {
@@ -153,197 +128,148 @@ h2 {
 }
 
 /* =========================
-   CARD (CENTERED, NOT FULL WIDTH)
+   CARD (CENTER FOCUS)
 ========================= */
 .card {
-  width: 168px; /* fixed so it never stretches */
-  height: 46px;
-  border-radius: 14px;
+  width: 170px;
+  height: 48px;
+  border-radius: 16px;
 
   background: linear-gradient(180deg, #ffffff, #e5e7eb);
   color: #020617;
-  font-weight: 900;
 
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: 2px;
 
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45);
-  cursor: pointer;
-  user-select: none;
-
-  transform-origin: center;
-}
-
-.card:active {
-  transform: scale(0.985);
-}
-
-.card.locked {
-  opacity: 0.55;
-  pointer-events: none;
-  filter: grayscale(0.35);
+  font-weight: 900;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.55);
 }
 
 .card.draw {
-  animation: cardDraw 420ms ease-out;
+  animation: cardPop 420ms ease-out;
 }
 
-@keyframes cardDraw {
-  0% {
-    transform: scale(1) rotateX(0deg);
-  }
-  35% {
-    transform: scale(0.98) rotateX(28deg);
-  }
-  70% {
-    transform: scale(1.02) rotateX(-10deg);
-  }
-  100% {
-    transform: scale(1) rotateX(0deg);
-  }
+@keyframes cardPop {
+  0% { transform: scale(0.95); }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.card.locked {
+  opacity: 0.5;
+  filter: grayscale(0.4);
 }
 
 .rank {
   font-size: 18px;
-  line-height: 1;
 }
 
 .rule {
   font-size: 10px;
-  font-weight: 800;
-  opacity: 0.78;
-  margin: 0;
+  opacity: 0.7;
 }
 
 /* =========================
-   PILLS (RIGHT SIDE)
+   INFO PILLS
 ========================= */
 .pills {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  align-items: flex-start;
 }
 
 .pill {
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   font-size: 11px;
-  font-weight: 900;
-  background: rgba(31, 41, 55, 0.95);
+  font-weight: 800;
+  background: rgba(31,41,55,0.95);
   color: #e5e7eb;
-  white-space: nowrap;
-  border: none;
-}
-
-button.pill {
-  cursor: pointer;
-}
-
-button.pill:active {
-  transform: scale(0.98);
 }
 
 .pill.mate {
-  background: #0f766e;
+  background: linear-gradient(135deg, #0f766e, #0d9488);
   color: #ecfeff;
 }
 
 .pill.muted {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 /* =========================
    PLAYERS GRID (2x3)
 ========================= */
 .players {
-  min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   padding: 6px 2px;
-
-  align-content: start;
-  overflow: hidden;
 }
 
 /* =========================
-   PLAYER TILE (LOCKED SIZE)
+   PLAYER TILE (VIDEO FEEL)
 ========================= */
 .player {
   position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 11; /* locked video feel */
-
-  border-radius: 16px;
-  background: linear-gradient(145deg, #0f172a, #0a0f1b);
-
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 10px 22px rgba(0, 0, 0, 0.55);
-
+  aspect-ratio: 16 / 11;
+  border-radius: 18px;
   padding: 12px;
-  overflow: hidden;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.45)),
+    linear-gradient(145deg, #0f172a, #0a0f1b);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    0 14px 30px rgba(0,0,0,0.6);
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
-  transition: transform 120ms ease, box-shadow 120ms ease, filter 180ms ease;
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
-.player:active {
-  transform: scale(0.985);
-}
-
-/* subtle camera texture */
-.player::before {
+.player::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.72));
-  z-index: 0;
+  border-radius: 18px;
+  background: radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 60%);
+  pointer-events: none;
 }
 
-.name,
-.beer,
-.mini,
-.badges,
-.tilebottom {
-  position: relative;
-  z-index: 1;
-}
-
+/* =========================
+   PLAYER CONTENT
+========================= */
 .name {
   font-size: 15px;
   font-weight: 900;
-  letter-spacing: 0.2px;
 }
 
 .tilebottom {
   display: flex;
-  align-items: flex-end;
   justify-content: space-between;
-  gap: 10px;
+  align-items: flex-end;
 }
 
 .beer {
   font-size: 12px;
-  opacity: 0.92;
   font-weight: 800;
 }
 
 .mini {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
   opacity: 0.55;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
 }
 
 /* =========================
-   BADGES
+   BADGES (CLEANED)
 ========================= */
 .badges {
   position: absolute;
@@ -351,257 +277,61 @@ button.pill:active {
   left: 6px;
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
+  z-index: 2;
 }
 
 .badge {
   padding: 4px 10px;
   border-radius: 999px;
-  font-size: 11px;
-  font-weight: 1000;
-  text-transform: uppercase;
-  backdrop-filter: blur(6px);
+  font-size: 10px;
+  font-weight: 900;
   color: #020617;
 }
 
-.badge.turn {
-  background: #22c55e;
-}
-.badge.thumb {
-  background: #facc15;
-  animation: thumbGlow 2s infinite;
-}
-.badge.heaven {
-  background: #38bdf8;
-}
-.badge.host {
-  background: #60a5fa;
-}
-.badge.readybadge {
-  background: #93c5fd;
-}
+.badge.turn { background: #22c55e; }
+.badge.thumb { background: #facc15; }
+.badge.heaven { background: #38bdf8; }
+.badge.host { background: #60a5fa; }
 
 /* =========================
-   PLAYER STATES
+   STATES & MOTION
 ========================= */
 .player.turn {
-  box-shadow: 0 0 0 2px #22c55e, 0 0 18px rgba(34, 197, 94, 0.55);
-  animation: activeIdle 2400ms ease-in-out infinite;
+  box-shadow:
+    0 0 0 2px #22c55e,
+    0 0 22px rgba(34,197,94,0.55);
+  animation: idleFloat 2.4s ease-in-out infinite;
 }
 
-@keyframes activeIdle {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-2px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-.player.active {
-  animation: selectPulse 1100ms ease-in-out infinite;
+@keyframes idleFloat {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
 }
 
 .player.drink {
-  animation: drinkPulse 900ms ease-out;
+  animation: drinkHit 900ms ease-out;
 }
 
-.player.drink::after {
-  content: "YOU DRINK";
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 14px;
-  font-weight: 1000;
-
-  background: rgba(239, 68, 68, 0.82);
-  border-radius: 16px;
-  z-index: 3;
-}
-
-.player.ready {
-  box-shadow: 0 0 0 2px #60a5fa, 0 0 18px rgba(96, 165, 250, 0.55);
-}
-
-.player.waterfall-active {
-  animation: waterfallPulse 900ms ease-in-out infinite;
-  box-shadow: 0 0 0 3px #38bdf8, 0 0 26px rgba(56, 189, 248, 0.85);
+@keyframes drinkHit {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 /* =========================
-   BUTTON (BOTTOM)
+   BOTTOM BUTTON
 ========================= */
 .reset {
-  width: 100%;
   height: 46px;
-  border-radius: 14px;
+  border-radius: 16px;
   border: none;
-
-  background: rgba(31, 41, 55, 0.95);
-  color: #ffffff;
-
+  background: rgba(31,41,55,0.95);
+  color: white;
   font-size: 15px;
-  font-weight: 1000;
+  font-weight: 900;
 }
 
 .reset:disabled {
-  opacity: 0.55;
-}
-
-/* =========================
-   HOST SHEET
-========================= */
-.sheet-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 50;
-}
-
-.sheet {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 10px;
-  width: min(520px, calc(100% - 24px));
-  background: rgba(15, 23, 42, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  padding: 14px;
-  z-index: 51;
-
-  backdrop-filter: blur(10px);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.65);
-
-  animation: sheetIn 180ms ease-out;
-}
-
-@keyframes sheetIn {
-  from {
-    transform: translateX(-50%) translateY(18px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
-}
-
-.sheetheader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.sheettitle {
-  font-weight: 1000;
-  letter-spacing: 0.2px;
-}
-
-.sheetclose {
-  height: 34px;
-  width: 40px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-weight: 1000;
-}
-
-.sheetgroup {
-  margin-top: 10px;
-}
-
-.grouptitle {
-  font-size: 12px;
-  font-weight: 1000;
-  opacity: 0.8;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-}
-
-.sheetgrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.sheetbtn {
-  height: 44px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-weight: 1000;
-}
-
-.sheetbtn.danger {
-  border-color: rgba(239, 68, 68, 0.35);
-  background: rgba(239, 68, 68, 0.16);
-}
-
-.sheetnote {
-  margin-top: 10px;
-  font-size: 12px;
-  opacity: 0.7;
-}
-
-/* =========================
-   ANIMATIONS
-========================= */
-@keyframes selectPulse {
-  0% {
-    box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.55), 0 0 18px rgba(234, 179, 8, 0.35);
-  }
-  50% {
-    box-shadow: 0 0 0 6px rgba(250, 204, 21, 0.85), 0 0 30px rgba(250, 204, 21, 0.6);
-  }
-  100% {
-    box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.55), 0 0 18px rgba(234, 179, 8, 0.35);
-  }
-}
-
-@keyframes drinkPulse {
-  0% {
-    transform: scale(0.985);
-  }
-  35% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes waterfallPulse {
-  0% {
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.65), 0 0 18px rgba(56, 189, 248, 0.45);
-  }
-  50% {
-    box-shadow: 0 0 0 6px rgba(125, 211, 252, 0.9), 0 0 32px rgba(125, 211, 252, 0.75);
-  }
-  100% {
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.65), 0 0 18px rgba(56, 189, 248, 0.45);
-  }
-}
-
-@keyframes thumbGlow {
-  0% {
-    box-shadow: 0 0 0 rgba(250, 204, 21, 0);
-  }
-  50% {
-    box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
-  }
-  100% {
-    box-shadow: 0 0 0 rgba(250, 204, 21, 0);
-  }
+  opacity: 0.5;
 }
