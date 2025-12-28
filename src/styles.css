@@ -66,40 +66,37 @@ h2 {
 }
 
 /* =========================
-   CARD + PILLS BAR (INLINE)
+   CARD + PILLS BAR (CENTER + RIGHT)
 ========================= */
 .control-bar {
   display: grid;
-  grid-template-columns: auto auto; /* 🔒 no stretching */
-  justify-content: center;          /* 🔒 tight + centered */
+  grid-template-columns: 1fr auto auto;
   align-items: center;
   gap: 10px;
 }
 
-.pills {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-start;
+/* spacer keeps card centered */
+.control-bar::before {
+  content: "";
 }
 
 /* =========================
-   CARD (SMALLER — MAKES ROOM)
+   CARD (CENTERED, NOT FULL WIDTH)
 ========================= */
 .card {
-  justify-self: center;
-  width: 100%;
-  max-width: 100px;   /* ⬅ HARD STOP */
-  height: 36px;
-  border-radius: 12px;
+  width: 180px;                /* ✅ controlled width */
+  height: 44px;
+  border-radius: 14px;
 
   background: linear-gradient(180deg, #ffffff, #e5e7eb);
   color: #020617;
   font-weight: 900;
 
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
 
   box-shadow: 0 6px 14px rgba(0,0,0,0.4);
   cursor: pointer;
@@ -113,7 +110,7 @@ h2 {
 }
 
 .rank {
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1;
 }
 
@@ -125,8 +122,15 @@ h2 {
 }
 
 /* =========================
-   PILLS (INLINE)
+   PILLS (RIGHT SIDE)
 ========================= */
+.pills {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
 .pill {
   padding: 6px 10px;
   border-radius: 999px;
@@ -168,8 +172,8 @@ h2 {
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
 
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 10px 22px rgba(0, 0, 0, 0.55);
+    inset 0 0 0 1px rgba(255,255,255,0.08),
+    0 10px 22px rgba(0,0,0,0.55);
 
   padding: 14px;
   overflow: hidden;
@@ -185,15 +189,14 @@ h2 {
   transform: scale(0.98);
 }
 
-/* subtle camera texture */
 .player::before {
   content: "";
   position: absolute;
   inset: 0;
   background: radial-gradient(
     circle at top,
-    rgba(255, 255, 255, 0.05),
-    rgba(0, 0, 0, 0.7)
+    rgba(255,255,255,0.05),
+    rgba(0,0,0,0.7)
   );
   z-index: 0;
 }
@@ -219,13 +222,6 @@ h2 {
   opacity: 0.9;
 }
 
-.mini {
-  font-size: 11px;
-  font-weight: 800;
-  opacity: 0.55;
-  text-transform: uppercase;
-}
-
 /* =========================
    BADGES
 ========================= */
@@ -247,22 +243,9 @@ h2 {
   color: #020617;
 }
 
-.badge.turn {
-  background: #22c55e;
-}
-
-.badge.thumb {
-  background: #facc15;
-  animation: thumbGlow 2s infinite;
-}
-
-.badge.heaven {
-  background: #38bdf8;
-}
-
-.badge.host {
-  background: #60a5fa;
-}
+.badge.turn { background: #22c55e; }
+.badge.thumb { background: #facc15; animation: thumbGlow 2s infinite; }
+.badge.heaven { background: #38bdf8; }
 
 /* =========================
    PLAYER STATES
@@ -270,7 +253,7 @@ h2 {
 .player.turn {
   box-shadow:
     0 0 0 2px #22c55e,
-    0 0 18px rgba(34, 197, 94, 0.55);
+    0 0 18px rgba(34,197,94,0.55);
 }
 
 .player.active {
@@ -302,7 +285,7 @@ h2 {
   50% {
     box-shadow:
       0 0 0 6px #facc15,
-      0 0 34px rgba(250, 204, 21, 0.9);
+      0 0 34px rgba(250,204,21,0.9);
   }
 }
 
@@ -314,6 +297,6 @@ h2 {
 
 @keyframes thumbGlow {
   50% {
-    box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
+    box-shadow: 0 0 14px rgba(250,204,21,0.9);
   }
 }
