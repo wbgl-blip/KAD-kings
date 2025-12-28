@@ -97,11 +97,22 @@ h2 {
   font-weight: 700;
   opacity: 0.85;
 }
-
 /* =========================
-   INFO PILLS ROW (STAYS TIGHT)
+   INFO PILLS – HUD OVERLAY (FINAL)
 ========================= */
 .info {
+  position: absolute;
+  top: 235px;              /* directly under the card */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: auto;
+}
+
   display: flex;
   flex-wrap: nowrap;        /* prevents it from taking extra vertical space */
   overflow: hidden;
