@@ -1,219 +1,149 @@
-/* =========================
-   RESET + BASE (NO SCROLL)
-========================= */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html,
-body {
+html, body {
   height: 100%;
   margin: 0;
-  overflow: hidden; /* 🔒 NO SCROLL EVER */
+  overflow: hidden;
 }
 
 body {
   background: radial-gradient(circle at top, #0b1220, #05070c);
-  color: #ffffff;
+  color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   display: flex;
   justify-content: center;
 }
 
-/* =========================
-   APP LAYOUT (HARD LOCK)
-========================= */
 .app {
   width: 100%;
   max-width: 520px;
-  height: 100svh; /* mobile-safe viewport */
-  padding: 10px 12px;
-
+  height: 100svh;
+  padding: 10px;
   display: grid;
-  grid-template-rows:
-    auto   /* title */
-    auto   /* turn */
-    auto   /* status */
-    auto   /* card row */
-    1fr;   /* players */
-
-  gap: 6px;
-  overflow: hidden; /* 🔒 */
+  grid-template-rows: auto auto auto auto 1fr auto;
+  gap: 8px;
 }
 
-/* =========================
-   HEADERS (COMPACT)
-========================= */
-h1 {
-  text-align: center;
-  margin: 4px 0 0;
-  font-size: 28px;
-}
+h1 { text-align: center; margin: 4px 0 0; font-size: 28px; }
+h2 { text-align: center; margin: 0; font-size: 13px; }
+.status { text-align: center; font-size: 12px; opacity: 0.85; }
 
-h2 {
-  text-align: center;
-  margin: 0;
-  font-size: 12px;
-  font-weight: 800;
-  opacity: 0.85;
-}
+/* CONTROL BAR */
 
-.status {
-  text-align: center;
-  font-size: 11px;
-  opacity: 0.7;
-}
-
-/* =========================
-   CARD + INFO ROW
-========================= */
 .control-bar {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: auto auto 1fr;
   align-items: center;
   gap: 10px;
 }
 
-/* =========================
-   CARD (LOCKED HEIGHT)
-========================= */
-.card {
-  width: 150px;
-  height: 40px;
-  border-radius: 14px;
+.reaction-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-  background: linear-gradient(180deg, #ffffff, #e5e7eb);
+.reaction {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.reaction.heaven { background: #38bdf8; color: #020617; }
+.reaction.thumb { background: #facc15; color: #020617; }
+.reaction:disabled { opacity: 0.35; }
+
+/* CARD */
+
+.card {
+  width: 180px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff, #e5e7eb);
   color: #020617;
   font-weight: 900;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
-
-  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
 }
 
 .card.locked {
-  opacity: 0.5;
+  opacity: 0.55;
   pointer-events: none;
 }
 
-.rank { font-size: 17px; }
-.rule { font-size: 9px; opacity: 0.7; }
+.rank { font-size: 18px; }
+.rule { font-size: 10px; opacity: 0.75; }
 
-/* =========================
-   PILLS (RIGHT)
-========================= */
+/* PILLS */
+
 .pills {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .pill {
-  padding: 5px 9px;
-  border-radius: 999px;
-  font-size: 10px;
   background: #1f2937;
-  opacity: 0.85;
-  white-space: nowrap;
+  color: #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
 }
 
 .pill.mate {
   background: #0f766e;
+  color: #ecfeff;
 }
 
-/* =========================
-   PLAYERS GRID (NO OVERFLOW)
-========================= */
+/* PLAYERS */
+
 .players {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, 1fr); /* 🔒 6 PLAYERS */
-  gap: 10px;
-
-  min-height: 0;
+  gap: 12px;
 }
 
-/* =========================
-   PLAYER TILE (VIDEO READY)
-========================= */
 .player {
-  position: relative;
-  border-radius: 14px;
-
+  aspect-ratio: 16 / 11;
+  border-radius: 16px;
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.08),
-    0 8px 18px rgba(0,0,0,0.5);
-
-  padding: 12px;
-  overflow: hidden;
-
+  padding: 14px;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
-  min-height: 0;
 }
 
-/* ACTIVE TURN — subtle motion only */
 .player.turn {
-  box-shadow:
-    inset 0 0 0 2px rgba(34,197,94,0.9),
-    0 0 10px rgba(34,197,94,0.45);
-  animation: idleFloat 4s ease-in-out infinite;
+  box-shadow: 0 0 0 2px #22c55e;
 }
 
-@keyframes idleFloat {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-}
-
-/* Drink pulse */
 .player.drink {
-  animation: drinkPulse 2.2s ease-out;
+  animation: drinkPulse 2.5s;
 }
 
-@keyframes drinkPulse {
-  10% { transform: scale(1.03); }
-}
+.name { font-weight: 800; }
+.beer { font-size: 12px; }
 
-/* =========================
-   PLAYER CONTENT
-========================= */
-.name {
-  font-size: 14px;
-  font-weight: 800;
-}
+/* BADGES */
 
-.beer {
-  font-size: 11px;
-}
-
-.live {
-  font-size: 9px;
-  opacity: 0.35;
-  text-align: right;
-}
-
-/* =========================
-   BADGES
-========================= */
 .badges {
   position: absolute;
   top: 6px;
   left: 6px;
   display: flex;
-  gap: 5px;
+  gap: 6px;
 }
 
 .badge {
-  padding: 3px 7px;
+  padding: 4px 8px;
   border-radius: 999px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 900;
   color: #020617;
 }
@@ -221,3 +151,20 @@ h2 {
 .badge.turn { background: #22c55e; }
 .badge.thumb { background: #facc15; }
 .badge.heaven { background: #38bdf8; }
+
+/* BUTTON */
+
+.reset {
+  height: 44px;
+  border-radius: 14px;
+  border: none;
+  background: #1f2937;
+  color: #fff;
+  font-weight: 900;
+}
+
+/* ANIMATIONS */
+
+@keyframes drinkPulse {
+  10% { transform: scale(1.05); }
+}
