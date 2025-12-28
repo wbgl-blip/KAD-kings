@@ -6,7 +6,7 @@ import "./styles.css";
    CONSTANTS
 ========================= */
 
-const PLAYERS = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];;
+const PLAYERS = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
 
 const CARD_RULES = {
   A: "Waterfall",
@@ -65,26 +65,22 @@ export default function App() {
   const [thumbHolder, setThumbHolder] = useState(null);
   const [heavenHolder, setHeavenHolder] = useState(null);
 
-  const [race, setRace] = useState({
-    type: null,
-    holder: null,
-    reacted: new Set(),
-  });
-
   const [waterfallReady, setWaterfallReady] = useState(new Set());
   const [waterfallIndex, setWaterfallIndex] = useState(null);
-  const [focusPlayers, setFocusPlayers] = useState(new Set());
 
   const currentPlayer = PLAYERS[turn];
   const currentRank = card ? rankOf(card) : null;
-  const DRINK_FLASH_MS = 2500;
+
+  /* =========================
+     HELPERS
+  ========================= */
 
   function drink(name) {
     setBeers(b => ({ ...b, [name]: b[name] + 1 }));
     setDrinkFlash(f => [...new Set([...f, name])]);
     setTimeout(
       () => setDrinkFlash(f => f.filter(n => n !== name)),
-      DRINK_FLASH_MS
+      2500
     );
   }
 
@@ -94,6 +90,16 @@ export default function App() {
     drink(name);
     (mates[name] || []).forEach(m => propagateDrink(m, visited));
   }
+
+  function currentWaterfallDrinker() {
+    return phase.type === "WATERFALL_ACTIVE"
+      ? PLAYERS[waterfallIndex]
+      : null;
+  }
+
+  /* =========================
+     GAME ACTIONS
+  ========================= */
 
   function drawCard() {
     if (phase.type !== "IDLE" || deck.length === 0) return;
@@ -115,28 +121,14 @@ export default function App() {
 
     if (r === "J") {
       setThumbHolder(drawer);
-      setTurn(t => (t + 1) % PLAYERS.length);
-      return;
+      return setTurn(t => (t + 1) % PLAYERS.length);
     }
 
     if (r === "7") {
       setHeavenHolder(drawer);
-      setTurn(t => (t + 1) % PLAYERS.length);
-      return;
+      return setTurn(t => (t + 1) % PLAYERS.length);
     }
 
-    setTurn(t => (t + 1) % PLAYERS.length);
-  }
-
-  function startWaterfall() {
-    setWaterfallIndex(PLAYERS.indexOf(currentPlayer));
-    setPhase({ type: "WATERFALL_ACTIVE", owner: currentPlayer });
-  }
-
-  function endWaterfall() {
-    setPhase({ type: "IDLE", owner: null });
-    setWaterfallReady(new Set());
-    setWaterfallIndex(null);
     setTurn(t => (t + 1) % PLAYERS.length);
   }
 
@@ -147,18 +139,39 @@ export default function App() {
     }
 
     if (phase.type === "WATERFALL_ACTIVE") {
-      if (PLAYERS[waterfallIndex] !== name) return;
+      if (name !== currentWaterfallDrinker()) return;
       setWaterfallIndex(i => (i + 1) % PLAYERS.length);
+      return;
+    }
+
+    if (phase.type === "SELECT_MATE" && name !== phase.owner) {
+      setMates(m => ({
+        ...m,
+        [phase.owner]: [...new Set([...m[phase.owner], name])]
+      }));
+      setPhase({ type: "IDLE", owner: null });
+      return;
+    }
+
+    if (phase.type === "SELECT_DRINK") {
+      propagateDrink(name);
+      setPhase({ type: "IDLE", owner: null });
       return;
     }
 
     propagateDrink(name);
   }
 
-  function focusPair(label) {
-    const [a, b] = label.split("→").map(s => s.trim());
-    setFocusPlayers(new Set([a, b]));
-    setTimeout(() => setFocusPlayers(new Set()), 1500);
+  function startWaterfall() {
+    setWaterfallIndex(PLAYERS.indexOf(phase.owner));
+    setPhase({ type: "WATERFALL_ACTIVE", owner: phase.owner });
+  }
+
+  function endWaterfall() {
+    setPhase({ type: "IDLE", owner: null });
+    setWaterfallReady(new Set());
+    setWaterfallIndex(null);
+    setTurn(t => (t + 1) % PLAYERS.length);
   }
 
   const matePills = useMemo(
@@ -172,6 +185,10 @@ export default function App() {
   const drawLocked = phase.type !== "IDLE";
   const allReady = waterfallReady.size === PLAYERS.length;
 
+  /* =========================
+     RENDER
+  ========================= */
+
   return (
     <div className="app">
       <h1>KAD Kings</h1>
@@ -181,7 +198,6 @@ export default function App() {
         {CARD_RULES[currentRank] || "Draw a card"}
       </div>
 
-      {/* CARD + PILLS */}
       <div className="control-bar">
         <div
           className={`card ${drawLocked ? "locked" : ""}`}
@@ -202,18 +218,13 @@ export default function App() {
           <span className="pill">☁️ Heaven: {heavenHolder || "—"}</span>
 
           {matePills.map((m, i) => (
-            <button
-              key={i}
-              className="pill mate"
-              onClick={() => focusPair(m)}
-            >
+            <span key={i} className="pill mate">
               {m}
-            </button>
+            </span>
           ))}
         </div>
       </div>
 
-      {/* PLAYERS */}
       <div className="players">
         {PLAYERS.map(p => (
           <div
@@ -221,14 +232,19 @@ export default function App() {
             className={`player
               ${p === currentPlayer ? "turn" : ""}
               ${drinkFlash.includes(p) ? "drink" : ""}
-              ${focusPlayers.has(p) ? "active" : ""}
             `}
             onClick={() => tapPlayer(p)}
           >
             <div className="badges">
-              {p === currentPlayer && <span className="badge turn">TURN</span>}
-              {p === thumbHolder && <span className="badge thumb">THUMB</span>}
-              {p === heavenHolder && <span className="badge heaven">HEAVEN</span>}
+              {p === currentPlayer && (
+                <span className="badge turn">TURN</span>
+              )}
+              {p === thumbHolder && (
+                <span className="badge thumb">THUMB</span>
+              )}
+              {p === heavenHolder && (
+                <span className="badge heaven">HEAVEN</span>
+              )}
             </div>
 
             <div className="name">{p}</div>
@@ -238,7 +254,11 @@ export default function App() {
       </div>
 
       {phase.type === "WATERFALL_READY" && (
-        <button className="reset" disabled={!allReady} onClick={startWaterfall}>
+        <button
+          className="reset"
+          disabled={!allReady}
+          onClick={startWaterfall}
+        >
           Start Waterfall
         </button>
       )}
