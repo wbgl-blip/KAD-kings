@@ -154,10 +154,12 @@ h2 {
 ========================= */
 .player {
   position: relative;
-  height: 150px;;                 /* REQUIRED */
-  border-radius: 16px;
+  width: 100%;
+  height: 150px;
 
+  border-radius: 16px;
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
+
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,0.08),
     0 10px 22px rgba(0,0,0,0.55);
@@ -171,7 +173,6 @@ h2 {
 
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-
 .player:active {
   transform: scale(0.98);
 }
