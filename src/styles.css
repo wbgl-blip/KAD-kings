@@ -103,15 +103,15 @@ h2 {
 ========================= */
 .info {
   position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  left: calc(100% + 10px); /* pushes to right of card */
+  transform: translateY(-50%);
 
   display: flex;
-  flex-direction: column;   /* ← THIS IS THE KEY */
-  align-items: center;
-
+  flex-direction: column;
+  align-items: flex-start;
   gap: 6px;
+
   z-index: 10;
   pointer-events: auto;
 }
