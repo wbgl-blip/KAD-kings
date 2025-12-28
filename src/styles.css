@@ -84,7 +84,7 @@ h2 {
    CARD (CENTERED, NOT FULL WIDTH)
 ========================= */
 .card {
-  width: 180px;                /* ✅ controlled width */
+  width: 180px;
   height: 44px;
   border-radius: 14px;
 
