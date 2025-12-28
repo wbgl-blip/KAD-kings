@@ -248,27 +248,34 @@ export default function App() {
       <h2>{currentPlayer}’s Turn</h2>
 
       <div className="status">{CARD_RULES[currentRank] || "Draw a card"}</div>
+<div className="card-wrapper">
+  <div
+    className={`card ${drawLocked ? "locked" : ""}`}
+    onClick={drawCard}
+  >
+    {card ? (
+      <>
+        <div className="rank">{card}</div>
+        <div className="rule">{CARD_RULES[currentRank]}</div>
+      </>
+    ) : (
+      "DRAW"
+    )}
+  </div>
 
-      <div className={`card ${drawLocked ? "locked" : ""}`} onClick={drawCard}>
-        {card ? (
-          <>
-            <div className="rank">{card}</div>
-            <div className="rule">{CARD_RULES[currentRank]}</div>
-          </>
-        ) : (
-          "DRAW"
-        )}
-      </div>
+  <div className="info">
+    <span className="pill">👍 Thumb: {thumbHolder || "—"}</span>
+    <span className="pill">☁️ Heaven: {heavenHolder || "—"}</span>
 
-      <div className="info">
-        <span className="pill">👍 Thumb: {thumbHolder || "—"}</span>
-        <span className="pill">☁️ Heaven: {heavenHolder || "—"}</span>
-        {matePills.length
-          ? matePills.map((m, i) => (
-              <span key={i} className="pill mate">{m}</span>
-            ))
-          : <span className="pill muted">🤝 No mates</span>}
-      </div>
+    {matePills.length > 0 ? (
+      matePills.map((m, i) => (
+        <span key={i} className="pill mate">{m}</span>
+      ))
+    ) : (
+      <span className="pill muted">🤝 No mates yet</span>
+    )}
+  </div>
+</div>
 
       <div className="players">
         {PLAYERS.map(p => (
