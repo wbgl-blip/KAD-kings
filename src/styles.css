@@ -90,7 +90,7 @@ h2 {
 
 .card:active { transform: scale(0.98); }
 
-.rank { font-size: 44px; line-height: 1; }
+.rank { font-size: 40px; line-height: 1; }
 .rule {
   margin-top: 4px;
   font-size: 13px;
