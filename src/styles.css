@@ -1,9 +1,15 @@
-* { box-sizing: border-box; }
+/* =========================
+   RESET + BASE (NO SCROLL)
+========================= */
+* {
+  box-sizing: border-box;
+}
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
-  overflow: hidden;
+  overflow: hidden; /* 🔒 NO SCROLL EVER */
 }
 
 body {
@@ -15,78 +21,78 @@ body {
 }
 
 /* =========================
-   APP
+   APP LAYOUT (HARD LOCK)
 ========================= */
-
 .app {
-  position: relative;
   width: 100%;
   max-width: 520px;
-  height: 100svh;
+  height: 100svh; /* mobile-safe viewport */
   padding: 10px 12px;
-  display: grid;
-  grid-template-rows: auto auto auto auto 1fr;
-  gap: 8px;
-}
 
-.app::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.04), transparent 60%);
-  pointer-events: none;
+  display: grid;
+  grid-template-rows:
+    auto   /* title */
+    auto   /* turn */
+    auto   /* status */
+    auto   /* card row */
+    1fr;   /* players */
+
+  gap: 6px;
+  overflow: hidden; /* 🔒 */
 }
 
 /* =========================
-   HEADERS
+   HEADERS (COMPACT)
 ========================= */
-
 h1 {
   text-align: center;
-  margin: 6px 0 0;
-  font-size: 30px;
+  margin: 4px 0 0;
+  font-size: 28px;
 }
 
 h2 {
   text-align: center;
   margin: 0;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
 .status {
   text-align: center;
-  font-size: 12px;
-  opacity: 0.75;
+  font-size: 11px;
+  opacity: 0.7;
 }
 
 /* =========================
-   CARD + INFO
+   CARD + INFO ROW
 ========================= */
-
 .control-bar {
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
-  gap: 12px;
-  margin-top: 6px;
+  gap: 10px;
 }
 
+/* =========================
+   CARD (LOCKED HEIGHT)
+========================= */
 .card {
-  width: 160px;
-  height: 42px;
+  width: 150px;
+  height: 40px;
   border-radius: 14px;
+
   background: linear-gradient(180deg, #ffffff, #e5e7eb);
   color: #020617;
   font-weight: 900;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
+
   box-shadow: 0 6px 14px rgba(0,0,0,0.4);
-  cursor: pointer;
 }
 
 .card.locked {
@@ -94,13 +100,16 @@ h2 {
   pointer-events: none;
 }
 
-.rank { font-size: 18px; }
-.rule { font-size: 10px; opacity: 0.75; }
+.rank { font-size: 17px; }
+.rule { font-size: 9px; opacity: 0.7; }
 
+/* =========================
+   PILLS (RIGHT)
+========================= */
 .pills {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .pill {
@@ -109,6 +118,7 @@ h2 {
   font-size: 10px;
   background: #1f2937;
   opacity: 0.85;
+  white-space: nowrap;
 }
 
 .pill.mate {
@@ -116,43 +126,55 @@ h2 {
 }
 
 /* =========================
-   PLAYERS
+   PLAYERS GRID (NO OVERFLOW)
 ========================= */
-
 .players {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  grid-template-rows: repeat(3, 1fr); /* 🔒 6 PLAYERS */
+  gap: 10px;
+
+  min-height: 0;
 }
 
+/* =========================
+   PLAYER TILE (VIDEO READY)
+========================= */
 .player {
   position: relative;
-  aspect-ratio: 16 / 10;
-  border-radius: 16px;
+  border-radius: 14px;
+
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,0.08),
-    0 10px 22px rgba(0,0,0,0.55);
-  padding: 14px;
+    0 8px 18px rgba(0,0,0,0.5);
+
+  padding: 12px;
+  overflow: hidden;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  min-height: 0;
 }
 
+/* ACTIVE TURN — subtle motion only */
 .player.turn {
   box-shadow:
     inset 0 0 0 2px rgba(34,197,94,0.9),
-    0 0 12px rgba(34,197,94,0.45);
-  animation: activeIdle 4s ease-in-out infinite;
+    0 0 10px rgba(34,197,94,0.45);
+  animation: idleFloat 4s ease-in-out infinite;
 }
 
-.player.drink {
-  animation: drinkPulse 2.2s ease-out;
-}
-
-@keyframes activeIdle {
+@keyframes idleFloat {
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(-2px); }
+}
+
+/* Drink pulse */
+.player.drink {
+  animation: drinkPulse 2.2s ease-out;
 }
 
 @keyframes drinkPulse {
@@ -160,40 +182,38 @@ h2 {
 }
 
 /* =========================
-   TILE CONTENT
+   PLAYER CONTENT
 ========================= */
-
 .name {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
 }
 
 .beer {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .live {
-  font-size: 10px;
-  opacity: 0.4;
+  font-size: 9px;
+  opacity: 0.35;
   text-align: right;
 }
 
 /* =========================
    BADGES
 ========================= */
-
 .badges {
   position: absolute;
   top: 6px;
   left: 6px;
   display: flex;
-  gap: 6px;
+  gap: 5px;
 }
 
 .badge {
-  padding: 4px 8px;
+  padding: 3px 7px;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 900;
   color: #020617;
 }
