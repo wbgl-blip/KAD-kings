@@ -70,10 +70,10 @@ h2 {
 ========================= */
 .control-bar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto auto; /* 🔒 no stretching */
+  justify-content: center;          /* 🔒 tight + centered */
   align-items: center;
   gap: 10px;
-  width: 100%;
 }
 
 .pills {
@@ -89,7 +89,7 @@ h2 {
 .card {
   justify-self: center;
   width: 100%;
-  max-width: 260px;   /* ⬅ HARD STOP */
+  max-width: 100px;   /* ⬅ HARD STOP */
   height: 36px;
   border-radius: 12px;
 
