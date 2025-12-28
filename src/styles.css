@@ -140,10 +140,10 @@ h2 {
    PLAYERS GRID (LOCKED)
 ========================= */
 .players {
-  min-height: 0;                 /* REQUIRED for grid shrink */
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: 1fr;            /* equal-height tiles */
+  grid-auto-rows: 150px; /* LOCKED HEIGHT */
   gap: 12px;
   padding: 6px;
   overflow: hidden;
@@ -154,7 +154,7 @@ h2 {
 ========================= */
 .player {
   position: relative;
-  min-height: 0;                 /* REQUIRED */
+  height: 150px;;                 /* REQUIRED */
   border-radius: 16px;
 
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
