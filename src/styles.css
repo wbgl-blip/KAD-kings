@@ -1,9 +1,12 @@
 /* =========================
    RESET + BASE (NO SCROLL)
 ========================= */
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   overflow: hidden;
@@ -63,23 +66,26 @@ h2 {
 }
 
 /* =========================
-   CARD (SMALLER)
+   CARD + PILLS BAR (INLINE)
 ========================= */
-/* CARD + PILLS BAR */
-
 .control-bar {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
+  width: 100%;
 }
 
 .pills {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  align-items: flex-start;
 }
 
+/* =========================
+   CARD (SMALLER — MAKES ROOM)
+========================= */
 .card {
   justify-self: center;
   width: min(86%, 360px);
@@ -96,11 +102,10 @@ h2 {
   justify-content: center;
   gap: 2px;
 
-  box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
   cursor: pointer;
   user-select: none;
 }
-
 
 .card.locked {
   opacity: 0.55;
@@ -121,21 +126,8 @@ h2 {
 }
 
 /* =========================
-   INFO PILLS
+   PILLS (INLINE)
 ========================= */
-.info {
-  position: absolute;
-  top: 50%;
-  left: calc(100% + 10px);
-  transform: translateY(-50%);
-
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  z-index: 10;
-}
-
 .pill {
   padding: 6px 10px;
   border-radius: 999px;
@@ -146,11 +138,17 @@ h2 {
   white-space: nowrap;
 }
 
-.pill.mate { background: #0f766e; color: #ecfeff; }
-.pill.muted { opacity: 0.6; }
+.pill.mate {
+  background: #0f766e;
+  color: #ecfeff;
+}
+
+.pill.muted {
+  opacity: 0.6;
+}
 
 /* =========================
-   PLAYERS GRID (WIDE, FLEXIBLE)
+   PLAYERS GRID (LOCKED)
 ========================= */
 .players {
   display: grid;
@@ -160,7 +158,7 @@ h2 {
 }
 
 /* =========================
-   PLAYER TILE (WIDE VIDEO STYLE)
+   PLAYER TILE (LOCKED SIZE)
 ========================= */
 .player {
   position: relative;
@@ -171,8 +169,8 @@ h2 {
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
 
   box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.08),
-    0 10px 22px rgba(0,0,0,0.55);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 10px 22px rgba(0, 0, 0, 0.55);
 
   padding: 14px;
   overflow: hidden;
@@ -188,13 +186,15 @@ h2 {
   transform: scale(0.98);
 }
 
+/* subtle camera texture */
 .player::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at top,
-    rgba(255,255,255,0.05),
-    rgba(0,0,0,0.7)
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 255, 255, 0.05),
+    rgba(0, 0, 0, 0.7)
   );
   z-index: 0;
 }
@@ -248,10 +248,22 @@ h2 {
   color: #020617;
 }
 
-.badge.turn   { background: #22c55e; }
-.badge.thumb  { background: #facc15; animation: thumbGlow 2s infinite; }
-.badge.heaven { background: #38bdf8; }
-.badge.host   { background: #60a5fa; }
+.badge.turn {
+  background: #22c55e;
+}
+
+.badge.thumb {
+  background: #facc15;
+  animation: thumbGlow 2s infinite;
+}
+
+.badge.heaven {
+  background: #38bdf8;
+}
+
+.badge.host {
+  background: #60a5fa;
+}
 
 /* =========================
    PLAYER STATES
@@ -259,7 +271,7 @@ h2 {
 .player.turn {
   box-shadow:
     0 0 0 2px #22c55e,
-    0 0 18px rgba(34,197,94,0.55);
+    0 0 18px rgba(34, 197, 94, 0.55);
 }
 
 .player.active {
@@ -288,13 +300,21 @@ h2 {
    ANIMATIONS
 ========================= */
 @keyframes selectPulse {
-  50% { box-shadow: 0 0 0 6px #facc15, 0 0 34px rgba(250,204,21,0.9); }
+  50% {
+    box-shadow:
+      0 0 0 6px #facc15,
+      0 0 34px rgba(250, 204, 21, 0.9);
+  }
 }
 
 @keyframes drinkPulse {
-  10% { transform: scale(1.03); }
+  10% {
+    transform: scale(1.03);
+  }
 }
 
 @keyframes thumbGlow {
-  50% { box-shadow: 0 0 14px rgba(250,204,21,0.9); }
+  50% {
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
+  }
 }
