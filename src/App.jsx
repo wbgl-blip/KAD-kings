@@ -11,7 +11,7 @@ const PLAYERS = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
 const CARD_RULES = {
   A: "Waterfall",
   2: "Pick someone to drink (starts with drawer)",
-  3: "Me",
+  3: "is for me Drink",
   4: "4s for Whores — Everyone drinks (stacks with mates)",
   5: "Guys drink (stacks with mates)",
   6: "6s for Dicks — Everyone drinks (stacks with mates)",
