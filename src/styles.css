@@ -218,7 +218,9 @@ h2 {
   color: #020617;
 }
 
-.badge.thumb { background: #facc15; }
+.badge.thumb { background: #facc15; {
+  animation: thumbGlow 2s infinite;
+}
 .badge.heaven { background: #38bdf8; }
 .badge.host { background: #60a5fa; }
 .badge.turn { background: #22c55e; }
