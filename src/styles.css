@@ -137,26 +137,32 @@ h2 {
 .pill.muted { opacity: 0.6; }
 
 /* =========================
-   PLAYERS GRID — MUST FIT
+   PLAYERS GRID (LOCKED)
 ========================= */
 .players {
-  grid-template-columns: 1fr 1fr;
-  grid-auto-rows: 1fr; /* force equal video-style tiles */
+  min-height: 0;                 /* REQUIRED for grid shrink */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr;            /* equal-height tiles */
+  gap: 12px;
+  padding: 6px;
+  overflow: hidden;
 }
 
 /* =========================
-   PLAYER TILE (VIDEO-LIKE, NOT SQUARE)
+   PLAYER TILE (VIDEO STYLE)
 ========================= */
 .player {
   position: relative;
+  min-height: 0;                 /* REQUIRED */
   border-radius: 16px;
+
   background: linear-gradient(145deg, #0f172a, #0a0f1b);
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,0.08),
     0 10px 22px rgba(0,0,0,0.55);
 
-  padding: 16px;
-  min-height: 150px;
+  padding: 14px;
   overflow: hidden;
 
   display: flex;
@@ -166,19 +172,34 @@ h2 {
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.player:active { transform: scale(0.98); }
+.player:active {
+  transform: scale(0.98);
+}
 
 /* subtle camera texture */
 .player::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at top, rgba(255,255,255,0.05), rgba(0,0,0,0.65));
+  background: radial-gradient(
+    circle at top,
+    rgba(255,255,255,0.05),
+    rgba(0,0,0,0.7)
+  );
   pointer-events: none;
   z-index: 0;
 }
 
-.name, .beer, .mini, .badges { position: relative; z-index: 1; }
+/* =========================
+   PLAYER CONTENT
+========================= */
+.name,
+.beer,
+.mini,
+.badges {
+  position: relative;
+  z-index: 1;
+}
 
 .name {
   font-size: 15px;
@@ -191,7 +212,7 @@ h2 {
   opacity: 0.9;
 }
 
-/* “tap to READY” / race hints — keep small so tiles can shrink */
+/* helper / race hint */
 .mini {
   font-size: 11px;
   font-weight: 800;
@@ -201,7 +222,7 @@ h2 {
 }
 
 /* =========================
-   BADGES — OVERLAY STYLE
+   BADGES (OVERLAY)
 ========================= */
 .badges {
   position: absolute;
@@ -224,10 +245,61 @@ h2 {
   color: #020617;
 }
 
-.badge.thumb { background: #facc15; animation: thumbGlow 2s infinite; }
+.badge.turn   { background: #22c55e; }
+.badge.thumb  { background: #facc15; animation: thumbGlow 2s infinite; }
 .badge.heaven { background: #38bdf8; }
-.badge.host { background: #60a5fa; }
-.badge.turn { background: #22c55e; }
+.badge.host   { background: #60a5fa; }
+
+/* =========================
+   PLAYER STATES
+========================= */
+.player.turn {
+  box-shadow:
+    0 0 0 2px #22c55e,
+    0 0 18px rgba(34,197,94,0.55);
+}
+
+.player.active {
+  animation: selectPulse 1.1s infinite;
+  box-shadow:
+    0 0 0 3px #eab308,
+    0 0 26px rgba(234,179,8,0.85);
+}
+
+.player.drink {
+  animation: drinkPulse 2.5s ease-out;
+  box-shadow:
+    0 0 0 3px #ef4444,
+    0 0 28px rgba(239,68,68,0.9);
+}
+
+.player.drink::after {
+  content: "YOU DRINK";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  background: rgba(239,68,68,0.85);
+  border-radius: 16px;
+  z-index: 3;
+}
+
+/* readiness */
+.player.ready {
+  box-shadow:
+    0 0 0 2px #60a5fa,
+    0 0 18px rgba(96,165,250,0.6);
+}
+
+.player.waterfall-active {
+  animation: waterfallPulse 1s infinite;
+  box-shadow:
+    0 0 0 3px #38bdf8,
+    0 0 30px rgba(56,189,248,0.9);
+}
 
 /* =========================
    STATES
