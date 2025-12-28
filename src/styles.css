@@ -133,12 +133,15 @@ h2 {
    PLAYERS GRID — MUST FIT
 ========================= */
 .players {
-  min-height: 0;                 /* critical */
+  min-height: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-auto-rows: minmax(120px, 1fr);/* each row shrinks to fit */
+
+  /* wider video-style tiles */
+  grid-template-columns: minmax(160px, 1fr) minmax(160px, 1fr);
+
+  grid-auto-rows: minmax(120px, 1fr);
   gap: 12px;
-  padding: 4px;
+  padding: 6px;
 }
 
 /* =========================
@@ -152,7 +155,7 @@ h2 {
     inset 0 0 0 1px rgba(255,255,255,0.08),
     0 10px 22px rgba(0,0,0,0.55);
 
-  padding: 14px;
+  padding: 16px;
   min-height: 0;
   overflow: hidden;
 
