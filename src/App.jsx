@@ -145,16 +145,17 @@ export default function App() {
     setCard(next);
 
     const r = rankOf(next);
-    const drawer = currentPlayer;
+const drawer = currentPlayer;
 
-    if (r === "8") return setPhase({ type: "SELECT_MATE", owner: drawer });
-    if (r === "2") return setPhase({ type: "SELECT_DRINK", owner: drawer });
+if (r === "8") return setPhase({ type: "SELECT_MATE", owner: drawer });
+if (r === "2") return setPhase({ type: "SELECT_DRINK", owner: drawer });
 
-    if (r === "A") {
-      setWaterfallReady(new Set());
-      return setPhase({ type: "WATERFALL_READY", owner: drawer });
+if (r === "A") {
+  setWaterfallReady(new Set());
+  return setPhase({ type: "WATERFALL_READY", owner: drawer });
+}
 
-}if (r === "J") {
+if (r === "J") {
   setThumbHolder(drawer);
   setTurn(t => (t + 1) % PLAYERS.length);
   return;
@@ -166,8 +167,7 @@ if (r === "7") {
   return;
 }
 
-    setTurn(t => (t + 1) % PLAYERS.length);
-  }
+setTurn(t => (t + 1) % PLAYERS.length);
 
   /* =========================
      RACES
@@ -199,8 +199,20 @@ if (r === "7") {
      TAP PLAYER
   ========================= */
 
-  function tapPlayer(name) {
-    if (phase.type.startsWith("RACE")) return handleRaceTap(name);
+  function tapPlayer(name) { 
+   // IDLE → allow Thumb / Heaven holder to trigger power
+if (phase.type === "IDLE") {
+  if (name === thumbHolder) {
+    startRace("THUMB", name);
+    return;
+  }
+
+  if (name === heavenHolder) {
+    startRace("HEAVEN", name);
+    return;
+  }
+}
+    if (phase.type.startsWith("RACE")) return; handleRaceTap(name);
 
     if (phase.type === "WATERFALL_READY") {
       setWaterfallReady(r => new Set(r).add(name));
