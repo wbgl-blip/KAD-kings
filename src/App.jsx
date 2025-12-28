@@ -1,25 +1,26 @@
+// src/App.jsx
 import { useMemo, useState } from "react";
 import "./styles.css";
 
 /* =========================
-   CONSTANTS
+   CONSTANTS (6 PLAYERS)
 ========================= */
 
 const PLAYERS = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
 
 const CARD_RULES = {
   A: "Waterfall",
-  2: "Pick someone",
+  2: "Pick someone to drink",
   3: "Me",
-  4: "Everyone",
+  4: "Everyone drinks",
   5: "Guys",
-  6: "Everyone",
+  6: "Everyone drinks",
   7: "Heaven",
-  8: "Mate",
+  8: "Pick a Mate",
   9: "Rhyme",
   10: "Categories",
-  J: "Thumb",
-  Q: "Questions",
+  J: "Thumbmaster",
+  Q: "Question Master",
   K: "Make a Rule",
 };
 
@@ -31,16 +32,16 @@ const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 ========================= */
 
 function buildDeck() {
-  const d = [];
-  RANKS.forEach(r => SUITS.forEach(s => d.push(`${r}${s}`)));
-  for (let i = d.length - 1; i > 0; i--) {
+  const deck = [];
+  RANKS.forEach(r => SUITS.forEach(s => deck.push(`${r}${s}`)));
+  for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [d[i], d[j]] = [d[j], d[i]];
+    [deck[i], deck[j]] = [deck[j], deck[i]];
   }
-  return d;
+  return deck;
 }
 
-const rankOf = c => c.replace(/[^A-Z0-9]/g, "");
+const rankOf = card => card.replace(/[^A-Z0-9]/g, "");
 
 /* =========================
    APP
@@ -55,39 +56,93 @@ export default function App() {
     Object.fromEntries(PLAYERS.map(p => [p, 0]))
   );
 
+  const [mates, setMates] = useState(
+    Object.fromEntries(PLAYERS.map(p => [p, []]))
+  );
+
+  const [phase, setPhase] = useState({ type: "IDLE", owner: null });
+  const [drinkFlash, setDrinkFlash] = useState([]);
   const [thumbHolder, setThumbHolder] = useState(null);
   const [heavenHolder, setHeavenHolder] = useState(null);
+  const [focusPlayers, setFocusPlayers] = useState(new Set());
 
   const currentPlayer = PLAYERS[turn];
   const currentRank = card ? rankOf(card) : null;
 
+  function drink(name) {
+    setBeers(b => ({ ...b, [name]: b[name] + 1 }));
+    setDrinkFlash(f => [...new Set([...f, name])]);
+    setTimeout(() => {
+      setDrinkFlash(f => f.filter(n => n !== name));
+    }, 2200);
+  }
+
+  function propagateDrink(name, visited = new Set()) {
+    if (visited.has(name)) return;
+    visited.add(name);
+    drink(name);
+    (mates[name] || []).forEach(m => propagateDrink(m, visited));
+  }
+
   function drawCard() {
-    if (!deck.length) return;
+    if (phase.type !== "IDLE" || deck.length === 0) return;
+
     const [next, ...rest] = deck;
     setDeck(rest);
     setCard(next);
 
     const r = rankOf(next);
+    const drawer = currentPlayer;
 
-    if (r === "J") setThumbHolder(currentPlayer);
-    if (r === "7") setHeavenHolder(currentPlayer);
+    if (r === "8") return setPhase({ type: "SELECT_MATE", owner: drawer });
+    if (r === "2") return setPhase({ type: "SELECT_DRINK", owner: drawer });
+
+    if (r === "J") {
+      setThumbHolder(drawer);
+      setTurn(t => (t + 1) % PLAYERS.length);
+      return;
+    }
+
+    if (r === "7") {
+      setHeavenHolder(drawer);
+      setTurn(t => (t + 1) % PLAYERS.length);
+      return;
+    }
 
     setTurn(t => (t + 1) % PLAYERS.length);
   }
 
+  function tapPlayer(name) {
+    if (phase.type === "SELECT_MATE" && name !== phase.owner) {
+      setMates(m => ({
+        ...m,
+        [phase.owner]: [...new Set([...m[phase.owner], name])]
+      }));
+      setPhase({ type: "IDLE", owner: null });
+      return;
+    }
+
+    if (phase.type === "SELECT_DRINK") {
+      propagateDrink(name);
+      setPhase({ type: "IDLE", owner: null });
+      return;
+    }
+
+    propagateDrink(name);
+  }
+
+  const matePills = useMemo(
+    () =>
+      Object.entries(mates).flatMap(([a, list]) =>
+        list.map(b => `${a} → ${b}`)
+      ),
+    [mates]
+  );
+
+  const drawLocked = phase.type !== "IDLE";
+
   return (
     <div className="app">
-
-      {/* TOP BAR */}
-      <div className="topbar">
-        <div className="roomchip">
-          <span className="roomlabel">ROOM</span>
-          <span className="roomcode">KAD-732</span>
-          <span className="roomhint">tap to copy</span>
-        </div>
-        <button className="hostbtn">Host</button>
-      </div>
-
       <h1>KAD Kings</h1>
       <h2>{currentPlayer}’s Turn</h2>
 
@@ -95,47 +150,53 @@ export default function App() {
         {CARD_RULES[currentRank] || "Draw a card"}
       </div>
 
-      {/* CONTROL BAR */}
       <div className="control-bar">
-        <div className="control-spacer" />
-
-        <div className={`card ${card ? "draw" : ""}`} onClick={drawCard}>
+        <div
+          className={`card ${drawLocked ? "locked" : ""}`}
+          onClick={drawCard}
+        >
           {card ? (
             <>
               <div className="rank">{card}</div>
               <div className="rule">{CARD_RULES[currentRank]}</div>
             </>
           ) : (
-            <div className="rank">DRAW</div>
+            "DRAW"
           )}
         </div>
 
         <div className="pills">
-          <div className="pill">👍 Thumb: {thumbHolder || "—"}</div>
-          <div className="pill">☁️ Heaven: {heavenHolder || "—"}</div>
+          <span className="pill">👍 Thumb: {thumbHolder || "—"}</span>
+          <span className="pill">☁️ Heaven: {heavenHolder || "—"}</span>
+
+          {matePills.map((m, i) => (
+            <span key={i} className="pill mate">
+              {m}
+            </span>
+          ))}
         </div>
       </div>
 
-      {/* PLAYERS */}
       <div className="players">
         {PLAYERS.map(p => (
           <div
             key={p}
-            className={`player ${p === currentPlayer ? "turn" : ""}`}
+            className={`player
+              ${p === currentPlayer ? "turn" : ""}
+              ${drinkFlash.includes(p) ? "drink" : ""}
+              ${focusPlayers.has(p) ? "active" : ""}
+            `}
+            onClick={() => tapPlayer(p)}
           >
             <div className="badges">
               {p === currentPlayer && <span className="badge turn">TURN</span>}
               {p === thumbHolder && <span className="badge thumb">THUMB</span>}
               {p === heavenHolder && <span className="badge heaven">HEAVEN</span>}
-              {p === "Wes" && <span className="badge host">HOST</span>}
             </div>
 
             <div className="name">{p}</div>
-
-            <div className="tilebottom">
-              <div className="beer">🍺 {beers[p]}</div>
-              <div className="mini">live</div>
-            </div>
+            <div className="beer">🍺 {beers[p]}</div>
+            <div className="live">LIVE</div>
           </div>
         ))}
       </div>
