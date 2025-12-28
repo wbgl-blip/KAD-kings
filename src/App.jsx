@@ -212,8 +212,10 @@ if (phase.type === "IDLE") {
     return;
   }
 }
-    if (phase.type.startsWith("RACE")) return; handleRaceTap(name);
-
+   if (phase.type.startsWith("RACE")) {
+  handleRaceTap(name);
+  return;
+   }
     if (phase.type === "WATERFALL_READY") {
       setWaterfallReady(r => new Set(r).add(name));
       return;
