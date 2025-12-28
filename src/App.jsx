@@ -227,42 +227,106 @@ export default function App() {
   const allReady = waterfallReady.size === PLAYERS.length;
 
   return (
-    <div className="app">
-      <h1>KAD Kings</h1>
-      <h2>{currentPlayer}’s Turn</h2>
+  <div className="app">
+    <h1>KAD Kings</h1>
+    <h2>{currentPlayer}’s Turn</h2>
 
-      <div className="status">{CARD_RULES[currentRank] || "Draw a card"}</div>
+    <div className="status">
+      {CARD_RULES[currentRank] || "Draw a card"}
+    </div>
 
-      <div className="card-wrapper">
-        <div
-          className={`card ${drawLocked ? "locked" : ""}`}
-          onClick={drawCard}
-        >
-          {card ? (
-            <>
-              <div className="rank">{card}</div>
-              <div className="rule">{CARD_RULES[currentRank]}</div>
-            </>
-          ) : (
-            "DRAW"
-          )}
-        </div>
-
-        <div className="info">
-          <span className="pill">👍 Thumb: {thumbHolder || "—"}</span>
-          <span className="pill">☁️ Heaven: {heavenHolder || "—"}</span>
-
-          {matePills.map((m, i) => (
-            <button
-              key={i}
-              className="pill mate"
-              onClick={() => focusPair(m)}
-            >
-              {m}
-            </button>
-          ))}
-        </div>
+    {/* CARD + PILLS INLINE BAR */}
+    <div className="control-bar">
+      <div
+        className={`card ${drawLocked ? "locked" : ""}`}
+        onClick={drawCard}
+      >
+        {card ? (
+          <>
+            <div className="rank">{card}</div>
+            <div className="rule">{CARD_RULES[currentRank]}</div>
+          </>
+        ) : (
+          "DRAW"
+        )}
       </div>
+
+      <div className="pills">
+        <span className="pill">👍 Thumb: {thumbHolder || "—"}</span>
+        <span className="pill">☁️ Heaven: {heavenHolder || "—"}</span>
+
+        {matePills.map((m, i) => (
+          <button
+            key={i}
+            className="pill mate"
+            onClick={() => focusPair(m)}
+          >
+            {m}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* PLAYERS GRID */}
+    <div className="players">
+      {PLAYERS.map(p => {
+        const isWaterfallActive =
+          phase.type === "WATERFALL_ACTIVE" &&
+          p === currentWaterfallDrinker();
+
+        return (
+          <div
+            key={p}
+            className={`player
+              ${p === currentPlayer ? "turn" : ""}
+              ${drinkFlash.includes(p) ? "drink" : ""}
+              ${waterfallReady.has(p) ? "ready" : ""}
+              ${isWaterfallActive ? "waterfall-active" : ""}
+              ${phase.owner === p &&
+                (phase.type === "SELECT_MATE" ||
+                 phase.type === "SELECT_DRINK")
+                ? "active"
+                : ""}
+              ${focusPlayers.has(p) ? "active" : ""}
+            `}
+            onClick={() => tapPlayer(p)}
+          >
+            <div className="badges">
+              {p === currentPlayer && (
+                <span className="badge turn">TURN</span>
+              )}
+              {p === thumbHolder && (
+                <span className="badge thumb">THUMB</span>
+              )}
+              {p === heavenHolder && (
+                <span className="badge heaven">HEAVEN</span>
+              )}
+            </div>
+
+            <div className="name">{p}</div>
+            <div className="beer">🍺 {beers[p]}</div>
+          </div>
+        );
+      })}
+    </div>
+
+    {phase.type === "WATERFALL_READY" && (
+      <button
+        className="reset"
+        disabled={!allReady}
+        onClick={startWaterfall}
+      >
+        Start Waterfall
+      </button>
+    )}
+
+    {phase.type === "WATERFALL_ACTIVE" && (
+      <button className="reset" onClick={endWaterfall}>
+        End Waterfall
+      </button>
+    )}
+  </div>
+);
 
       <div className="players">
         {PLAYERS.map(p => {
