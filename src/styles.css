@@ -65,9 +65,19 @@ h2 {
 /* =========================
    CARD (SMALLER)
 ========================= */
-.card-wrapper {
-  position: relative;
-  margin-bottom: 36px;
+/* CARD + PILLS BAR */
+
+.control-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.pills {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .card {
@@ -90,6 +100,7 @@ h2 {
   cursor: pointer;
   user-select: none;
 }
+
 
 .card.locked {
   opacity: 0.55;
