@@ -1,7 +1,9 @@
 /* =========================
    GLOBAL RESET
 ========================= */
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -9,182 +11,83 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: radial-gradient(circle at top, #020617, #020617 40%, #000);
-  color: #fff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
   height: 100%;
-  overflow: hidden; /* 🔒 NO SCROLL */
+  background: radial-gradient(circle at top, #0b1220, #04070f 60%);
+  color: #e5e7eb;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 /* =========================
    APP WRAPPER
 ========================= */
 .app {
-  position: relative;
+  position: relative; /* REQUIRED for edge-rail anchoring */
   min-height: 100vh;
-  padding: 20px 96px 20px 20px; /* reserve space for right rail */
+  padding: 16px 16px 96px;
+  overflow-x: hidden;
 }
 
 /* =========================
-   HEADERS
+   HEADERS / STATUS
 ========================= */
 h1 {
-  margin: 6px 0 2px;
+  text-align: center;
   font-size: 34px;
   font-weight: 900;
-  text-align: center;
+  margin: 8px 0 4px;
 }
 
 h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
   text-align: center;
-  opacity: 0.9;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
 }
 
-/* =========================
-   STATUS LINE
-========================= */
 .status {
   text-align: center;
-  margin-top: 6px;
-  font-size: 14px;
-  opacity: 0.8;
+  font-size: 15px;
+  opacity: 0.85;
+  margin: 6px 0 18px;
 }
 
 /* =========================
-   CONTROL BAR
-========================= */
-.control-bar {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 12px;
-  margin-top: 14px;
-}
-
-/* =========================
-   POWER BUTTON COLUMN
-========================= */
-.power-col {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.power-btn {
-  width: 88px;
-  height: 46px;
-  border-radius: 14px;
-  border: none;
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-weight: 700;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.power-btn.disabled {
-  opacity: 0.35;
-  pointer-events: none;
-}
-
-.power-btn.armed {
-  box-shadow: 0 0 0 2px #a855f7, 0 0 18px rgba(168, 85, 247, 0.6);
-}
-
-.power-sub {
-  font-size: 11px;
-  opacity: 0.7;
-}
-
-/* =========================
-   CENTER DECK CARD
+   CENTER CARD / DRAW
 ========================= */
 .card {
-  justify-self: center;
-  width: 168px;
-  height: 124px;
+  width: 220px;
+  height: 110px;
+  margin: 0 auto 20px;
   border-radius: 18px;
-
   background: linear-gradient(180deg, #ffffff, #f1f5f9);
   color: #020617;
-
+  font-weight: 900;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  gap: 8px;
-  font-weight: 900;
-
+  gap: 6px;
   box-shadow:
-    0 14px 32px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-
-  cursor: pointer;
-  user-select: none;
-}
-
-.card.locked {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.card .rank {
-  font-size: 34px;
-  line-height: 1;
-}
-
-.card .rule {
-  font-size: 13px;
-  text-align: center;
-  opacity: 0.8;
-  padding: 0 8px;
+    0 16px 40px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.6);
 }
 
 /* =========================
-   RIGHT EDGE RAIL
+   CONTROL PILL BAR
 ========================= */
-.side-rail {
-  position: absolute;
-  top: 96px;
-  right: 12px;
-  width: 72px;
+.controls {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  z-index: 5;
+  margin-bottom: 16px;
 }
 
-.rail-section {
-  background: rgba(255, 255, 255, 0.06);
+.control-pill {
+  background: rgba(255,255,255,0.06);
   border-radius: 14px;
-  padding: 8px 6px;
-  backdrop-filter: blur(10px);
-}
-
-.rail-title {
-  font-size: 11px;
-  opacity: 0.7;
-  text-align: center;
-  margin-bottom: 6px;
-}
-
-.rail-pill {
-  font-size: 11px;
-  padding: 4px 6px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  text-align: center;
-  margin-bottom: 4px;
-  white-space: nowrap;
+  padding: 12px 14px;
+  font-weight: 700;
 }
 
 /* =========================
@@ -192,203 +95,158 @@ h2 {
 ========================= */
 .players {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 /* =========================
-   PLAYER TILE (VIDEO READY)
+   PLAYER CARD
 ========================= */
 .player {
   position: relative;
-  height: 104px;
+  height: 96px;
   border-radius: 18px;
-  background: linear-gradient(180deg, #0b1220, #020617);
+  padding: 14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.15));
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 10px 22px rgba(0, 0, 0, 0.5);
-
-  padding: 12px;
-  cursor: pointer;
-  overflow: hidden;
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 14px 32px rgba(0,0,0,0.55);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-/* future video layer */
-.player::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 55%);
-  pointer-events: none;
-}
-
-/* =========================
-   PLAYER STATES
-========================= */
+/* turn / highlight states */
 .player.turn {
   box-shadow:
-    0 0 0 2px #22c55e,
-    0 0 26px rgba(34, 197, 94, 0.6);
-}
-
-.player.ready {
-  box-shadow:
-    0 0 0 2px #38bdf8,
-    0 0 20px rgba(56, 189, 248, 0.6);
-}
-
-.player.waterfall-active {
-  animation: idleGlow 2200ms ease-in-out infinite;
+    0 0 0 2px rgba(34,197,94,0.95),
+    0 0 26px rgba(34,197,94,0.5),
+    0 18px 40px rgba(0,0,0,0.7);
 }
 
 .player.lose {
-  animation: loseShake 520ms ease-out;
   box-shadow:
-    0 0 0 2px rgba(239, 68, 68, 0.95),
-    0 0 22px rgba(239, 68, 68, 0.35);
+    0 0 0 2px rgba(239,68,68,0.95),
+    0 0 22px rgba(239,68,68,0.35);
 }
 
 /* =========================
-   DRINK FLASH (OBVIOUS)
+   DRINK FLASH
 ========================= */
 .player.drink {
   animation: drinkFlash 900ms ease-out;
-  box-shadow:
-    0 0 0 2px rgba(239, 68, 68, 0.95),
-    0 0 26px rgba(239, 68, 68, 0.65),
-    0 16px 30px rgba(0, 0, 0, 0.6);
 }
 
 .player.drink::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(239, 68, 68, 0.45);
-  z-index: 3;
-  pointer-events: none;
+  background: rgba(239,68,68,0.45);
   border-radius: inherit;
+  pointer-events: none;
   animation: drinkOverlay 900ms ease-out;
 }
 
-/* =========================
-   PLAYER CONTENT
-========================= */
-.name {
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.beer {
-  position: absolute;
-  right: 12px;
-  bottom: 10px;
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-/* =========================
-   BADGES
-========================= */
-.badges {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  display: flex;
-  gap: 6px;
-}
-
-.badge {
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-weight: 800;
-}
-
-.badge.turn {
-  background: #22c55e;
-  color: #052e16;
-}
-
-.badge.thumb {
-  background: #facc15;
-  color: #422006;
-}
-
-.badge.heaven {
-  background: #38bdf8;
-  color: #042f49;
-}
-
-.badge.q {
-  background: #a855f7;
-  color: #2e1065;
-}
-
-/* =========================
-   RESET BUTTON
-========================= */
-.reset {
-  width: 100%;
-  margin-top: 16px;
-  height: 52px;
-  border-radius: 16px;
-  border: none;
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-/* =========================
-   ANIMATIONS
-========================= */
-@keyframes idleGlow {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
 @keyframes drinkFlash {
-  0% {
-    transform: scale(1);
-  }
-  15% {
-    transform: scale(1.04);
-  }
-  30% {
-    transform: scale(0.98) translateX(-4px);
-  }
-  45% {
-    transform: scale(1.02) translateX(4px);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0%   { transform: scale(1); }
+  15%  { transform: scale(1.04); }
+  30%  { transform: scale(0.98) translateX(-4px); }
+  45%  { transform: scale(1.02) translateX(4px); }
+  60%  { transform: scale(1); }
+  100% { transform: scale(1); }
 }
 
 @keyframes drinkOverlay {
-  0% {
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  55%  { opacity: 0.9; }
+  100% { opacity: 0; }
 }
 
-@keyframes loseShake {
-  0% { transform: translateX(0); }
-  18% { transform: translateX(-6px); }
-  36% { transform: translateX(6px); }
-  54% { transform: translateX(-4px); }
-  72% { transform: translateX(4px); }
-  100% { transform: translateX(0); }
+/* =========================
+   RIGHT EDGE RAIL (MATES / RULES)
+========================= */
+.edge-rail {
+  position: absolute;
+  top: 108px;          /* BELOW header + status */
+  right: 12px;
+  width: 220px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* rail block */
+.rail-section {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0.18));
+  border-radius: 18px;
+  padding: 12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 16px 32px rgba(0,0,0,0.6);
+}
+
+/* rail title */
+.rail-title {
+  font-weight: 800;
+  font-size: 14px;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+/* scroll container */
+.rail-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+/* pill */
+.rail-pill {
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* muted */
+.rail-pill.muted {
+  opacity: 0.5;
+  font-style: italic;
+}
+
+/* =========================
+   FOOTER BUTTON
+========================= */
+button {
+  width: 100%;
+  border: none;
+  border-radius: 18px;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: 900;
+  background: linear-gradient(180deg, #334155, #020617);
+  color: #e5e7eb;
+  box-shadow: 0 16px 32px rgba(0,0,0,0.6);
+}
+
+/* =========================
+   MOBILE SAFETY
+========================= */
+@media (max-width: 420px) {
+  .edge-rail {
+    right: 8px;
+    width: 200px;
+  }
+
+  .players {
+    margin-right: 220px; /* PREVENT OVERLAP */
+  }
 }
