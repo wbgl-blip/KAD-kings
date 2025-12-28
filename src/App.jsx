@@ -243,7 +243,21 @@ if (r === "7") {
       ),
     [mates]
   );
+/* =========================
+   RESET GAME (RESHUFFLE)
+========================= */
 
+function resetGame() {
+  setDeck(buildDeck());            // reshuffle deck
+  setCard(null);
+  setTurn(0);
+  setPhase({ type: "IDLE", owner: null });
+  setWaterfallReady(new Set());
+  setWaterfallIndex(null);
+  setRace({ type: null, holder: null, reacted: new Set() });
+  setThumbHolder(null);
+  setHeavenHolder(null);
+}
   /* =========================
      RENDER
   ========================= */
