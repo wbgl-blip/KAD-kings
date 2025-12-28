@@ -155,8 +155,17 @@ export default function App() {
       return setPhase({ type: "WATERFALL_READY", owner: drawer });
     }
 
-    if (r === "J") setThumbHolder(drawer);
-    if (r === "7") setHeavenHolder(drawer);
+    if (r === "J") {
+  setThumbHolder(drawer);
+  startRace("THUMB", drawer);
+  return;
+}
+
+if (r === "7") {
+  setHeavenHolder(drawer);
+  startRace("HEAVEN", drawer);
+  return;
+}
 
     setTurn(t => (t + 1) % PLAYERS.length);
   }
