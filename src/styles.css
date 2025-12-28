@@ -62,21 +62,18 @@ h2 {
   opacity: 0.85;
   margin: 0;
 }
+/* =========================
+   CARD (SMALLER — MAKES ROOM)
+========================= */
 .card-wrapper {
   position: relative;
-  margin-bottom: 42px; /* reserves space for HUD pills */
-}
-
-.card.locked {
-  opacity: 0.55;
-  pointer-events: none;
-  filter: grayscale(0.35);
+  margin-bottom: 36px; /* space for pills */
 }
 
 .card {
   justify-self: center;
-  width: min(88%, 380px);   /* narrower */
-  height: 72px;             /* MUCH smaller */
+  width: min(86%, 360px);
+  height: 64px;
   border-radius: 14px;
 
   background: linear-gradient(180deg, #ffffff, #e5e7eb);
@@ -87,11 +84,29 @@ h2 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;                 /* tight spacing */
+  gap: 2px;
 
-  box-shadow: 0 10px 22px rgba(0,0,0,0.55);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.45);
   cursor: pointer;
   user-select: none;
+}
+
+.card.locked {
+  opacity: 0.55;
+  pointer-events: none;
+  filter: grayscale(0.35);
+}
+
+.rank {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.rule {
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.75;
+  margin: 0;
 }
 
 .rank {
