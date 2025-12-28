@@ -133,8 +133,8 @@ h2 {
 .card {
   justify-self: center;
   width: min(82%, 300px);
-  height: 80px;
-  border-radius: 16px;
+  height: 120px;
+  border-radius: 14px;
 
   background: linear-gradient(180deg, #ffffff, #e5e7eb);
   color: #020617;
