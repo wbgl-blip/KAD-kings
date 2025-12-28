@@ -442,41 +442,25 @@ export default function App() {
 {/* CARD ACTIONS */}
 <div className="card-actions">
 
-  {/* WATERFALL */}
   {phase.type === "WATERFALL_READY" && (
-    <div
-      className="action-pill primary"
-      onClick={() =>
-        setPhase({ type: "WATERFALL_ACTIVE", owner: phase.owner })
-      }
-    >
+    <div className="action-pill primary" onClick={startWaterfall}>
       Start WATERFALL (owner: {phase.owner})
     </div>
   )}
 
-  {/* THUMB RACE */}
-  {thumbHolder && phase.type === "IDLE" && (
-    <div
-      className="action-pill thumb"
-      onClick={() =>
-        setPhase({ type: "RACE_THUMB", owner: thumbHolder })
-      }
-    >
+  {canStartThumbRace() && (
+    <div className="action-pill thumb" onClick={startThumbRace}>
       Start THUMB race (holder: {thumbHolder})
     </div>
   )}
 
-  {/* HEAVEN RACE */}
-  {heavenHolder && phase.type === "IDLE" && (
-    <div
-      className="action-pill heaven"
-      onClick={() =>
-        setPhase({ type: "RACE_HEAVEN", owner: heavenHolder })
-      }
-    >
+  {canStartHeavenRace() && (
+    <div className="action-pill heaven" onClick={startHeavenRace}>
       Start HEAVEN race (holder: {heavenHolder})
     </div>
   )}
+
+</div>
 
 </div>
       {/* INFO PILLS (always) */}
