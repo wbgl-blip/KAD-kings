@@ -153,17 +153,15 @@ export default function App() {
     if (r === "A") {
       setWaterfallReady(new Set());
       return setPhase({ type: "WATERFALL_READY", owner: drawer });
-    }
-
     if (r === "J") {
   setThumbHolder(drawer);
-  startRace("THUMB", drawer);
+  setTurn(t => (t + 1) % PLAYERS.length);
   return;
 }
 
 if (r === "7") {
   setHeavenHolder(drawer);
-  startRace("HEAVEN", drawer);
+  setTurn(t => (t + 1) % PLAYERS.length);
   return;
 }
 
