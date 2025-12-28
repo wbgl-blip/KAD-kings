@@ -84,6 +84,9 @@ export default function App() {
   const [waterfallReady, setWaterfallReady] = useState(new Set());
   const [waterfallIndex, setWaterfallIndex] = useState(null);
 
+  /* ---------- UI FOCUS ---------- */
+  const [focusPlayers, setFocusPlayers] = useState(new Set()); // 🔹 ADDED
+
   const currentPlayer = PLAYERS[turn];
   const currentRank = card ? rankOf(card) : null;
 
@@ -145,30 +148,31 @@ export default function App() {
     setCard(next);
 
     const r = rankOf(next);
-const drawer = currentPlayer;
+    const drawer = currentPlayer;
 
-if (r === "8") return setPhase({ type: "SELECT_MATE", owner: drawer });
-if (r === "2") return setPhase({ type: "SELECT_DRINK", owner: drawer });
+    if (r === "8") return setPhase({ type: "SELECT_MATE", owner: drawer });
+    if (r === "2") return setPhase({ type: "SELECT_DRINK", owner: drawer });
 
-if (r === "A") {
-  setWaterfallReady(new Set());
-  return setPhase({ type: "WATERFALL_READY", owner: drawer });
-}
+    if (r === "A") {
+      setWaterfallReady(new Set());
+      return setPhase({ type: "WATERFALL_READY", owner: drawer });
+    }
 
-if (r === "J") {
-  setThumbHolder(drawer);
-  setTurn(t => (t + 1) % PLAYERS.length);
-  return;
-}
+    if (r === "J") {
+      setThumbHolder(drawer);
+      setTurn(t => (t + 1) % PLAYERS.length);
+      return;
+    }
 
-if (r === "7") {
-  setHeavenHolder(drawer);
-  setTurn(t => (t + 1) % PLAYERS.length);
-  return;
-}
+    if (r === "7") {
+      setHeavenHolder(drawer);
+      setTurn(t => (t + 1) % PLAYERS.length);
+      return;
+    }
 
-  setTurn(t => (t + 1) % PLAYERS.length);
-}
+    setTurn(t => (t + 1) % PLAYERS.length);
+  }
+
   /* =========================
      RACES
   ========================= */
@@ -199,23 +203,23 @@ if (r === "7") {
      TAP PLAYER
   ========================= */
 
-  function tapPlayer(name) { 
-   // IDLE → allow Thumb / Heaven holder to trigger power
-if (phase.type === "IDLE") {
-  if (name === thumbHolder) {
-    startRace("THUMB", name);
-    return;
-  }
+  function tapPlayer(name) {
+    if (phase.type === "IDLE") {
+      if (name === thumbHolder) {
+        startRace("THUMB", name);
+        return;
+      }
+      if (name === heavenHolder) {
+        startRace("HEAVEN", name);
+        return;
+      }
+    }
 
-  if (name === heavenHolder) {
-    startRace("HEAVEN", name);
-    return;
-  }
-}
-   if (phase.type.startsWith("RACE")) {
-  handleRaceTap(name);
-  return;
-   }
+    if (phase.type.startsWith("RACE")) {
+      handleRaceTap(name);
+      return;
+    }
+
     if (phase.type === "WATERFALL_READY") {
       setWaterfallReady(r => new Set(r).add(name));
       return;
@@ -246,6 +250,16 @@ if (phase.type === "IDLE") {
   }
 
   /* =========================
+     MATE FOCUS (UI)
+  ========================= */
+
+  function focusPair(label) { // 🔹 ADDED
+    const [a, b] = label.split("→").map(s => s.trim());
+    setFocusPlayers(new Set([a, b]));
+    setTimeout(() => setFocusPlayers(new Set()), 1500);
+  }
+
+  /* =========================
      INFO
   ========================= */
 
@@ -256,21 +270,23 @@ if (phase.type === "IDLE") {
       ),
     [mates]
   );
-/* =========================
-   RESET GAME (RESHUFFLE)
-========================= */
 
-function resetGame() {
-  setDeck(buildDeck());            // reshuffle deck
-  setCard(null);
-  setTurn(0);
-  setPhase({ type: "IDLE", owner: null });
-  setWaterfallReady(new Set());
-  setWaterfallIndex(null);
-  setRace({ type: null, holder: null, reacted: new Set() });
-  setThumbHolder(null);
-  setHeavenHolder(null);
-}
+  /* =========================
+     RESET GAME
+  ========================= */
+
+  function resetGame() {
+    setDeck(buildDeck());
+    setCard(null);
+    setTurn(0);
+    setPhase({ type: "IDLE", owner: null });
+    setWaterfallReady(new Set());
+    setWaterfallIndex(null);
+    setRace({ type: null, holder: null, reacted: new Set() });
+    setThumbHolder(null);
+    setHeavenHolder(null);
+  }
+
   /* =========================
      RENDER
   ========================= */
@@ -284,34 +300,42 @@ function resetGame() {
       <h2>{currentPlayer}’s Turn</h2>
 
       <div className="status">{CARD_RULES[currentRank] || "Draw a card"}</div>
-<div className="card-wrapper">
-  <div
-    className={`card ${drawLocked ? "locked" : ""}`}
-    onClick={drawCard}
-  >
-    {card ? (
-      <>
-        <div className="rank">{card}</div>
-        <div className="rule">{CARD_RULES[currentRank]}</div>
-      </>
-    ) : (
-      "DRAW"
-    )}
-  </div>
 
-  <div className="info">
-    <span className="pill">👍 Thumb: {thumbHolder || "—"}</span>
-    <span className="pill">☁️ Heaven: {heavenHolder || "—"}</span>
+      <div className="card-wrapper">
+        <div
+          className={`card ${drawLocked ? "locked" : ""}`}
+          onClick={drawCard}
+        >
+          {card ? (
+            <>
+              <div className="rank">{card}</div>
+              <div className="rule">{CARD_RULES[currentRank]}</div>
+            </>
+          ) : (
+            "DRAW"
+          )}
+        </div>
 
-    {matePills.length > 0 ? (
-      matePills.map((m, i) => (
-        <span key={i} className="pill mate">{m}</span>
-      ))
-    ) : (
-      <span className="pill muted">🤝 No mates yet</span>
-    )}
-  </div>
-</div>
+        <div className="info">
+          <span className="pill">👍 Thumb: {thumbHolder || "—"}</span>
+          <span className="pill">☁️ Heaven: {heavenHolder || "—"}</span>
+
+          {matePills.length > 0 ? (
+            matePills.map((m, i) => (
+              <button
+                key={i}
+                type="button"
+                className="pill mate"
+                onClick={() => focusPair(m)} // 🔹 ADDED
+              >
+                {m}
+              </button>
+            ))
+          ) : (
+            <span className="pill muted">🤝 No mates yet</span>
+          )}
+        </div>
+      </div>
 
       <div className="players">
         {PLAYERS.map(p => (
@@ -320,6 +344,7 @@ function resetGame() {
             className={`player
               ${p === currentPlayer ? "turn" : ""}
               ${drinkFlash.includes(p) ? "drink" : ""}
+              ${focusPlayers.has(p) ? "focus" : ""}   // 🔹 ADDED
             `}
             onClick={() => tapPlayer(p)}
           >
