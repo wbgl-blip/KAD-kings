@@ -44,6 +44,8 @@ html, body {
   display: flex;
   gap: 10px;
   padding: 8px 12px;
+  max-height: 96px;      /* 🔑 LIMIT HEIGHT */
+  overflow-y: auto;     /* 🔑 SCROLL INSIDE */
 }
 
 .panel {
@@ -54,6 +56,9 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-height: 0;        /* 🔑 REQUIRED */
+  overflow: hidden;     /* 🔑 REQUIRED */
+}
 }
 
 .panel-title {
@@ -122,11 +127,12 @@ html, body {
 
 /* VIDEO GRID */
 .video-grid {
-  flex: 1;
-  padding: 10px;
+  flex: 1;              /* 🔑 TAKES REMAINING SPACE */
+  min-height: 0;        /* 🔑 CRITICAL */
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
 }
 
 .player {
@@ -134,7 +140,7 @@ html, body {
   border-radius: 18px;
   overflow: hidden;
   background: #000;
-  aspect-ratio: 16 / 9;
+  height: 100%;
 }
 
 .player video {
