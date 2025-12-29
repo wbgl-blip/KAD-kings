@@ -1,24 +1,34 @@
+/* src/styles.css — FULL REPLACEMENT */
+
 * {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
   background: radial-gradient(circle at top, #0b1220, #05070c);
-  color: white;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  overflow: hidden; /* ✅ NO PAGE SCROLL */
 }
 
+/* =========================
+   APP SHELL
+========================= */
 .app {
   height: 100svh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden; /* ✅ */
 }
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
 .header {
   padding: 12px;
   text-align: center;
@@ -27,57 +37,89 @@ html, body {
 .header h1 {
   margin: 0;
   font-size: 24px;
+  line-height: 1.1;
 }
 
 .header h2 {
   margin: 4px 0 0;
   font-size: 18px;
+  line-height: 1.2;
 }
 
 .subtitle {
-  opacity: 0.7;
+  margin-top: 6px;
+  opacity: 0.75;
   font-size: 14px;
 }
 
-/* GAME STRIP */
+/* =========================
+   GAME STRIP (TOP PANELS)
+   - This area scrolls internally only if needed
+========================= */
 .game-strip {
   display: flex;
   gap: 10px;
   padding: 8px 12px;
-  max-height: 96px;      /* 🔑 LIMIT HEIGHT */
-  overflow-y: auto;     /* 🔑 SCROLL INSIDE */
+
+  max-height: 96px; /* ✅ limits panels so video grid fits */
+  min-height: 0;
+  overflow-y: auto; /* ✅ internal scroll if too many pills */
+  overscroll-behavior: contain;
+
+  /* nicer scrolling without showing huge bar */
+  scrollbar-width: thin;
+}
+
+/* optional: webkit scrollbar subtle */
+.game-strip::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.game-strip::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+.game-strip::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .panel {
   flex: 1;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 14px;
   padding: 8px;
+
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-height: 0;        /* 🔑 REQUIRED */
-  overflow: hidden;     /* 🔑 REQUIRED */
-}
+
+  min-height: 0;
+  overflow: hidden;
 }
 
 .panel-title {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 13px;
+  letter-spacing: 0.2px;
+  opacity: 0.95;
 }
 
 .pill {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .pill.muted {
-  opacity: 0.5;
+  opacity: 0.55;
 }
 
-/* CARD STAGE */
+/* =========================
+   CARD STAGE
+========================= */
 .card-stage {
   padding: 12px;
   display: flex;
@@ -86,17 +128,24 @@ html, body {
   gap: 10px;
 }
 
+/* card size tuned for mobile: not too huge */
 .card {
-  width: 220px;
-  height: 140px;
-  background: white;
-  color: black;
+  width: 210px;
+  height: 132px;
+  background: #ffffff;
+  color: #020617;
   border-radius: 18px;
+
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+
   font-size: 28px;
-  font-weight: 800;
+  font-weight: 900;
+
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55);
+  user-select: none;
 }
 
 .controls {
@@ -106,10 +155,18 @@ html, body {
 }
 
 .control {
-  padding: 6px 12px;
+  padding: 8px 12px;
   border-radius: 999px;
   border: none;
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 13px;
+  color: #0b1220;
+  cursor: pointer;
+}
+
+.control:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .heaven {
@@ -122,24 +179,32 @@ html, body {
 
 .cards-left {
   font-size: 13px;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
-/* VIDEO GRID */
+/* =========================
+   VIDEO GRID (6 tiles)
+   - Takes remaining space
+   - No scrolling
+========================= */
 .video-grid {
-  flex: 1;              /* 🔑 TAKES REMAINING SPACE */
-  min-height: 0;        /* 🔑 CRITICAL */
+  flex: 1;
+  min-height: 0; /* ✅ critical */
+  padding: 0 12px 10px;
+
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: repeat(3, 1fr);
   gap: 8px;
+
+  overflow: hidden;
 }
 
 .player {
   position: relative;
   border-radius: 18px;
   overflow: hidden;
-  background: #000;
+  background: #000000;
   height: 100%;
 }
 
@@ -151,29 +216,43 @@ html, body {
 
 .player.turn {
   outline: 3px solid #22c55e;
+  outline-offset: -3px;
 }
 
 .player-overlay {
   position: absolute;
-  inset: auto 0 0 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
   padding: 6px 8px;
   display: flex;
   justify-content: space-between;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  align-items: flex-end;
+
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.82),
+    rgba(0, 0, 0, 0)
+  );
+
   font-size: 13px;
 }
 
 .name {
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .drinks {
-  opacity: 0.9;
+  opacity: 0.92;
+  font-weight: 700;
 }
 
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 .footer {
-  padding: 10px;
+  padding: 10px 12px 12px;
 }
 
 .reset {
@@ -181,8 +260,16 @@ html, body {
   padding: 14px;
   border-radius: 14px;
   border: none;
+
   font-size: 16px;
-  font-weight: 700;
-  background: rgba(255,255,255,0.08);
-  color: white;
+  font-weight: 900;
+
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+
+  cursor: pointer;
+}
+
+.reset:active {
+  transform: scale(0.99);
 }
