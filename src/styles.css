@@ -18,8 +18,7 @@ html, body {
   overflow: hidden;
 }
 
-/* ================= HEADER ================= */
-
+/* HEADER */
 .header {
   padding: 12px;
   text-align: center;
@@ -40,12 +39,12 @@ html, body {
   font-size: 14px;
 }
 
-/* ================= GAME STRIP ================= */
-
+/* GAME STRIP */
 .game-strip {
   display: flex;
   gap: 10px;
   padding: 8px 12px;
+  max-height: 112px;
 }
 
 .panel {
@@ -56,34 +55,28 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  height: 104px;
 }
 
-/* TITLE */
 .panel-title {
   font-weight: 700;
   font-size: 13px;
 }
 
-/* CONTENT AREA – HARD LOCK 4 ROWS */
 .panel-content {
   display: flex;
   flex-direction: column;
   gap: 6px;
-
-  /* 4 pills @ 28px + gaps */
-  height: calc((28px * 4) + (6px * 3));
+  flex: 1;
 }
 
-/* ================= PILLS ================= */
-
+/* PILLS */
 .pill {
-  height: 28px;
-  display: flex;
-  align-items: center;
+  background: rgba(255,255,255,0.1);
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 12px;
-  background: rgba(255,255,255,0.1);
+  line-height: 1;
 }
 
 .pill.empty {
@@ -91,8 +84,7 @@ html, body {
   color: transparent;
 }
 
-/* ================= CARD STAGE ================= */
-
+/* CARD STAGE */
 .card-stage {
   padding: 12px;
   display: flex;
@@ -140,8 +132,7 @@ html, body {
   opacity: 0.7;
 }
 
-/* ================= VIDEO GRID ================= */
-
+/* VIDEO GRID */
 .video-grid {
   flex: 1;
   min-height: 0;
@@ -149,7 +140,7 @@ html, body {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: repeat(3, 1fr);
   gap: 8px;
-  padding: 0 12px;
+  padding: 8px 12px;
 }
 
 .player {
@@ -187,8 +178,7 @@ html, body {
   opacity: 0.9;
 }
 
-/* ================= FOOTER ================= */
-
+/* FOOTER */
 .footer {
   padding: 10px;
 }
