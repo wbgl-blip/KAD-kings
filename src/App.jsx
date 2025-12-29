@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import "./styles.css";
 
 const PLAYERS = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
+const PANEL_ROWS = 4;
 
 export default function App() {
   const currentPlayer = "Wes";
@@ -21,6 +22,16 @@ export default function App() {
     [mates]
   );
 
+  const paddedMates = [
+    ...matePills,
+    ...Array(Math.max(0, PANEL_ROWS - matePills.length)).fill(null),
+  ].slice(0, PANEL_ROWS);
+
+  const paddedRules = [
+    ...houseRules,
+    ...Array(Math.max(0, PANEL_ROWS - houseRules.length)).fill(null),
+  ].slice(0, PANEL_ROWS);
+
   return (
     <div className="app">
       {/* HEADER */}
@@ -34,32 +45,34 @@ export default function App() {
       <section className="game-strip">
         <div className="panel">
           <div className="panel-title">🤝 Mates</div>
-          {matePills.length === 0 ? (
-            <div className="pill muted">No mates</div>
-          ) : (
-            matePills.map((m, i) => (
-              <div key={i} className="pill">{m}</div>
-            ))
-          )}
+          <div className="panel-content">
+            {paddedMates.map((m, i) =>
+              m ? (
+                <div key={i} className="pill">{m}</div>
+              ) : (
+                <div key={i} className="pill empty" />
+              )
+            )}
+          </div>
         </div>
 
         <div className="panel">
           <div className="panel-title">📜 Rules</div>
-          {houseRules.length === 0 ? (
-            <div className="pill muted">No rules</div>
-          ) : (
-            houseRules.map((r, i) => (
-              <div key={i} className="pill">{r}</div>
-            ))
-          )}
+          <div className="panel-content">
+            {paddedRules.map((r, i) =>
+              r ? (
+                <div key={i} className="pill">{r}</div>
+              ) : (
+                <div key={i} className="pill empty" />
+              )
+            )}
+          </div>
         </div>
       </section>
 
       {/* CARD STAGE */}
       <section className="card-stage">
-        <div className="card">
-          DRAW
-        </div>
+        <div className="card">DRAW</div>
 
         <div className="controls">
           <button className="control heaven">☁ Heaven</button>
@@ -73,15 +86,9 @@ export default function App() {
         {PLAYERS.map(name => (
           <div
             key={name}
-            className={`player ${
-              name === currentPlayer ? "turn" : ""
-            }`}
+            className={`player ${name === currentPlayer ? "turn" : ""}`}
           >
-            <video
-              autoPlay
-              muted
-              playsInline
-            />
+            <video autoPlay muted playsInline />
             <div className="player-overlay">
               <span className="name">{name}</span>
               <span className="drinks">🍺 0</span>
