@@ -7,11 +7,9 @@ export default function App() {
   const currentPlayer = "Wes";
   const cardsRemaining = 42;
 
-  const mates = {
-    Wes: ["Kyle"],
-  };
-
-  const houseRules = ["No swearing", "Left hand only"];
+  // START EMPTY (important)
+  const mates = {};
+  const houseRules = [];
 
   const matePills = useMemo(
     () =>
@@ -39,7 +37,7 @@ export default function App() {
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="pill empty">—</div>
                 ))
-              : matePills.map((m, i) => (
+              : matePills.slice(0, 4).map((m, i) => (
                   <div key={i} className="pill">{m}</div>
                 ))}
           </div>
@@ -52,7 +50,7 @@ export default function App() {
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="pill empty">—</div>
                 ))
-              : houseRules.map((r, i) => (
+              : houseRules.slice(0, 4).map((r, i) => (
                   <div key={i} className="pill">{r}</div>
                 ))}
           </div>
