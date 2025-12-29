@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import "./styles.css";
 
 const PLAYERS = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
-const PANEL_ROWS = 4;
 
 export default function App() {
   const currentPlayer = "Wes";
@@ -22,16 +21,6 @@ export default function App() {
     [mates]
   );
 
-  const paddedMates = [
-    ...matePills,
-    ...Array(Math.max(0, PANEL_ROWS - matePills.length)).fill(null),
-  ].slice(0, PANEL_ROWS);
-
-  const paddedRules = [
-    ...houseRules,
-    ...Array(Math.max(0, PANEL_ROWS - houseRules.length)).fill(null),
-  ].slice(0, PANEL_ROWS);
-
   return (
     <div className="app">
       {/* HEADER */}
@@ -46,26 +35,26 @@ export default function App() {
         <div className="panel">
           <div className="panel-title">🤝 Mates</div>
           <div className="panel-content">
-            {paddedMates.map((m, i) =>
-              m ? (
-                <div key={i} className="pill">{m}</div>
-              ) : (
-                <div key={i} className="pill empty" />
-              )
-            )}
+            {matePills.length === 0
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="pill empty">—</div>
+                ))
+              : matePills.map((m, i) => (
+                  <div key={i} className="pill">{m}</div>
+                ))}
           </div>
         </div>
 
         <div className="panel">
           <div className="panel-title">📜 Rules</div>
           <div className="panel-content">
-            {paddedRules.map((r, i) =>
-              r ? (
-                <div key={i} className="pill">{r}</div>
-              ) : (
-                <div key={i} className="pill empty" />
-              )
-            )}
+            {houseRules.length === 0
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="pill empty">—</div>
+                ))
+              : houseRules.map((r, i) => (
+                  <div key={i} className="pill">{r}</div>
+                ))}
           </div>
         </div>
       </section>
