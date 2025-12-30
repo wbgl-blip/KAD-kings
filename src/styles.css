@@ -4,7 +4,7 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #111827, #020617);
+  background: radial-gradient(circle at top, #0f172a, #020617);
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -12,13 +12,13 @@ body {
 .app {
   max-width: 430px;
   margin: 0 auto;
-  padding: 12px;
+  padding: 14px;
 }
 
 /* HEADER */
 .header {
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .header h1 {
@@ -28,7 +28,7 @@ body {
 }
 
 .header h2 {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   font-size: 14px;
   opacity: 0.7;
 }
@@ -37,116 +37,123 @@ body {
 .top-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
 }
 
 .panel {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 14px;
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  height: 190px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 18px;
+  padding: 10px;
+  min-height: 220px;
+  border: 1px solid rgba(255,255,255,0.08);
   display: flex;
   flex-direction: column;
 }
 
 .panel-title {
-  font-size: 15px;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .row {
-  height: 28px;
+  height: 36px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
   margin-bottom: 6px;
 }
 
-.row:last-child {
-  margin-bottom: 0;
-}
-
-.muted {
+.placeholder {
+  background: rgba(255,255,255,0.06);
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 /* CARD */
 .card-panel {
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .card {
   width: 100%;
   height: 100%;
-  background: #ffffff;
-  color: #000;
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 800;
 }
 
-.draw-text {
-  font-weight: 800;
-  font-size: 18px;
+.card.draw {
+  background: #9ca3af;
+  color: #111;
   letter-spacing: 1px;
 }
 
-/* ACTION BUTTONS */
-.actions-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 8px;
+.card.active {
+  background: #fff;
+  color: #000;
+  flex-direction: column;
 }
 
-.action {
+.rank {
+  font-size: 42px;
+}
+
+.sub {
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+/* ACTIONS */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.btn {
   border: none;
-  border-radius: 12px;
-  padding: 10px 0;
-  font-size: 15px;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 16px;
   font-weight: 700;
 }
 
-.action.thumb {
+.btn:disabled {
+  opacity: 0.5;
+}
+
+.btn.thumb {
   background: #facc15;
   color: #000;
 }
 
-.action.ready {
+.btn.ready {
   background: #22c55e;
   color: #000;
 }
 
-.action.heaven {
+.btn.heaven {
   background: #3b82f6;
   color: #fff;
-}
-
-.action:disabled {
-  opacity: 0.4;
 }
 
 /* STATUS BAR */
 .status-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  background: rgba(255,255,255,0.05);
   padding: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  font-size: 12px;
-  margin-bottom: 8px;
+  border-radius: 14px;
+  font-size: 13px;
 }
 
 .mode {
-  font-weight: 700;
+  white-space: nowrap;
 }
 
 .detail {
@@ -157,11 +164,10 @@ body {
 .pill {
   border: none;
   border-radius: 999px;
-  padding: 4px 10px;
-  background: rgba(255, 255, 255, 0.12);
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.1);
   color: #fff;
   font-weight: 600;
-  font-size: 12px;
 }
 
 .pill.danger {
@@ -173,34 +179,28 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  margin-top: 12px;
 }
 
 .player {
-  height: 88px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.05),
-    rgba(0, 0, 0, 0.2)
-  );
-  border-radius: 16px;
-  position: relative;
-  overflow: hidden;
-}
-
-.player-overlay {
-  position: absolute;
-  inset: 0;
-  padding: 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 18px;
+  padding: 14px;
+  min-height: 90px;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  border: 2px solid transparent;
+}
+
+.player.TURN {
+  border-color: #22c55e;
 }
 
 .player-name {
   font-weight: 700;
-  font-size: 14px;
 }
 
 .player-beers {
-  font-size: 14px;
+  opacity: 0.8;
 }
