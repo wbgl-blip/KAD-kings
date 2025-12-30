@@ -1,110 +1,191 @@
-import { useMemo, useState } from "react";
-import "./styles.css";
+* {
+  box-sizing: border-box;
+}
 
-const PLAYERS = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: radial-gradient(circle at top, #0b1220, #05070c);
+  color: white;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
 
-export default function App() {
-  const currentPlayer = "Wes";
-  const cardsRemaining = 50;
+.app {
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  const [ruleDraft, setRuleDraft] = useState("");
-  const [houseRules, setHouseRules] = useState([]);
+/* HEADER */
+.header {
+  padding: 12px;
+  text-align: center;
+}
 
-  const mates = {};
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+}
 
-  const matePills = useMemo(
-    () =>
-      Object.entries(mates).flatMap(([a, list]) =>
-        list.map(b => `${a} → ${b}`)
-      ),
-    [mates]
-  );
+.header h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
 
-  function saveRule() {
-    if (!ruleDraft.trim()) return;
-    setHouseRules(r => [...r, ruleDraft.trim()]);
-    setRuleDraft("");
-  }
+.subtitle {
+  opacity: 0.7;
+  font-size: 13px;
+}
 
-  return (
-    <div className="app">
-      {/* HEADER */}
-      <header className="header">
-        <h1>KAD Kings</h1>
-        <h2>Wes’s Turn</h2>
-        <p className="subtitle">
-          Make a Rule: Wes types it (persists)
-        </p>
-      </header>
+/* GAME STRIP */
+.game-strip {
+  display: flex;
+  gap: 10px;
+  padding: 8px 12px;
+}
 
-      {/* TOP STRIP */}
-      <section className="top-strip">
-        <div className="side-panels">
-          <div className="panel">
-            <div className="panel-title">🤝 Mates</div>
-            <div className="panel-content">
-              {matePills.length === 0
-                ? Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="pill empty">—</div>
-                  ))
-                : matePills.map((m, i) => (
-                    <div key={i} className="pill">{m}</div>
-                  ))}
-            </div>
-          </div>
+.panel {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border-radius: 14px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 120px;
+}
 
-          <div className="panel">
-            <div className="panel-title">📜 Rules</div>
-            <div className="panel-content">
-              {houseRules.length === 0
-                ? Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="pill empty">—</div>
-                  ))
-                : houseRules.slice(-4).map((r, i) => (
-                    <div key={i} className="pill">{r}</div>
-                  ))}
-            </div>
-          </div>
-        </div>
+.panel-title {
+  font-weight: 700;
+  font-size: 13px;
+}
 
-        <div className="card-area">
-          <div className="card">
-            <div className="rank">A♠</div>
-            <div className="count">{cardsRemaining} left</div>
-          </div>
-        </div>
-      </section>
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-      {/* RULE INPUT */}
-      <section className="rule-input">
-        <input
-          value={ruleDraft}
-          onChange={e => setRuleDraft(e.target.value)}
-          placeholder="Type the rule (persists)…"
-        />
-        <button onClick={saveRule}>Add</button>
-      </section>
+.pill {
+  background: rgba(255,255,255,0.12);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
 
-      {/* PLAYER GRID */}
-      <section className="video-grid">
-        {PLAYERS.map(name => (
-          <div
-            key={name}
-            className={`player ${name === currentPlayer ? "turn" : ""}`}
-          >
-            <video autoPlay muted playsInline />
-            <div className="player-overlay">
-              <span className="name">{name}</span>
-              <span className="drinks">🍺 0</span>
-            </div>
-          </div>
-        ))}
-      </section>
+.pill.empty {
+  background: rgba(255,255,255,0.04);
+  color: transparent;
+}
 
-      {/* FOOTER */}
-      <footer className="footer">
-        <button className="save">Save Rule</button>
-      </footer>
-    </div>
-  );
-               }
+/* CARD STAGE */
+.card-stage {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.card {
+  width: 220px;
+  height: 140px;
+  background: white;
+  color: black;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 800;
+  position: relative;
+}
+
+.cards-left {
+  position: absolute;
+  bottom: 8px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.rule-input {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  padding: 0 12px;
+}
+
+.rule-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+.rule-input button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+}
+
+/* VIDEO GRID */
+.video-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+  padding: 8px;
+}
+
+.player {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+}
+
+.player.turn {
+  outline: 3px solid #22c55e;
+}
+
+.player video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.player-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 6px 8px;
+  display: flex;
+  justify-content: space-between;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  font-size: 13px;
+}
+
+.name {
+  font-weight: 700;
+}
+
+/* FOOTER */
+.footer {
+  padding: 10px;
+}
+
+.reset {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
