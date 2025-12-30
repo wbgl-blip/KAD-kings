@@ -35,65 +35,65 @@ export default function App() {
         <h2>{started ? `${currentPlayer}’s Turn` : "Waiting to Start"}</h2>
       </header>
 
-      {/* TOP GRID */}
-      <section className="top-grid">
-        {/* MATES */}
-        <div className="panel">
-          <div className="panel-title">🤝 Mates</div>
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="row muted">—</div>
-          ))}
-        </div>
-
-        {/* CARD (SAME WIDTH AS PANELS) */}
-        <div className="panel card-panel">
-          <div
-            className={`card ${!started ? "locked" : ""}`}
-            onClick={drawCard}
-          >
-            {card ? (
-              <>
-                <div className="rank">
-                  {card.rank}
-                  {card.suit}
-                </div>
-                <div className="sub">{card.remaining} left</div>
-              </>
-            ) : (
-              <div className="draw-text">DRAW</div>
-            )}
+      {/* FIXED TOP AREA (NO SCROLL) */}
+      <div className="fixed-top">
+        {/* PANELS + CARD */}
+        <section className="top-grid">
+          <div className="panel">
+            <div className="panel-title">🤝 Mates</div>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="row muted">—</div>
+            ))}
           </div>
-        </div>
 
-        {/* RULES */}
-        <div className="panel">
-          <div className="panel-title">📜 Rules</div>
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="row muted">—</div>
-          ))}
-        </div>
-      </section>
+          <div className="panel card-panel">
+            <div
+              className={`card ${!started ? "locked" : ""}`}
+              onClick={drawCard}
+            >
+              {card ? (
+                <>
+                  <div className="rank">
+                    {card.rank}
+                    {card.suit}
+                  </div>
+                  <div className="sub">{card.remaining} left</div>
+                </>
+              ) : (
+                <div className="draw-text">DRAW</div>
+              )}
+            </div>
+          </div>
 
-      {/* ACTION ROW */}
-      <section className="actions-grid">
-        <button className="action thumb" disabled={!started}>
-          👍 Thumb
-        </button>
+          <div className="panel">
+            <div className="panel-title">📜 Rules</div>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="row muted">—</div>
+            ))}
+          </div>
+        </section>
 
-        <button
-          className="action ready"
-          onClick={startGame}
-          disabled={started}
-        >
-          {started ? "In Progress" : "Ready"}
-        </button>
+        {/* ACTIONS */}
+        <section className="actions-grid">
+          <button className="action thumb" disabled={!started}>
+            👍 Thumb
+          </button>
 
-        <button className="action heaven" disabled={!started}>
-          ☁ Heaven
-        </button>
-      </section>
+          <button
+            className="action ready"
+            onClick={startGame}
+            disabled={started}
+          >
+            {started ? "In Progress" : "Ready"}
+          </button>
 
-      {/* PLAYERS */}
+          <button className="action heaven" disabled={!started}>
+            ☁ Heaven
+          </button>
+        </section>
+      </div>
+
+      {/* SCROLLING PLAYER GRID */}
       <section className="players">
         {players.map((p) => (
           <div key={p.name} className={`player ${p.status || ""}`}>
