@@ -3,21 +3,46 @@ import "./styles.css";
 
 const PLAYER_NAMES = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
 
-export default function App() {
-  const [gameStarted, setGameStarted] = useState(false);
+const INITIAL_PLAYERS = PLAYER_NAMES.map((name) => ({
+  name,
+  beers: 0,
+  status: null, // TURN | THUMB | null
+}));
 
-  const players = PLAYER_NAMES.map((name) => ({
-    name,
-    beers: 0,
-    status: null,
-  }));
+export default function App() {
+  const [phase, setPhase] = useState("WAITING"); // WAITING | PLAYING
+  const [players, setPlayers] = useState(INITIAL_PLAYERS);
+  const [currentPlayer, setCurrentPlayer] = useState(null);
+  const [enforcer, setEnforcer] = useState(null);
+  const [card, setCard] = useState(null); // { rank, suit, remaining }
+
+  function startGame() {
+    if (phase !== "WAITING") return;
+
+    const first = players[0].name;
+
+    setPlayers((prev) =>
+      prev.map((p) =>
+        p.name === first ? { ...p, status: "TURN" } : p
+      )
+    );
+
+    setCurrentPlayer(first);
+    setEnforcer(null);
+    setCard(null);
+    setPhase("PLAYING");
+  }
 
   return (
     <div className="app">
       {/* HEADER */}
       <header className="header">
         <h1>KAD Kings</h1>
-        <h2>{gameStarted ? "Game On" : "Waiting to Start"}</h2>
+        <h2>
+          {phase === "WAITING"
+            ? "Waiting to Start"
+            : `${currentPlayer}'s Turn`}
+        </h2>
       </header>
 
       {/* TOP GRID */}
@@ -26,38 +51,49 @@ export default function App() {
         <div className="panel">
           <div className="panel-title">🤝 Mates</div>
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="row muted">—</div>
+            <div key={i} className="row placeholder">—</div>
           ))}
         </div>
 
         {/* CARD */}
         <div className="panel card-panel">
-          <div className="card">
-            <div className="draw-text">DRAW</div>
-          </div>
+          {phase === "WAITING" || !card ? (
+            <div className="card draw">DRAW</div>
+          ) : (
+            <div className="card active">
+              <div className="rank">
+                {card.rank}
+                {card.suit}
+              </div>
+              <div className="sub">{card.remaining} left</div>
+            </div>
+          )}
         </div>
 
         {/* RULES */}
         <div className="panel">
           <div className="panel-title">📜 Rules</div>
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="row muted">—</div>
+            <div key={i} className="row placeholder">—</div>
           ))}
         </div>
       </section>
 
-      {/* ACTION BUTTONS */}
-      <section className="actions-grid">
-        <button className="action thumb" disabled={!gameStarted}>
+      {/* ACTIONS */}
+      <section className="actions">
+        <button className="btn thumb" disabled={phase === "WAITING"}>
           👍 Thumb
         </button>
+
         <button
-          className="action ready"
-          onClick={() => setGameStarted(true)}
+          className="btn ready"
+          onClick={startGame}
+          disabled={phase !== "WAITING"}
         >
           Ready
         </button>
-        <button className="action heaven" disabled={!gameStarted}>
+
+        <button className="btn heaven" disabled={phase === "WAITING"}>
           ☁ Heaven
         </button>
       </section>
@@ -66,7 +102,8 @@ export default function App() {
       <section className="status-bar">
         <span className="mode">🎤 RHYME</span>
         <span className="detail">
-          Enforcer: <b>—</b> — Current: <b>—</b>
+          Enforcer: <b>{enforcer || "—"}</b> — Current:{" "}
+          <b>{currentPlayer || "—"}</b>
         </span>
         <button className="pill">Next</button>
         <button className="pill danger">Lose</button>
@@ -75,11 +112,12 @@ export default function App() {
       {/* PLAYERS */}
       <section className="players">
         {players.map((p) => (
-          <div key={p.name} className="player">
-            <div className="player-overlay">
-              <span className="player-name">{p.name}</span>
-              <span className="player-beers">🍺 {p.beers}</span>
-            </div>
+          <div
+            key={p.name}
+            className={`player ${p.status || ""}`}
+          >
+            <div className="player-name">{p.name}</div>
+            <div className="player-beers">🍺 {p.beers}</div>
           </div>
         ))}
       </section>
