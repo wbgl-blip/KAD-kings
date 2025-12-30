@@ -4,21 +4,36 @@ import "./styles.css";
 const PLAYERS = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
 
 export default function App() {
-  const [card] = useState({ rank: "J", suit: "♦", remaining: 52 });
-  const [currentPlayer] = useState("Marsh");
+  // GAME STATE
+  const [started, setStarted] = useState(false);
+  const [turnIndex, setTurnIndex] = useState(0);
+  const [card, setCard] = useState(null);
+
+  const currentPlayer = started ? PLAYERS[turnIndex] : null;
 
   const players = PLAYERS.map((name) => ({
     name,
-    beers: Math.floor(Math.random() * 8),
-    status: name === currentPlayer ? "TURN" : null,
+    beers: 0,
+    status: started && name === currentPlayer ? "TURN" : null,
   }));
+
+  function startGame() {
+    setStarted(true);
+    setTurnIndex(0);
+    setCard(null);
+  }
+
+  function drawCard() {
+    if (!started) return;
+    setCard({ rank: "J", suit: "♦", remaining: 51 });
+  }
 
   return (
     <div className="app">
       {/* HEADER */}
       <header className="header">
         <h1>KAD Kings</h1>
-        <h2>{currentPlayer}’s Turn</h2>
+        <h2>{started ? `${currentPlayer}’s Turn` : "Waiting to Start"}</h2>
       </header>
 
       {/* TOP GRID */}
@@ -33,12 +48,21 @@ export default function App() {
 
         {/* CARD */}
         <div className="card-stage">
-          <div className="card">
-            <div className="rank">
-              {card.rank}
-              {card.suit}
-            </div>
-            <div className="sub">{card.remaining} left</div>
+          <div
+            className={`card ${!started ? "disabled" : ""}`}
+            onClick={drawCard}
+          >
+            {card ? (
+              <>
+                <div className="rank">
+                  {card.rank}
+                  {card.suit}
+                </div>
+                <div className="sub">{card.remaining} left</div>
+              </>
+            ) : (
+              <div className="sub">DRAW</div>
+            )}
           </div>
         </div>
 
@@ -53,20 +77,32 @@ export default function App() {
 
       {/* ACTION ROW */}
       <section className="actions-grid">
-        <button className="action thumb">👍 Thumb</button>
-        <button className="action ready">Ready</button>
-        <button className="action heaven">☁ Heaven</button>
+        <button className="action thumb" disabled={!started}>
+          👍 Thumb
+        </button>
+
+        <button
+          className="action ready"
+          onClick={startGame}
+          disabled={started}
+        >
+          {started ? "In Progress" : "Ready"}
+        </button>
+
+        <button className="action heaven" disabled={!started}>
+          ☁ Heaven
+        </button>
       </section>
 
-      {/* STATUS BAR */}
-      <section className="status-bar">
-        <span className="mode">🎤 RHYME</span>
-        <span className="detail">
-          Enforcer: <b>Travis</b> — Current: <b>Kyle</b>
-        </span>
-        <button className="pill">Next</button>
-        <button className="pill danger">Lose</button>
-      </section>
+      {/* STATUS BAR (ONLY WHEN ACTIVE) */}
+      {started && card && (
+        <section className="status-bar">
+          <span className="mode">🎴 Card Drawn</span>
+          <span className="detail">
+            Waiting on <b>{currentPlayer}</b>
+          </span>
+        </section>
+      )}
 
       {/* PLAYERS */}
       <section className="players">
