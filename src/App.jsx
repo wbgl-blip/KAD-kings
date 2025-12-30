@@ -7,10 +7,9 @@ export default function App() {
   const currentPlayer = "Wes";
   const cardsRemaining = 50;
 
-  const [ruleDraft, setRuleDraft] = useState("");
+  const [mates] = useState({});
   const [houseRules, setHouseRules] = useState([]);
-
-  const mates = {};
+  const [ruleDraft, setRuleDraft] = useState("");
 
   const matePills = useMemo(
     () =>
@@ -20,7 +19,7 @@ export default function App() {
     [mates]
   );
 
-  function saveRule() {
+  function addRule() {
     if (!ruleDraft.trim()) return;
     setHouseRules(r => [...r, ruleDraft.trim()]);
     setRuleDraft("");
@@ -31,61 +30,57 @@ export default function App() {
       {/* HEADER */}
       <header className="header">
         <h1>KAD Kings</h1>
-        <h2>Wes’s Turn</h2>
-        <p className="subtitle">
-          Make a Rule: Wes types it (persists)
-        </p>
+        <h2>{currentPlayer}’s Turn</h2>
+        <p className="subtitle">Make a Rule: {currentPlayer} types it (persists)</p>
       </header>
 
-      {/* TOP STRIP */}
-      <section className="top-strip">
-        <div className="side-panels">
-          <div className="panel">
-            <div className="panel-title">🤝 Mates</div>
-            <div className="panel-content">
-              {matePills.length === 0
-                ? Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="pill empty">—</div>
-                  ))
-                : matePills.map((m, i) => (
-                    <div key={i} className="pill">{m}</div>
-                  ))}
-            </div>
-          </div>
-
-          <div className="panel">
-            <div className="panel-title">📜 Rules</div>
-            <div className="panel-content">
-              {houseRules.length === 0
-                ? Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="pill empty">—</div>
-                  ))
-                : houseRules.slice(-4).map((r, i) => (
-                    <div key={i} className="pill">{r}</div>
-                  ))}
-            </div>
+      {/* GAME STRIP */}
+      <section className="game-strip">
+        <div className="panel">
+          <div className="panel-title">🤝 Mates</div>
+          <div className="panel-content">
+            {matePills.length === 0
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="pill empty">—</div>
+                ))
+              : matePills.map((m, i) => (
+                  <div key={i} className="pill">{m}</div>
+                ))}
           </div>
         </div>
 
-        <div className="card-area">
-          <div className="card">
-            <div className="rank">A♠</div>
-            <div className="count">{cardsRemaining} left</div>
+        <div className="panel">
+          <div className="panel-title">📜 Rules</div>
+          <div className="panel-content">
+            {houseRules.length === 0
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="pill empty">—</div>
+                ))
+              : houseRules.map((r, i) => (
+                  <div key={i} className="pill">{r}</div>
+                ))}
           </div>
         </div>
       </section>
 
-      {/* RULE INPUT */}
-      <section className="rule-input">
-        <input
-          value={ruleDraft}
-          onChange={e => setRuleDraft(e.target.value)}
-          placeholder="Type the rule (persists)…"
-        />
-        <button onClick={saveRule}>Add</button>
+      {/* CARD STAGE */}
+      <section className="card-stage">
+        <div className="card">
+          A♠
+          <div className="cards-left">{cardsRemaining} left</div>
+        </div>
+
+        <div className="rule-input">
+          <input
+            value={ruleDraft}
+            onChange={e => setRuleDraft(e.target.value)}
+            placeholder="Type the rule (persists)…"
+          />
+          <button onClick={addRule}>Add</button>
+        </div>
       </section>
 
-      {/* PLAYER GRID */}
+      {/* VIDEO GRID */}
       <section className="video-grid">
         {PLAYERS.map(name => (
           <div
@@ -103,7 +98,7 @@ export default function App() {
 
       {/* FOOTER */}
       <footer className="footer">
-        <button className="save">Save Rule</button>
+        <button className="reset">Save Rule</button>
       </footer>
     </div>
   );
