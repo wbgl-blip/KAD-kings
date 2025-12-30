@@ -4,7 +4,6 @@ import "./styles.css";
 const PLAYERS = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
 
 export default function App() {
-  // GAME STATE
   const [started, setStarted] = useState(false);
   const [turnIndex, setTurnIndex] = useState(0);
   const [card, setCard] = useState(null);
@@ -24,7 +23,7 @@ export default function App() {
   }
 
   function drawCard() {
-    if (!started) return;
+    if (!started || card) return;
     setCard({ rank: "J", suit: "♦", remaining: 51 });
   }
 
@@ -46,10 +45,10 @@ export default function App() {
           ))}
         </div>
 
-        {/* CARD */}
-        <div className="card-stage">
+        {/* CARD (SAME WIDTH AS PANELS) */}
+        <div className="panel card-panel">
           <div
-            className={`card ${!started ? "disabled" : ""}`}
+            className={`card ${!started ? "locked" : ""}`}
             onClick={drawCard}
           >
             {card ? (
@@ -61,7 +60,7 @@ export default function App() {
                 <div className="sub">{card.remaining} left</div>
               </>
             ) : (
-              <div className="sub">DRAW</div>
+              <div className="draw-text">DRAW</div>
             )}
           </div>
         </div>
@@ -93,16 +92,6 @@ export default function App() {
           ☁ Heaven
         </button>
       </section>
-
-      {/* STATUS BAR (ONLY WHEN ACTIVE) */}
-      {started && card && (
-        <section className="status-bar">
-          <span className="mode">🎴 Card Drawn</span>
-          <span className="detail">
-            Waiting on <b>{currentPlayer}</b>
-          </span>
-        </section>
-      )}
 
       {/* PLAYERS */}
       <section className="players">
