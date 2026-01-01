@@ -1,3 +1,4 @@
+/* src/styles.css */
 * {
   box-sizing: border-box;
 }
@@ -9,19 +10,28 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+button,
+input {
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .app {
   max-width: 430px;
   margin: 0 auto;
   padding: 14px;
 }
 
+/* In fullscreen, stop shrinking to 430px and use the whole viewport */
 :fullscreen .app {
   max-width: none;
   width: 100vw;
+  margin: 0;
+  padding: 16px;
 }
 
 /* HEADER */
-
 .header {
   position: relative;
   text-align: center;
@@ -34,6 +44,7 @@ body {
   font-weight: 800;
 }
 
+/* keep it in the top-right even in fullscreen */
 .fullscreen-btn {
   position: fixed;
   right: 12px;
@@ -41,60 +52,68 @@ body {
   width: 44px;
   height: 40px;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
   color: #fff;
+  font-size: 16px;
   font-weight: 800;
   z-index: 50;
 }
 
 /* TOP GRID */
-
 .top-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
 }
 
+/* Panels */
 .panel {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 18px;
   padding: 10px;
   min-height: 220px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
 }
 
 .panel-title {
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 8px;
+  opacity: 0.95;
 }
 
 .row {
-  height: 34px;
+  height: 36px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   margin-bottom: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.7;
-  font-size: 12px;
+  opacity: 0.75;
+  padding: 0 10px;
+}
+
+.row-text {
+  display: block;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* CARD */
-
 .card-panel {
-  display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .card-wrapper {
   width: 100%;
-  max-width: 150px;
-  aspect-ratio: 2 / 3;
+  height: 100%;
 }
 
 .card {
@@ -104,18 +123,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  text-align: center;
+  font-weight: 900;
   user-select: none;
+  text-align: center;
 }
 
 .card.draw {
   background: #9ca3af;
   color: #111;
-}
-
-.card.draw.disabled {
-  opacity: 0.6;
+  cursor: pointer;
 }
 
 .card.active {
@@ -125,27 +141,35 @@ body {
   padding: 10px;
 }
 
+.card.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .rank {
   font-size: 42px;
+  line-height: 1.05;
 }
 
 .rule-text {
   font-size: 12px;
-  margin-top: 4px;
+  margin-top: 6px;
+  font-weight: 800;
 }
 
 .sub {
   font-size: 12px;
-  opacity: 0.6;
+  opacity: 0.65;
+  margin-top: 4px;
+  font-weight: 800;
 }
 
-/* ACTIONS */
-
+/* ACTION BUTTONS */
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  margin: 12px 0;
+  margin: 12px 0 8px;
 }
 
 .btn {
@@ -153,7 +177,12 @@ body {
   border-radius: 14px;
   padding: 12px;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 900;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:disabled {
+  opacity: 0.45;
 }
 
 .btn.thumb {
@@ -171,19 +200,48 @@ body {
   color: #fff;
 }
 
-/* STATUS */
-
+/* STATUS BAR */
 .status-bar {
-  background: rgba(255,255,255,0.06);
+  margin: 0 0 10px;
+  background: rgba(255, 255, 255, 0.06);
   padding: 10px;
   border-radius: 14px;
   font-size: 13px;
   text-align: center;
-  margin-bottom: 10px;
+}
+
+.status-main {
+  font-weight: 800;
+}
+
+.status-meta {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.meta-pill {
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.meta-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-weight: 900;
+  font-size: 12px;
 }
 
 /* PLAYERS */
-
 .players {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -191,14 +249,15 @@ body {
 }
 
 .player {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   padding: 12px;
-  min-height: 110px;
+  min-height: 100px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   border: 2px solid transparent;
+  overflow: hidden;
 }
 
 .player.TURN {
@@ -206,26 +265,35 @@ body {
 }
 
 .player.FLASH {
-  border-color: rgba(255,80,80,0.95);
+  border-color: rgba(255, 80, 80, 0.95);
+  box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
 }
 
 .video-slot {
   flex: 1;
   background: #000;
   border-radius: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.player-footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .player-name {
-  font-weight: 800;
+  font-weight: 900;
+  font-size: 18px;
 }
 
 .player-beers {
-  opacity: 0.85;
+  opacity: 0.9;
+  font-weight: 900;
 }
 
 /* RULE INPUT */
-
 .rule-input {
   margin-top: 10px;
   display: flex;
@@ -234,14 +302,53 @@ body {
 
 .rule-input input {
   flex: 1;
-  padding: 8px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 10px;
   border: none;
 }
 
 .rule-input button {
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
   border: none;
-  font-weight: 800;
+  font-weight: 900;
+}
+
+/* FULLSCREEN / LARGE VIEWPORT TUNING
+   - Make player “video screens” larger
+   - Make mates/rules row text smaller so it fits the columns
+*/
+:fullscreen .row {
+  height: 32px;
+  margin-bottom: 6px;
+}
+
+:fullscreen .row-text {
+  font-size: 11px;
+}
+
+:fullscreen .panel-title {
+  font-size: 14px;
+}
+
+:fullscreen .players {
+  gap: 12px;
+}
+
+:fullscreen .player {
+  min-height: 140px;
+  padding: 14px;
+}
+
+:fullscreen .video-slot {
+  margin-bottom: 10px;
+  border-radius: 14px;
+}
+
+:fullscreen .player-name {
+  font-size: 20px;
+}
+
+:fullscreen .player-beers {
+  font-size: 14px;
 }
