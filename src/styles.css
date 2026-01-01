@@ -10,10 +10,24 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+button,
+input {
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .app {
   max-width: 430px;
   margin: 0 auto;
   padding: 14px;
+}
+
+/* In fullscreen, stop shrinking to 430px */
+:fullscreen .app {
+  max-width: none;
+  width: 100vw;
+  margin: 0;
 }
 
 /* HEADER */
@@ -29,10 +43,11 @@ body {
   font-weight: 800;
 }
 
+/* keep it in the top-right even in fullscreen */
 .fullscreen-btn {
-  position: absolute;
-  right: 0;
-  top: 2px;
+  position: fixed;
+  right: 12px;
+  top: 12px;
   width: 44px;
   height: 40px;
   border-radius: 12px;
@@ -41,6 +56,7 @@ body {
   color: #fff;
   font-size: 16px;
   font-weight: 800;
+  z-index: 50;
 }
 
 /* TOP GRID */
@@ -90,11 +106,18 @@ body {
   align-items: center;
   justify-content: center;
   font-weight: 800;
+  user-select: none;
 }
 
 .card.draw {
   background: #9ca3af;
   color: #111;
+  cursor: pointer;
+}
+
+.card.draw.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .card.active {
@@ -119,7 +142,7 @@ body {
   opacity: 0.6;
 }
 
-/* ACTION BUTTONS (RESTORED) */
+/* ACTION BUTTONS (restore colored look everywhere) */
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -133,6 +156,7 @@ body {
   padding: 12px;
   font-size: 16px;
   font-weight: 800;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn:disabled {
@@ -180,7 +204,6 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   border: 2px solid transparent;
-  position: relative;
   overflow: hidden;
 }
 
@@ -189,7 +212,7 @@ body {
 }
 
 .player.FLASH {
-  border-color: rgba(255, 80, 80, 0.9);
+  border-color: rgba(255, 80, 80, 0.95);
   box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
 }
 
@@ -227,16 +250,4 @@ body {
   border-radius: 8px;
   border: none;
   font-weight: 800;
-}
-
-/* START (KEPT) */
-.start {
-  margin-top: 12px;
-  width: 100%;
-  padding: 14px;
-  border-radius: 16px;
-  border: none;
-  background: #22c55e;
-  color: #000;
-  font-weight: 900;
 }
