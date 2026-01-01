@@ -9,14 +9,29 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+button,
+input {
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .app {
   max-width: 430px;
   margin: 0 auto;
   padding: 14px;
 }
 
+/* In fullscreen, stop shrinking to 430px */
+:fullscreen .app {
+  max-width: none;
+  width: 100vw;
+  margin: 0;
+}
+
 /* HEADER */
 .header {
+  position: relative;
   text-align: center;
   margin-bottom: 10px;
 }
@@ -27,6 +42,22 @@ body {
   font-weight: 800;
 }
 
+/* fullscreen button (top-right) */
+.fullscreen-btn {
+  position: fixed;
+  right: 12px;
+  top: 12px;
+  width: 44px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  z-index: 50;
+}
+
 /* TOP GRID */
 .top-grid {
   display: grid;
@@ -35,9 +66,34 @@ body {
 }
 
 .panel {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 18px;
-  min-height: 180px;
+  padding: 10px;
+  min-height: 220px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-title {
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.row {
+  height: 36px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  padding: 0 10px;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* CARD */
@@ -51,28 +107,46 @@ body {
   width: 100%;
   height: 100%;
   border-radius: 16px;
-  background: #9ca3af;
-  color: #111;
-  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
+  font-weight: 900;
   user-select: none;
+  text-align: center;
+}
+
+.card.draw {
+  background: #9ca3af;
+  color: #111;
+  cursor: pointer;
+}
+
+.card.active {
+  background: #fff;
+  color: #000;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.card.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .rank {
-  font-size: 42px;
+  font-size: 44px;
 }
 
 .rule-text {
-  font-size: 12px;
-  margin-top: 4px;
+  font-size: 13px;
+  margin-top: 6px;
+  font-weight: 800;
 }
 
 .sub {
   font-size: 12px;
-  opacity: 0.7;
+  opacity: 0.65;
+  margin-top: 4px;
 }
 
 /* ACTION BUTTONS */
@@ -80,7 +154,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  margin: 12px 0;
+  margin: 12px 0 10px;
 }
 
 .btn {
@@ -88,7 +162,12 @@ body {
   border-radius: 14px;
   padding: 12px;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 900;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:disabled {
+  opacity: 0.45;
 }
 
 .btn.thumb {
@@ -108,12 +187,12 @@ body {
 
 /* STATUS BAR */
 .status-bar {
-  background: rgba(255,255,255,0.06);
+  margin: 0 0 10px;
+  background: rgba(255, 255, 255, 0.06);
   padding: 10px;
   border-radius: 14px;
-  text-align: center;
-  margin-bottom: 10px;
   font-size: 13px;
+  text-align: center;
 }
 
 /* PLAYERS */
@@ -124,7 +203,7 @@ body {
 }
 
 .player {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   padding: 12px;
   min-height: 120px;
@@ -132,6 +211,8 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   border: 2px solid transparent;
+  overflow: hidden;
+  cursor: pointer;
 }
 
 .player.TURN {
@@ -139,21 +220,42 @@ body {
 }
 
 .player.FLASH {
-  border-color: #ef4444;
-  box-shadow: inset 0 0 0 2px rgba(239,68,68,0.45);
+  border-color: rgba(255, 80, 80, 0.95);
+  box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
 }
 
 .video-slot {
   flex: 1;
   background: #000;
   border-radius: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .player-name {
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .player-beers {
   opacity: 0.85;
+}
+
+/* RULE INPUT */
+.rule-input {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.rule-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+.rule-input button {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 900;
 }
