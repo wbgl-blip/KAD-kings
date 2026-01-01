@@ -23,16 +23,18 @@ export default function App() {
 
     setPlayers((prev) =>
       prev.map((p) =>
-        p.name === first ? { ...p, status: "TURN" } : p
+        p.name === first ? { ...p, status: "TURN" } : { ...p, status: null }
       )
     );
 
     setCurrentPlayer(first);
+    setEnforcer(null);
+    setCard(null);
     setPhase("PLAYING");
   }
 
   function drawCard() {
-    if (phase !== "PLAYING") return;
+    if (phase !== "PLAYING" || card) return;
 
     const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
     const suits = ["♠","♥","♦","♣"];
@@ -44,16 +46,23 @@ export default function App() {
     });
   }
 
+  function gameMessage() {
+    if (phase === "WAITING") {
+      return "Waiting for players to get ready";
+    }
+
+    if (!card) {
+      return `${currentPlayer} is drawing a card`;
+    }
+
+    return `${currentPlayer} drew ${card.rank}${card.suit}`;
+  }
+
   return (
     <div className="app">
       {/* HEADER */}
       <header className="header">
         <h1>KAD Kings</h1>
-        <h2>
-          {phase === "WAITING"
-            ? "Waiting to Start"
-            : `${currentPlayer}'s Turn`}
-        </h2>
       </header>
 
       {/* TOP GRID */}
@@ -62,7 +71,10 @@ export default function App() {
 
         <div className="panel card-panel">
           {!card ? (
-            <div className="card draw" onClick={drawCard}>
+            <div
+              className={`card draw ${phase === "WAITING" ? "disabled" : ""}`}
+              onClick={drawCard}
+            >
               DRAW
             </div>
           ) : (
@@ -98,23 +110,26 @@ export default function App() {
         </button>
       </section>
 
-      {/* STATUS BAR */}
-      <section className="status-bar">
-        <span className="mode">🎤 RHYME</span>
-        <span className="detail">
-          Enforcer: <b>{enforcer || "—"}</b> — Current:{" "}
-          <b>{currentPlayer || "—"}</b>
-        </span>
-        <button className="pill">Next</button>
-        <button className="pill danger">Lose</button>
+      {/* GAME MESSAGE BAR */}
+      <section className="message-bar">
+        <span className="message-text">{gameMessage()}</span>
+        <div className="message-actions">
+          <button className="pill">Next</button>
+          <button className="pill danger">Lose</button>
+        </div>
       </section>
 
       {/* PLAYERS */}
       <section className="players">
         {players.map((p) => (
           <div key={p.name} className={`player ${p.status || ""}`}>
-            <span className="player-name">{p.name}</span>
-            <span className="player-beers">🍺 {p.beers}</span>
+            <div className="player-video">
+              {/* future <video /> goes here */}
+            </div>
+            <div className="player-overlay">
+              <span className="player-name">{p.name}</span>
+              <span className="player-beers">🍺 {p.beers}</span>
+            </div>
           </div>
         ))}
       </section>
