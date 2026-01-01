@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useMemo, useRef, useState } from "react";
 import "./styles.css";
 
@@ -17,12 +16,12 @@ const RULE_TEXT = {
   4: "Women drink",
   5: "Guys drink",
   6: "Everyone drinks",
-  7: "Heaven — last to press drinks",
+  7: "Heaven — last to tap drinks",
   8: "Pick a mate",
-  9: "Rhyme — tap loser",
-  10: "Categories — tap loser",
-  J: "Thumbmaster — last to press drinks",
-  Q: "Question Master — answer = drink",
+  9: "Rhyme — pick the loser",
+  10: "Categories — pick the loser",
+  J: "Thumbmaster — last to tap drinks",
+  Q: "Question Master — answered question = drink",
   K: "Make a rule",
 };
 
@@ -32,7 +31,7 @@ const RULE_TEXT = {
 
 function buildDeck() {
   const deck = [];
-  RANKS.forEach((r) => SUITS.forEach((s) => deck.push({ rank: r, suit: s })));
+  RANKS.forEach(r => SUITS.forEach(s => deck.push({ rank: r, suit: s })));
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -50,10 +49,10 @@ export default function App() {
 
   const [turnIndex, setTurnIndex] = useState(0);
   const [phase, setPhase] = useState("WAITING");
-  // WAITING | IDLE | PICK_DRINK | PICK_MATE | RHYME | CATEGORIES | MAKE_RULE
+  // WAITING | IDLE | PICK_DRINK | PICK_MATE | THUMB_RACE | HEAVEN_RACE | QUESTION_PICK | MAKE_RULE
 
   const [players, setPlayers] = useState(
-    PLAYER_NAMES.map((name) => ({
+    PLAYER_NAMES.map(name => ({
       name,
       beers: 0,
       gender: "M",
@@ -62,52 +61,46 @@ export default function App() {
   );
 
   const [statusText, setStatusText] = useState("Waiting for everyone to be ready");
-  const [rules, setRules] = useState([]);
-  const [ruleDraft, setRuleDraft] = useState("");
 
-  const [flashNames, setFlashNames] = useState(() => new Set());
-  const flashTimerRef = useRef(null);
+  const [thumbHolder, setThumbHolder] = useState(null);
+  const [heavenHolder, setHeavenHolder] = useState(null);
+  const [questionHolder, setQuestionHolder] = useState(null);
 
+  const [raceReacted, setRaceReacted] = useState(new Set());
+  const [flashNames, setFlashNames] = useState(new Set());
+
+  const flashTimer = useRef(null);
   const playersRef = useRef(players);
   playersRef.current = players;
 
-  const currentPlayer = useMemo(
-    () => players[turnIndex],
-    [players, turnIndex]
-  );
+  const currentPlayer = players[turnIndex];
 
   /* =========================
      HELPERS
   ========================= */
 
   function nextTurn() {
-    setTurnIndex((i) => (i + 1) % playersRef.current.length);
+    setTurnIndex(i => (i + 1) % playersRef.current.length);
   }
 
-  function setStatusWithTurn(msg) {
-    setStatusText(`${msg} — ${playersRef.current[turnIndex].name}'s turn`);
+  function flash(names) {
+    clearTimeout(flashTimer.current);
+    setFlashNames(new Set(names));
+    flashTimer.current = setTimeout(() => setFlashNames(new Set()), 2000);
   }
 
   function addDrink(name) {
-    setPlayers((p) =>
-      p.map((pl) =>
-        pl.name === name ? { ...pl, beers: pl.beers + 1 } : pl
-      )
+    setPlayers(p =>
+      p.map(pl => pl.name === name ? { ...pl, beers: pl.beers + 1 } : pl)
     );
-  }
-
-  function flashPlayers(names) {
-    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
-    setFlashNames(new Set(names));
-    flashTimerRef.current = setTimeout(() => setFlashNames(new Set()), 2000);
   }
 
   function propagateDrink(name, visited = new Set()) {
     if (visited.has(name)) return;
     visited.add(name);
     addDrink(name);
-    const p = playersRef.current.find((x) => x.name === name);
-    (p?.mates || []).forEach((m) => propagateDrink(m, visited));
+    const p = playersRef.current.find(x => x.name === name);
+    (p?.mates || []).forEach(m => propagateDrink(m, visited));
   }
 
   /* =========================
@@ -116,7 +109,7 @@ export default function App() {
 
   function startGame() {
     setPhase("IDLE");
-    setStatusWithTurn("Draw a card");
+    setStatusText(`${currentPlayer.name}'s turn — tap the deck`);
   }
 
   function drawCard() {
@@ -127,66 +120,84 @@ export default function App() {
     setCard(next);
 
     const r = next.rank;
-    setStatusWithTurn(RULE_TEXT[r]);
+    setStatusText(RULE_TEXT[r]);
 
     if (r === "2") return setPhase("PICK_DRINK");
     if (r === "8") return setPhase("PICK_MATE");
-    if (r === "9") return setPhase("RHYME");
-    if (r === "10") return setPhase("CATEGORIES");
+    if (r === "J") return setThumbHolder(currentPlayer.name);
+    if (r === "7") return setHeavenHolder(currentPlayer.name);
+    if (r === "Q") return setQuestionHolder(currentPlayer.name);
+    if (r === "K") return setPhase("MAKE_RULE");
 
     if (r === "3") {
-      flashPlayers([currentPlayer.name]);
+      flash([currentPlayer.name]);
       propagateDrink(currentPlayer.name);
-      nextTurn();
-      return;
-    }
-
-    if (r === "4") {
-      const women = playersRef.current.filter(p => p.gender === "F").map(p => p.name);
-      flashPlayers(women);
-      women.forEach(propagateDrink);
-      nextTurn();
-      return;
-    }
-
-    if (r === "5") {
-      const guys = playersRef.current.filter(p => p.gender === "M").map(p => p.name);
-      flashPlayers(guys);
-      guys.forEach(propagateDrink);
       nextTurn();
       return;
     }
 
     if (r === "6") {
       const all = playersRef.current.map(p => p.name);
-      flashPlayers(all);
+      flash(all);
       all.forEach(propagateDrink);
       nextTurn();
       return;
     }
 
-    if (r === "K") return setPhase("MAKE_RULE");
-
     nextTurn();
   }
 
   /* =========================
-     PLAYER TAP ROUTER (FIX)
+     RACES
+  ========================= */
+
+  function startThumb() {
+    if (!thumbHolder) return;
+    setRaceReacted(new Set());
+    setPhase("THUMB_RACE");
+    setStatusText("Thumbmaster active — tap your tile!");
+  }
+
+  function startHeaven() {
+    if (!heavenHolder) return;
+    setRaceReacted(new Set());
+    setPhase("HEAVEN_RACE");
+    setStatusText("Heaven active — tap your tile!");
+  }
+
+  function handleRaceTap(name) {
+    if (raceReacted.has(name)) return;
+
+    const next = new Set(raceReacted);
+    next.add(name);
+    setRaceReacted(next);
+
+    if (next.size === playersRef.current.length - 1) {
+      const loser = playersRef.current.find(p => !next.has(p.name)).name;
+      flash([loser]);
+      propagateDrink(loser);
+      setPhase("IDLE");
+      setStatusText(`${loser} was last — drinks`);
+      nextTurn();
+    }
+  }
+
+  /* =========================
+     INTERACTIONS
   ========================= */
 
   function tapPlayer(name) {
     if (phase === "PICK_DRINK") {
-      flashPlayers([name]);
+      flash([name]);
       propagateDrink(name);
       setPhase("IDLE");
       nextTurn();
-      setStatusWithTurn(`${name} drinks`);
       return;
     }
 
     if (phase === "PICK_MATE" && name !== currentPlayer.name) {
-      setPlayers((p) =>
-        p.map((pl) =>
+      setPlayers(p =>
+        p.map(pl =>
           pl.name === currentPlayer.name && !pl.mates.includes(name)
             ? { ...pl, mates: [...pl.mates, name] }
             : pl
@@ -194,38 +205,21 @@ export default function App() {
       );
       setPhase("IDLE");
       nextTurn();
-      setStatusWithTurn(`${currentPlayer.name} picked ${name} as mate`);
       return;
     }
 
-    if (phase === "RHYME" || phase === "CATEGORIES") {
-      flashPlayers([name]);
+    if (phase === "THUMB_RACE" || phase === "HEAVEN_RACE") {
+      handleRaceTap(name);
+      return;
+    }
+
+    if (phase === "QUESTION_PICK") {
+      flash([name]);
       propagateDrink(name);
       setPhase("IDLE");
-      nextTurn();
-      setStatusWithTurn(`${name} lost`);
+      setStatusText(`${name} answered — drinks`);
     }
   }
-
-  function submitRule() {
-    if (!ruleDraft.trim()) return;
-    setRules((r) => [...r, ruleDraft.trim()]);
-    setRuleDraft("");
-    setPhase("IDLE");
-    nextTurn();
-    setStatusWithTurn("Rule saved");
-  }
-
-  function enterFullscreen() {
-    if (document.fullscreenElement) document.exitFullscreen?.();
-    else document.documentElement.requestFullscreen?.();
-  }
-
-  const matesLines = useMemo(() => {
-    const out = [];
-    players.forEach(p => p.mates.forEach(m => out.push(`${p.name} → ${m}`)));
-    return out;
-  }, [players]);
 
   /* =========================
      RENDER
@@ -235,41 +229,33 @@ export default function App() {
     <div className="app">
       <header className="header">
         <h1>KAD Kings</h1>
-        <button className="fullscreen-btn" onClick={enterFullscreen}>⛶</button>
       </header>
 
       <section className="top-grid">
-        <Panel title="🤝 Mates" items={matesLines} />
-
+        <div className="panel" />
         <div className="panel card-panel">
-          <div
-            className={`card ${card ? "active" : "draw"}`}
-            onClick={drawCard}
-          >
-            {!card ? "DRAW" : (
+          <div className="card draw" onClick={drawCard}>
+            {card ? (
               <>
                 <div className="rank">{card.rank}{card.suit}</div>
-                <div className="rule-text">{RULE_TEXT[card.rank]}</div>
-                <div className="sub">{deck.length} cards remaining</div>
+                <div className="sub">{deck.length} cards left</div>
               </>
-            )}
+            ) : "DRAW"}
           </div>
         </div>
-
-        <Panel title="📜 Rules" items={rules} />
+        <div className="panel" />
       </section>
 
-      {/* ACTIONS — FIXED: ALWAYS PRESENT */}
       <section className="actions">
-        <button className="btn thumb">👍 Thumb</button>
+        <button className="btn thumb" onClick={startThumb}>👍 Thumb</button>
         <button className="btn ready" onClick={startGame}>Ready</button>
-        <button className="btn heaven">☁ Heaven</button>
+        <button className="btn heaven" onClick={startHeaven}>☁ Heaven</button>
       </section>
 
       <section className="status-bar">{statusText}</section>
 
       <section className="players">
-        {players.map((p) => (
+        {players.map(p => (
           <div
             key={p.name}
             className={`player ${p.name === currentPlayer?.name ? "TURN" : ""} ${flashNames.has(p.name) ? "FLASH" : ""}`}
@@ -281,24 +267,6 @@ export default function App() {
           </div>
         ))}
       </section>
-
-      {phase === "MAKE_RULE" && (
-        <div className="rule-input">
-          <input value={ruleDraft} onChange={(e) => setRuleDraft(e.target.value)} />
-          <button onClick={submitRule}>Save Rule</button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Panel({ title, items = [] }) {
-  return (
-    <div className="panel">
-      <div className="panel-title">{title}</div>
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className="row">{items[i] || "—"}</div>
-      ))}
     </div>
   );
 }
