@@ -1,4 +1,6 @@
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -13,68 +15,93 @@ body {
   padding: 12px;
 }
 
+/* FULLSCREEN LAYOUT EXPANSION */
 :fullscreen .app {
   max-width: none;
   width: 100vw;
+  padding: 20px;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
+
 .header {
   position: relative;
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
 }
 
 .fullscreen-btn {
   position: fixed;
-  top: 10px;
-  right: 10px;
-  width: 40px;
-  height: 38px;
-  border-radius: 10px;
+  top: 12px;
+  right: 12px;
+  width: 44px;
+  height: 40px;
+  border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.15);
   background: rgba(255,255,255,0.06);
   color: #fff;
   font-weight: 800;
+  z-index: 50;
 }
 
-/* TOP GRID */
+/* ================= TOP GRID ================= */
+
 .top-grid {
   display: grid;
   grid-template-columns: 1fr 1.2fr 1fr;
-  gap: 8px;
+  gap: 10px;
+}
+
+/* Slightly more breathing room in fullscreen */
+:fullscreen .top-grid {
+  gap: 16px;
 }
 
 .panel {
   background: rgba(255,255,255,0.04);
-  border-radius: 16px;
-  padding: 8px;
+  border-radius: 18px;
+  padding: 10px;
   border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-title {
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
+/* Rows adapt text instead of breaking layout */
 .row {
-  height: 32px;
+  min-height: 32px;
+  padding: 0 8px;
   border-radius: 999px;
   background: rgba(255,255,255,0.06);
   margin-bottom: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.6;
+  font-size: 13px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.7;
 }
 
-/* CARD FIX */
+/* Shrink text slightly in fullscreen to fit more */
+:fullscreen .row {
+  font-size: 12px;
+}
+
+/* ================= CARD ================= */
+
 .card-panel {
   display: flex;
   justify-content: center;
@@ -83,19 +110,20 @@ body {
 
 .card-wrapper {
   width: 100%;
-  max-width: 140px;
+  max-width: 150px;
   aspect-ratio: 2 / 3;
 }
 
 .card {
   width: 100%;
   height: 100%;
-  border-radius: 14px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   text-align: center;
+  user-select: none;
 }
 
 .card.draw {
@@ -107,11 +135,11 @@ body {
   background: #fff;
   color: #000;
   flex-direction: column;
-  padding: 8px;
+  padding: 10px;
 }
 
 .rank {
-  font-size: 36px;
+  font-size: 38px;
 }
 
 .rule-text {
@@ -124,64 +152,113 @@ body {
   opacity: 0.6;
 }
 
-/* ACTIONS */
+/* ================= ACTION BUTTONS ================= */
+
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  margin: 10px 0;
+  gap: 10px;
+  margin: 12px 0;
 }
 
 .btn {
   border-radius: 14px;
   padding: 12px;
+  font-size: 16px;
   font-weight: 800;
   border: none;
 }
 
-.btn.thumb { background: #facc15; color: #000; }
-.btn.ready { background: #22c55e; color: #000; }
-.btn.heaven { background: #3b82f6; color: #fff; }
+.btn.thumb {
+  background: #facc15;
+  color: #000;
+}
 
-/* STATUS */
+.btn.ready {
+  background: #22c55e;
+  color: #000;
+}
+
+.btn.heaven {
+  background: #3b82f6;
+  color: #fff;
+}
+
+/* ================= STATUS ================= */
+
 .status-bar {
   background: rgba(255,255,255,0.06);
   padding: 10px;
   border-radius: 14px;
   text-align: center;
   font-size: 13px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
-/* PLAYERS */
+/* ================= PLAYERS ================= */
+
 .players {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 
+/* FULLSCREEN: BIGGER PLAYER GRID */
+:fullscreen .players {
+  gap: 16px;
+}
+
+/* Player tile */
 .player {
   background: rgba(255,255,255,0.05);
-  border-radius: 16px;
-  padding: 10px;
-  min-height: 90px;
+  border-radius: 18px;
+  padding: 12px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   border: 2px solid transparent;
+  transition: transform 0.15s ease;
 }
 
-.player.TURN { border-color: #22c55e; }
-.player.FLASH { border-color: #ef4444; }
+/* Enlarge tiles in fullscreen */
+:fullscreen .player {
+  min-height: 150px;
+  padding: 16px;
+}
 
+.player.TURN {
+  border-color: #22c55e;
+}
+
+.player.FLASH {
+  border-color: rgba(255,80,80,0.95);
+  box-shadow: 0 0 0 2px rgba(255,80,80,0.35) inset;
+}
+
+/* Video slot scales */
 .video-slot {
   height: 36px;
   background: #000;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 6px;
 }
 
-.player-name { font-weight: 800; }
-.player-beers { opacity: 0.8; }
+/* Bigger video in fullscreen */
+:fullscreen .video-slot {
+  height: 60px;
+}
 
-/* RULE INPUT */
+.player-name {
+  font-weight: 800;
+}
+
+.player-beers {
+  opacity: 0.85;
+}
+
+/* ================= RULE INPUT ================= */
+
 .rule-input {
   display: flex;
   gap: 8px;
@@ -198,5 +275,6 @@ body {
 .rule-input button {
   padding: 8px 12px;
   border-radius: 8px;
+  border: none;
   font-weight: 800;
 }
