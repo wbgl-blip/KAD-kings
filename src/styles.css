@@ -1,8 +1,5 @@
 * {
   box-sizing: border-box;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
 }
 
 body {
@@ -21,7 +18,7 @@ body {
 /* HEADER */
 .header {
   text-align: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .header h1 {
@@ -38,11 +35,11 @@ body {
 }
 
 .panel {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255,255,255,0.04);
   border-radius: 18px;
   padding: 10px;
   min-height: 220px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255,255,255,0.08);
   display: flex;
   flex-direction: column;
 }
@@ -55,7 +52,7 @@ body {
 .row {
   height: 36px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255,255,255,0.06);
   margin-bottom: 6px;
   display: flex;
   align-items: center;
@@ -77,17 +74,11 @@ body {
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  border: none;
 }
 
 .card.draw {
   background: #9ca3af;
   color: #111;
-  font-size: 18px;
-}
-
-.card.draw:disabled {
-  opacity: 0.4;
 }
 
 .card.active {
@@ -140,14 +131,14 @@ body {
   color: #fff;
 }
 
-/* STATUS MESSAGE BAR */
-.status-bar.message {
+/* STATUS BAR */
+.status-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  padding: 10px 12px;
-  border-radius: 16px;
+  gap: 8px;
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+  border-radius: 14px;
   font-size: 14px;
 }
 
@@ -156,16 +147,11 @@ body {
   opacity: 0.9;
 }
 
-.status-actions {
-  display: flex;
-  gap: 8px;
-}
-
 .pill {
   border: none;
   border-radius: 999px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255,255,255,0.1);
   color: #fff;
   font-weight: 600;
 }
@@ -174,7 +160,7 @@ body {
   background: #7f1d1d;
 }
 
-/* PLAYERS (VIDEO-READY) */
+/* PLAYERS */
 .players {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -183,33 +169,28 @@ body {
 }
 
 .player {
-  position: relative;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255,255,255,0.05);
   border-radius: 18px;
-  overflow: hidden;
+  padding: 10px;
+  min-height: 110px;
   border: 2px solid transparent;
-  aspect-ratio: 16 / 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .player.TURN {
   border-color: #22c55e;
 }
 
-.video-slot {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.08),
-    rgba(0, 0, 0, 0.2)
-  );
+.video-tile {
+  flex: 1;
+  border-radius: 12px;
+  background: radial-gradient(circle at top, #1e293b, #020617);
+  margin-bottom: 6px;
 }
 
-.player-overlay {
-  position: absolute;
-  bottom: 10px;
-  left: 12px;
-  right: 12px;
+.player-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -220,5 +201,5 @@ body {
 }
 
 .player-beers {
-  opacity: 0.85;
+  opacity: 0.8;
 }
