@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./styles.css";
 
 const PLAYER_NAMES = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
@@ -13,26 +13,10 @@ export default function App() {
     }))
   );
   const [currentPlayer, setCurrentPlayer] = useState(null);
-  const [enforcer, setEnforcer] = useState(null);
   const [card, setCard] = useState(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  useEffect(() => {
-    function onFullscreenChange() {
-      setIsFullscreen(!!document.fullscreenElement);
-    }
-    document.addEventListener("fullscreenchange", onFullscreenChange);
-    return () =>
-      document.removeEventListener("fullscreenchange", onFullscreenChange);
-  }, []);
-
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  }
+  const [statusMessage, setStatusMessage] = useState(
+    "Waiting for players to get ready"
+  );
 
   function startGame() {
     if (phase !== "WAITING") return;
@@ -46,28 +30,26 @@ export default function App() {
     );
 
     setCurrentPlayer(first);
-    setEnforcer(null);
-    setCard(null);
     setPhase("PLAYING");
+    setStatusMessage(`${first} draws first`);
   }
 
   function drawCard() {
-    if (phase !== "PLAYING" || card) return;
+    if (phase !== "PLAYING") return;
 
-    const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
-    const suits = ["♠","♥","♦","♣"];
+    const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+    const suits = ["♠", "♥", "♦", "♣"];
 
-    setCard({
+    const nextCard = {
       rank: ranks[Math.floor(Math.random() * ranks.length)],
       suit: suits[Math.floor(Math.random() * suits.length)],
       remaining: Math.floor(Math.random() * 40) + 10,
-    });
-  }
+    };
 
-  function gameMessage() {
-    if (phase === "WAITING") return "Waiting for players to get ready";
-    if (!card) return `${currentPlayer} is drawing a card`;
-    return `${currentPlayer} drew ${card.rank}${card.suit}`;
+    setCard(nextCard);
+    setStatusMessage(
+      `${currentPlayer} drew ${nextCard.rank}${nextCard.suit}`
+    );
   }
 
   return (
@@ -75,13 +57,6 @@ export default function App() {
       {/* HEADER */}
       <header className="header">
         <h1>KAD Kings</h1>
-        <button
-          className="fullscreen-btn"
-          onClick={toggleFullscreen}
-          aria-label="Toggle Fullscreen"
-        >
-          {isFullscreen ? "⤢" : "⤢"}
-        </button>
       </header>
 
       {/* TOP GRID */}
@@ -90,12 +65,13 @@ export default function App() {
 
         <div className="panel card-panel">
           {!card ? (
-            <div
-              className={`card draw ${phase === "WAITING" ? "disabled" : ""}`}
+            <button
+              className="card draw"
               onClick={drawCard}
+              disabled={phase !== "PLAYING"}
             >
               DRAW
-            </div>
+            </button>
           ) : (
             <div className="card active">
               <div className="rank">
@@ -129,10 +105,10 @@ export default function App() {
         </button>
       </section>
 
-      {/* MESSAGE BAR */}
-      <section className="message-bar">
-        <span className="message-text">{gameMessage()}</span>
-        <div className="message-actions">
+      {/* STATUS MESSAGE BAR */}
+      <section className="status-bar message">
+        <span className="status-text">{statusMessage}</span>
+        <div className="status-actions">
           <button className="pill">Next</button>
           <button className="pill danger">Lose</button>
         </div>
@@ -142,7 +118,7 @@ export default function App() {
       <section className="players">
         {players.map((p) => (
           <div key={p.name} className={`player ${p.status || ""}`}>
-            <div className="player-video" />
+            <div className="video-slot" />
             <div className="player-overlay">
               <span className="player-name">{p.name}</span>
               <span className="player-beers">🍺 {p.beers}</span>
