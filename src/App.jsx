@@ -19,8 +19,8 @@ const RULE_TEXT = {
   6: "Everyone drinks",
   7: "Heaven — last to press drinks",
   8: "Pick a mate",
-  9: "Rhyme — drawer enforces",
-  10: "Categories — drawer enforces",
+  9: "Rhyme — pick the loser",
+  10: "Categories — pick the loser",
   J: "Thumbmaster — last to press drinks",
   Q: "Question Master — answer = drink",
   K: "Make a rule",
@@ -50,6 +50,7 @@ export default function App() {
 
   const [turnIndex, setTurnIndex] = useState(0);
   const [phase, setPhase] = useState("WAITING");
+  // WAITING | IDLE | WATERFALL_READY | PICK_DRINK | PICK_MATE | PICK_LOSER | MAKE_RULE
 
   const [players, setPlayers] = useState(
     PLAYER_NAMES.map((name) => ({
@@ -186,8 +187,11 @@ export default function App() {
     }
 
     if (r === "8") return setPhase("PICK_MATE");
-    if (r === "9") return setPhase("RHYME");
-    if (r === "10") return setPhase("CATEGORIES");
+
+    if (r === "9" || r === "10") {
+      setPhase("PICK_LOSER");
+      return;
+    }
 
     if (r === "J" || r === "Q") {
       nextTurn();
@@ -208,6 +212,15 @@ export default function App() {
       setPhase("IDLE");
       nextTurn();
       setStatusWithTurn(`Picked ${name} to drink`);
+      return;
+    }
+
+    if (phase === "PICK_LOSER") {
+      flashPlayers([name]);
+      addDrink(name);
+      setPhase("IDLE");
+      nextTurn();
+      setStatusWithTurn(`Loser: ${name}`);
       return;
     }
 
@@ -250,7 +263,9 @@ export default function App() {
 
   const matesLines = useMemo(() => {
     const out = [];
-    players.forEach((p) => p.mates.forEach((m) => out.push(`${p.name} → ${m}`)));
+    players.forEach((p) =>
+      p.mates.forEach((m) => out.push(`${p.name} → ${m}`))
+    );
     return out;
   }, [players]);
 
@@ -268,15 +283,12 @@ export default function App() {
       <section className="top-grid">
         <Panel title="🤝 Mates" items={matesLines} />
 
-        {/* DECK / CARD — ALWAYS TAP TO DRAW */}
         <div className="panel card-panel">
           <div
             className={`card ${card ? "active" : "draw"} ${
               phase !== "IDLE" ? "disabled" : ""
             }`}
             onClick={drawCard}
-            role="button"
-            aria-disabled={phase !== "IDLE"}
           >
             {!card ? (
               "DRAW"
