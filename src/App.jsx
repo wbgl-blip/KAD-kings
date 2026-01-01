@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+// src/App.jsx
+import { useState, useMemo, useRef } from "react";
 import "./styles.css";
 
 /* =========================
@@ -48,7 +49,7 @@ export default function App() {
   const [card, setCard] = useState(null);
 
   const [turnIndex, setTurnIndex] = useState(0);
-  const [phase, setPhase] = useState("WAITING"); 
+  const [phase, setPhase] = useState("WAITING");
   // WAITING | IDLE | WATERFALL_READY | WATERFALL_ACTIVE | PICK_MATE | PICK_DRINK | RHYME | CATEGORIES | MAKE_RULE
 
   const [players, setPlayers] = useState(
@@ -62,11 +63,17 @@ export default function App() {
     }))
   );
 
-  const [statusText, setStatusText] = useState("Waiting for everyone to be ready");
+  const [statusText, setStatusText] = useState(
+    "Waiting for everyone to be ready"
+  );
   const [rules, setRules] = useState([]);
   const [ruleDraft, setRuleDraft] = useState("");
 
-  const currentPlayer = players[turnIndex];
+  // UI-only flash for "drink owed" (2s)
+  const [flashNames, setFlashNames] = useState(() => new Set());
+  const flashTimerRef = useRef(null);
+
+  const currentPlayer = useMemo(() => players[turnIndex], [players, turnIndex]);
 
   /* =========================
      HELPERS
@@ -78,19 +85,38 @@ export default function App() {
 
   function addDrink(name) {
     setPlayers((p) =>
-      p.map((pl) =>
-        pl.name === name ? { ...pl, beers: pl.beers + 1 } : pl
-      )
+      p.map((pl) => (pl.name === name ? { ...pl, beers: pl.beers + 1 } : pl))
     );
+  }
+
+  function flashPlayers(names) {
+    if (flashTimerRef.current) {
+      clearTimeout(flashTimerRef.current);
+      flashTimerRef.current = null;
+    }
+
+    const next = new Set(names);
+    setFlashNames(next);
+
+    flashTimerRef.current = setTimeout(() => {
+      setFlashNames(new Set());
+      flashTimerRef.current = null;
+    }, 2000);
   }
 
   function propagateDrink(name, visited = new Set()) {
     if (visited.has(name)) return;
     visited.add(name);
+
     addDrink(name);
 
     const player = players.find((p) => p.name === name);
     player?.mates.forEach((m) => propagateDrink(m, visited));
+  }
+
+  function setStatusWithTurn(message) {
+    const turn = currentPlayer?.name ? ` — ${currentPlayer.name}'s turn` : "";
+    setStatusText(`${message}${turn}`);
   }
 
   /* =========================
@@ -99,7 +125,7 @@ export default function App() {
 
   function startGame() {
     setPhase("IDLE");
-    setStatusText(`${currentPlayer.name}'s turn — draw a card`);
+    setStatusWithTurn("Draw a card");
   }
 
   function drawCard() {
@@ -110,7 +136,7 @@ export default function App() {
     setCard(next);
 
     const r = next.rank;
-    setStatusText(RULE_TEXT[r]);
+    setStatusWithTurn(RULE_TEXT[r]);
 
     // === RULE HANDLING ===
 
@@ -126,35 +152,39 @@ export default function App() {
     }
 
     if (r === "3") {
+      flashPlayers([currentPlayer.name]);
       propagateDrink(currentPlayer.name);
       nextTurn();
       return;
     }
 
     if (r === "4") {
-      players
-        .filter((p) => p.gender === "F")
-        .forEach((p) => propagateDrink(p.name));
+      const women = players.filter((p) => p.gender === "F").map((p) => p.name);
+      if (women.length) flashPlayers(women);
+      women.forEach((n) => propagateDrink(n));
       nextTurn();
       return;
     }
 
     if (r === "5") {
-      players
-        .filter((p) => p.gender === "M")
-        .forEach((p) => propagateDrink(p.name));
+      const guys = players.filter((p) => p.gender === "M").map((p) => p.name);
+      if (guys.length) flashPlayers(guys);
+      guys.forEach((n) => propagateDrink(n));
       nextTurn();
       return;
     }
 
     if (r === "6") {
-      players.forEach((p) => propagateDrink(p.name));
+      const all = players.map((p) => p.name);
+      flashPlayers(all);
+      all.forEach((n) => propagateDrink(n));
       nextTurn();
       return;
     }
 
     if (r === "7") {
-      setPhase("IDLE"); // Heaven trigger handled via button later
+      // Heaven trigger handled via Heaven button (later)
+      setPhase("IDLE");
       nextTurn();
       return;
     }
@@ -175,13 +205,13 @@ export default function App() {
     }
 
     if (r === "J") {
-      setStatusText("Thumbmaster active — holder may trigger anytime");
+      setStatusWithTurn("Thumbmaster active — can be triggered anytime");
       nextTurn();
       return;
     }
 
     if (r === "Q") {
-      setStatusText("Question Master active — answers cause drinks");
+      setStatusWithTurn("Question Master active — answers cause drinks");
       nextTurn();
       return;
     }
@@ -198,9 +228,12 @@ export default function App() {
 
   function tapPlayer(name) {
     if (phase === "PICK_DRINK") {
+      flashPlayers([name]);
       propagateDrink(name);
       setPhase("IDLE");
       nextTurn();
+      setStatusWithTurn(`Picked ${name} to drink`);
+      return;
     }
 
     if (phase === "PICK_MATE" && name !== currentPlayer.name) {
@@ -213,6 +246,8 @@ export default function App() {
       );
       setPhase("IDLE");
       nextTurn();
+      setStatusWithTurn(`${currentPlayer.name} picked ${name} as a mate`);
+      return;
     }
   }
 
@@ -222,6 +257,48 @@ export default function App() {
     setRuleDraft("");
     setPhase("IDLE");
     nextTurn();
+    setStatusWithTurn("Rule saved");
+  }
+
+  function onThumb() {
+    if (phase === "WAITING") return;
+    setStatusWithTurn("Thumb pressed");
+  }
+
+  function onHeaven() {
+    if (phase === "WAITING") return;
+    setStatusWithTurn("Heaven pressed");
+  }
+
+  function onReadyAction() {
+    if (phase === "WAITING") {
+      startGame();
+      return;
+    }
+
+    if (phase === "WATERFALL_READY") {
+      // Placeholder (logic later)
+      setStatusWithTurn("Waterfall ready (logic coming next)");
+      setPhase("IDLE");
+      nextTurn();
+      return;
+    }
+
+    setStatusWithTurn("Ready");
+  }
+
+  function enterFullscreen() {
+    const el = document.documentElement;
+
+    try {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+        return;
+      }
+      el.requestFullscreen?.();
+    } catch {
+      // do nothing; browser may block
+    }
   }
 
   /* =========================
@@ -233,6 +310,14 @@ export default function App() {
       {/* HEADER */}
       <header className="header">
         <h1>KAD Kings</h1>
+        <button
+          className="fullscreen-btn"
+          onClick={enterFullscreen}
+          aria-label="Fullscreen"
+          title="Fullscreen"
+        >
+          ⛶
+        </button>
       </header>
 
       {/* TOP GRID */}
@@ -257,6 +342,29 @@ export default function App() {
         <Panel title="📜 Rules" items={rules} />
       </section>
 
+      {/* ACTION BUTTONS (RESTORED) */}
+      <section className="actions">
+        <button
+          className="btn thumb"
+          onClick={onThumb}
+          disabled={phase === "WAITING"}
+        >
+          👍 Thumb
+        </button>
+
+        <button className="btn ready" onClick={onReadyAction}>
+          Ready
+        </button>
+
+        <button
+          className="btn heaven"
+          onClick={onHeaven}
+          disabled={phase === "WAITING"}
+        >
+          ☁ Heaven
+        </button>
+      </section>
+
       {/* STATUS BAR */}
       <section className="status-bar">
         <span>{statusText}</span>
@@ -264,17 +372,24 @@ export default function App() {
 
       {/* PLAYERS */}
       <section className="players">
-        {players.map((p) => (
-          <div
-            key={p.name}
-            className={`player ${p.name === currentPlayer.name ? "TURN" : ""}`}
-            onClick={() => tapPlayer(p.name)}
-          >
-            <div className="video-slot" />
-            <span className="player-name">{p.name}</span>
-            <span className="player-beers">🍺 {p.beers}</span>
-          </div>
-        ))}
+        {players.map((p) => {
+          const isTurn = p.name === currentPlayer.name;
+          const isFlashing = flashNames.has(p.name);
+
+          return (
+            <div
+              key={p.name}
+              className={`player ${isTurn ? "TURN" : ""} ${
+                isFlashing ? "FLASH" : ""
+              }`}
+              onClick={() => tapPlayer(p.name)}
+            >
+              <div className="video-slot" />
+              <span className="player-name">{p.name}</span>
+              <span className="player-beers">🍺 {p.beers}</span>
+            </div>
+          );
+        })}
       </section>
 
       {/* RULE INPUT */}
@@ -289,7 +404,7 @@ export default function App() {
         </div>
       )}
 
-      {/* START */}
+      {/* START (KEPT) */}
       {phase === "WAITING" && (
         <button className="start" onClick={startGame}>
           Ready
@@ -310,4 +425,4 @@ function Panel({ title, items = [] }) {
       ))}
     </div>
   );
-}
+         }
