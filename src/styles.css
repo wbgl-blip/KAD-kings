@@ -1,398 +1,369 @@
-/* src/styles.css */
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  background: radial-gradient(circle at top, #0f172a, #020617);
-  color: #fff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow: hidden; /* no page scroll on mobile */
-}
-
-button,
-input {
-  font: inherit;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-/* APP LAYOUT (NO SCROLL) */
-.app {
-  height: 100svh;
-  max-width: 430px;
-  margin: 0 auto;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  overflow: hidden;
-}
-
-/* In fullscreen, stop shrinking to 430px and use the whole viewport */
-:fullscreen .app,
-:-webkit-full-screen .app {
-  max-width: none;
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 16px;
-}
-
-/* HEADER */
-.header {
-  position: relative;
-  text-align: center;
-  flex: 0 0 auto;
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 800;
-}
-
-/* keep it in the top-right even in fullscreen */
-.fullscreen-btn {
-  position: fixed;
-  right: 12px;
-  top: 12px;
-  width: 44px;
-  height: 40px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
-  z-index: 50;
-}
-
-/* TOP GRID */
-.top-grid {
-  flex: 0 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-  height: 200px; /* fixed block so players can fill remaining space */
-}
-
-/* Panels */
-.panel {
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 18px;
-  padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.panel-title {
-  font-weight: 800;
-  margin-bottom: 8px;
-  opacity: 0.95;
-  font-size: 14px;
-}
-
-.row {
-  height: 34px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.78;
-  padding: 0 10px;
-  overflow: hidden;
-}
-
-.row-text {
-  display: block;
-  width: 100%;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
-}
-
-/* CARD / DECK */
-.card-panel {
-  justify-content: center;
-  align-items: center;
-}
-
-.card {
-  width: 100%;
-  height: 100%;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  user-select: none;
-  text-align: center;
-}
-
-.card.draw {
-  background: #9ca3af;
-  color: #111;
-  cursor: pointer;
-}
-
-.card-draw-label {
-  font-size: 18px;
-  letter-spacing: 0.12em;
-}
-
-.card.active {
-  background: #fff;
-  color: #000;
-  flex-direction: column;
-  padding: 10px;
-}
-
-.card.disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.rank {
-  font-size: 42px;
-  line-height: 1.05;
-}
-
-.rule-text {
-  font-size: 12px;
-  margin-top: 6px;
-  font-weight: 800;
-}
-
-.sub {
-  font-size: 12px;
-  opacity: 0.65;
-  margin-top: 4px;
-  font-weight: 800;
-}
-
-/* ACTION BUTTONS */
-.actions {
-  flex: 0 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-}
-
-.btn {
-  border: none;
-  border-radius: 14px;
-  padding: 12px;
-  font-size: 16px;
-  font-weight: 900;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.btn:disabled {
-  opacity: 0.45;
-}
-
-.btn.thumb {
-  background: #facc15;
-  color: #000;
-}
-
-.btn.ready {
-  background: #22c55e;
-  color: #000;
-}
-
-.btn.heaven {
-  background: #3b82f6;
-  color: #fff;
-}
-
-/* STATUS BAR */
-.status-bar {
-  flex: 0 0 auto;
-  background: rgba(255, 255, 255, 0.06);
-  padding: 10px;
-  border-radius: 14px;
-  font-size: 13px;
-  text-align: center;
-}
-
-.status-main {
-  font-weight: 800;
-}
-
-.status-meta {
-  margin-top: 8px;
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.meta-pill {
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.09);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  font-weight: 900;
-  font-size: 12px;
-}
-
-.meta-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  font-weight: 900;
-  font-size: 12px;
-}
-
-/* PLAYERS (FILL REMAINING HEIGHT) */
-.players {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.player {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 18px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  border: 2px solid transparent;
-  overflow: hidden;
-  min-height: 0;
-}
-
-.player.TURN {
-  border-color: #22c55e;
-}
-
-/* 2s drink flash */
-.player.FLASH {
-  border-color: rgba(255, 80, 80, 0.95);
-  box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
-}
-.player.FLASH::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 80, 80, 0.28);
-  pointer-events: none;
-  border-radius: inherit;
-}
-
-/* Video placeholder (prepared for real video later) */
-.video-slot {
-  flex: 1 1 auto;
-  min-height: 0;
-  background: #000;
-  border-radius: 12px;
-  margin-bottom: 8px;
-  pointer-events: none; /* IMPORTANT: does not block taps on the tile */
-}
-
-.player-footer {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.player-name {
-  font-weight: 900;
-  font-size: 18px;
-}
-
-.player-beers {
-  opacity: 0.9;
-  font-weight: 900;
-}
-
-/* RULE INPUT */
-.rule-input {
-  flex: 0 0 auto;
-  display: flex;
-  gap: 8px;
-}
-
-.rule-input input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-}
-
-.rule-input button {
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 900;
-}
-
-/* FULLSCREEN / LARGE VIEWPORT TUNING
-   - Enlarge player “video screens”
-   - Make mates/rules text smaller so it fits
-*/
-:fullscreen .top-grid,
-:-webkit-full-screen .top-grid {
-  height: 230px;
-}
-
-:fullscreen .row,
-:-webkit-full-screen .row {
-  height: 30px;
-}
-
-:fullscreen .row-text,
-:-webkit-full-screen .row-text {
-  font-size: 11px;
-}
-
-:fullscreen .panel-title,
-:-webkit-full-screen .panel-title {
-  font-size: 13px;
-}
-
-:fullscreen .players,
-:-webkit-full-screen .players {
-  gap: 12px;
-}
-
-:fullscreen .player,
-:-webkit-full-screen .player {
-  padding: 14px;
-}
-
-:fullscreen .video-slot,
-:-webkit-full-screen .video-slot {
-  border-radius: 14px;
-  margin-bottom: 10px;
-}
-
-:fullscreen .player-name,
-:-webkit-full-screen .player-name {
-  font-size: 20px;
-}
-
-:fullscreen .player-beers,
-:-webkit-full-screen .player-beers {
-  font-size: 14px;
-}
+001 /* src/styles.css */
+002 * {
+003   box-sizing: border-box;
+004 }
+005 
+006 html,
+007 body {
+008   height: 100%;
+009 }
+010 
+011 body {
+012   margin: 0;
+013   background: radial-gradient(circle at top, #0f172a, #020617);
+014   color: #fff;
+015   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+016   overflow: hidden; /* prevent page scroll */
+017 }
+018 
+019 button,
+020 input {
+021   font: inherit;
+022   -webkit-appearance: none;
+023   appearance: none;
+024 }
+025 
+026 /* =========================
+027    APP LAYOUT
+028 ========================= */
+029 .app {
+030   height: 100svh;
+031   max-width: 430px;
+032   margin: 0 auto;
+033   padding: 14px;
+034   display: flex;
+035   flex-direction: column;
+036   gap: 10px;
+037   overflow: hidden;
+038 }
+039 
+040 :fullscreen .app,
+041 :-webkit-full-screen .app {
+042   max-width: none;
+043   width: 100vw;
+044   height: 100vh;
+045   margin: 0;
+046   padding: 16px;
+047 }
+048 
+049 /* =========================
+050    HEADER
+051 ========================= */
+052 .header {
+053   position: relative;
+054   text-align: center;
+055 }
+056 
+057 .header h1 {
+058   margin: 0;
+059   font-size: 26px;
+060   font-weight: 800;
+061 }
+062 
+063 .fullscreen-btn {
+064   position: fixed;
+065   top: 12px;
+066   right: 12px;
+067   width: 44px;
+068   height: 40px;
+069   border-radius: 12px;
+070   border: 1px solid rgba(255, 255, 255, 0.12);
+071   background: rgba(255, 255, 255, 0.06);
+072   color: #fff;
+073   font-size: 16px;
+074   font-weight: 800;
+075   z-index: 50;
+076 }
+077 
+078 /* =========================
+079    TOP GRID
+080 ========================= */
+081 .top-grid {
+082   display: grid;
+083   grid-template-columns: 1fr 1fr 1fr;
+084   gap: 10px;
+085   height: 200px;
+086 }
+087 
+088 :fullscreen .top-grid,
+089 :-webkit-full-screen .top-grid {
+090   height: 230px;
+091 }
+092 
+093 /* =========================
+094    PANELS
+095 ========================= */
+096 .panel {
+097   background: rgba(255, 255, 255, 0.04);
+098   border-radius: 18px;
+099   padding: 10px;
+100   border: 1px solid rgba(255, 255, 255, 0.08);
+101   display: flex;
+102   flex-direction: column;
+103   overflow: hidden;
+104 }
+105 
+106 .panel-title {
+107   font-weight: 800;
+108   margin-bottom: 8px;
+109   opacity: 0.95;
+110   font-size: 14px;
+111 }
+112 
+113 :fullscreen .panel-title,
+114 :-webkit-full-screen .panel-title {
+115   font-size: 13px;
+116 }
+117 
+118 .row {
+119   height: 34px;
+120   border-radius: 999px;
+121   background: rgba(255, 255, 255, 0.06);
+122   margin-bottom: 6px;
+123   display: flex;
+124   align-items: center;
+125   justify-content: center;
+126   opacity: 0.78;
+127   padding: 0 10px;
+128   overflow: hidden;
+129 }
+130 
+131 :fullscreen .row,
+132 :-webkit-full-screen .row {
+133   height: 30px;
+134 }
+135 
+136 .row-text {
+137   width: 100%;
+138   text-align: center;
+139   overflow: hidden;
+140   text-overflow: ellipsis;
+141   white-space: nowrap;
+142   font-size: 12px;
+143 }
+144 
+145 :fullscreen .row-text,
+146 :-webkit-full-screen .row-text {
+147   font-size: 11px;
+148 }
+149 
+150 /* =========================
+151    CARD / DECK
+152 ========================= */
+153 .card-panel {
+154   display: flex;
+155   align-items: center;
+156   justify-content: center;
+157 }
+158 
+159 .card {
+160   width: 100%;
+161   height: 100%;
+162   border-radius: 16px;
+163   display: flex;
+164   align-items: center;
+165   justify-content: center;
+166   font-weight: 900;
+167   user-select: none;
+168   text-align: center;
+169 }
+170 
+171 .card.draw {
+172   background: #9ca3af;
+173   color: #111;
+174   cursor: pointer;
+175 }
+176 
+177 .card.active {
+178   background: #fff;
+179   color: #000;
+180   flex-direction: column;
+181   padding: 10px;
+182 }
+183 
+184 .card.disabled {
+185   opacity: 0.55;
+186   cursor: not-allowed;
+187 }
+188 
+189 .rank {
+190   font-size: 42px;
+191 }
+192 
+193 .rule-text {
+194   font-size: 12px;
+195   margin-top: 6px;
+196   font-weight: 800;
+197 }
+198 
+199 .sub {
+200   font-size: 12px;
+201   opacity: 0.65;
+202   margin-top: 4px;
+203   font-weight: 800;
+204 }
+205 
+206 /* =========================
+207    ACTION BUTTONS
+208 ========================= */
+209 .actions {
+210   display: grid;
+211   grid-template-columns: 1fr 1fr 1fr;
+212   gap: 10px;
+213 }
+214 
+215 .btn {
+216   border: none;
+217   border-radius: 14px;
+218   padding: 12px;
+219   font-size: 16px;
+220   font-weight: 900;
+221 }
+222 
+223 .btn.thumb {
+224   background: #facc15;
+225   color: #000;
+226 }
+227 
+228 .btn.ready {
+229   background: #22c55e;
+230   color: #000;
+231 }
+232 
+233 .btn.heaven {
+234   background: #3b82f6;
+235   color: #fff;
+236 }
+237 
+238 /* =========================
+239    STATUS BAR
+240 ========================= */
+241 .status-bar {
+242   background: rgba(255, 255, 255, 0.06);
+243   padding: 10px;
+244   border-radius: 14px;
+245   font-size: 13px;
+246   text-align: center;
+247 }
+248 
+249 .status-main {
+250   font-weight: 800;
+251 }
+252 
+253 .status-meta {
+254   margin-top: 8px;
+255   display: flex;
+256   gap: 8px;
+257   justify-content: center;
+258   flex-wrap: wrap;
+259 }
+260 
+261 .meta-pill {
+262   border-radius: 999px;
+263   padding: 6px 10px;
+264   background: rgba(255, 255, 255, 0.09);
+265   border: 1px solid rgba(255, 255, 255, 0.1);
+266   font-weight: 900;
+267   font-size: 12px;
+268 }
+269 
+270 .meta-btn {
+271   border-radius: 999px;
+272   padding: 6px 10px;
+273   background: rgba(255, 255, 255, 0.14);
+274   color: #fff;
+275   font-weight: 900;
+276   font-size: 12px;
+277   border: none;
+278 }
+279 
+280 /* =========================
+281    PLAYERS GRID
+282 ========================= */
+283 .players {
+284   flex: 1 1 auto;
+285   display: grid;
+286   grid-template-columns: 1fr 1fr;
+287   gap: 10px;
+288 }
+289 
+290 :fullscreen .players,
+291 :-webkit-full-screen .players {
+292   gap: 12px;
+293 }
+294 
+295 .player {
+296   position: relative;
+297   background: rgba(255, 255, 255, 0.05);
+298   border-radius: 18px;
+299   padding: 12px;
+300   display: flex;
+301   flex-direction: column;
+302   justify-content: flex-end;
+303   border: 2px solid transparent;
+304   overflow: hidden;
+305 }
+306 
+307 :fullscreen .player,
+308 :-webkit-full-screen .player {
+309   padding: 14px;
+310 }
+311 
+312 .player.TURN {
+313   border-color: #22c55e;
+314 }
+315 
+316 /* 2s DRINK FLASH — PLAYER TILE ONLY */
+317 .player.FLASH {
+318   border-color: rgba(255, 80, 80, 0.95);
+319   box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
+320 }
+321 
+322 .player.FLASH::after {
+323   content: "";
+324   position: absolute;
+325   inset: 0;
+326   background: rgba(255, 80, 80, 0.28);
+327   pointer-events: none;
+328   border-radius: inherit;
+329 }
+330 
+331 .video-slot {
+332   flex: 1;
+333   background: #000;
+334   border-radius: 12px;
+335   margin-bottom: 8px;
+336   pointer-events: none;
+337 }
+338 
+339 :fullscreen .video-slot,
+340 :-webkit-full-screen .video-slot {
+341   border-radius: 14px;
+342   margin-bottom: 10px;
+343 }
+344 
+345 .player-footer {
+346   display: flex;
+347   justify-content: space-between;
+348   align-items: baseline;
+349 }
+350 
+351 .player-name {
+352   font-weight: 900;
+353   font-size: 18px;
+354 }
+355 
+356 :fullscreen .player-name,
+357 :-webkit-full-screen .player-name {
+358   font-size: 20px;
+359 }
+360 
+361 .player-beers {
+362   font-weight: 900;
+363   opacity: 0.9;
+364 }
+365 
+366 :fullscreen .player-beers,
+367 :-webkit-full-screen .player-beers {
+368   font-size: 14px;
+369 }
