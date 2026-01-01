@@ -30,7 +30,10 @@ input {
   margin: 0;
 }
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
+
 .header {
   position: relative;
   text-align: center;
@@ -43,7 +46,7 @@ input {
   font-weight: 800;
 }
 
-/* keep it in the top-right even in fullscreen */
+/* Fullscreen button stays top-right */
 .fullscreen-btn {
   position: fixed;
   right: 12px;
@@ -59,7 +62,10 @@ input {
   z-index: 50;
 }
 
-/* TOP GRID */
+/* =========================
+   TOP GRID
+========================= */
+
 .top-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -92,7 +98,10 @@ input {
   opacity: 0.6;
 }
 
-/* CARD */
+/* =========================
+   CARD / DECK
+========================= */
+
 .card-panel {
   justify-content: center;
   align-items: center;
@@ -107,17 +116,12 @@ input {
   justify-content: center;
   font-weight: 800;
   user-select: none;
+  cursor: pointer;
 }
 
 .card.draw {
   background: #9ca3af;
   color: #111;
-  cursor: pointer;
-}
-
-.card.draw.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .card.active {
@@ -126,6 +130,12 @@ input {
   flex-direction: column;
   text-align: center;
   padding: 10px;
+}
+
+/* Disabled state for BOTH draw + active card */
+.card.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .rank {
@@ -142,7 +152,10 @@ input {
   opacity: 0.6;
 }
 
-/* ACTION BUTTONS (restore colored look everywhere) */
+/* =========================
+   ACTION BUTTONS
+========================= */
+
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -178,7 +191,10 @@ input {
   color: #fff;
 }
 
-/* STATUS BAR */
+/* =========================
+   STATUS BAR
+========================= */
+
 .status-bar {
   margin: 0 0 10px;
   background: rgba(255, 255, 255, 0.06);
@@ -188,7 +204,10 @@ input {
   text-align: center;
 }
 
-/* PLAYERS */
+/* =========================
+   PLAYERS
+========================= */
+
 .players {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -231,7 +250,10 @@ input {
   opacity: 0.85;
 }
 
-/* RULE INPUT */
+/* =========================
+   RULE INPUT
+========================= */
+
 .rule-input {
   margin-top: 10px;
   display: flex;
