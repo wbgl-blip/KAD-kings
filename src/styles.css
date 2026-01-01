@@ -1,73 +1,135 @@
+/* src/styles.css */
 * {
   box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
   margin: 0;
   background: radial-gradient(circle at top, #0f172a, #020617);
   color: #fff;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden; /* no page scroll on mobile */
 }
 
+button,
+input {
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* APP LAYOUT (NO SCROLL) */
 .app {
+  height: 100svh;
   max-width: 430px;
   margin: 0 auto;
   padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
 }
 
-:fullscreen .app {
+/* In fullscreen, stop shrinking to 430px and use the whole viewport */
+:fullscreen .app,
+:-webkit-full-screen .app {
   max-width: none;
   width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 16px;
 }
 
 /* HEADER */
 .header {
   position: relative;
   text-align: center;
-  margin-bottom: 10px;
+  flex: 0 0 auto;
 }
 
+.header h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+/* keep it in the top-right even in fullscreen */
 .fullscreen-btn {
   position: fixed;
   right: 12px;
   top: 12px;
-  background: rgba(255,255,255,0.1);
+  width: 44px;
+  height: 40px;
   border-radius: 12px;
-  padding: 8px;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
   color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  z-index: 50;
 }
 
-/* GRID */
+/* TOP GRID */
 .top-grid {
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
+  height: 200px; /* fixed block so players can fill remaining space */
 }
 
+/* Panels */
 .panel {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 18px;
   padding: 10px;
-  min-height: 220px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .panel-title {
   font-weight: 800;
   margin-bottom: 8px;
+  opacity: 0.95;
+  font-size: 14px;
 }
 
 .row {
-  height: 36px;
-  background: rgba(255,255,255,0.06);
+  height: 34px;
   border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
   margin-bottom: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.78;
+  padding: 0 10px;
+  overflow: hidden;
 }
 
-/* CARD */
+.row-text {
+  display: block;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+/* CARD / DECK */
+.card-panel {
+  justify-content: center;
+  align-items: center;
+}
+
 .card {
   width: 100%;
   height: 100%;
@@ -76,81 +138,261 @@ body {
   align-items: center;
   justify-content: center;
   font-weight: 900;
+  user-select: none;
+  text-align: center;
 }
 
 .card.draw {
   background: #9ca3af;
-  color: #000;
+  color: #111;
+  cursor: pointer;
+}
+
+.card-draw-label {
+  font-size: 18px;
+  letter-spacing: 0.12em;
 }
 
 .card.active {
   background: #fff;
   color: #000;
   flex-direction: column;
+  padding: 10px;
 }
 
 .card.disabled {
-  opacity: 0.5;
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
-/* ACTIONS */
+.rank {
+  font-size: 42px;
+  line-height: 1.05;
+}
+
+.rule-text {
+  font-size: 12px;
+  margin-top: 6px;
+  font-weight: 800;
+}
+
+.sub {
+  font-size: 12px;
+  opacity: 0.65;
+  margin-top: 4px;
+  font-weight: 800;
+}
+
+/* ACTION BUTTONS */
 .actions {
+  flex: 0 0 auto;
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  margin: 12px 0;
 }
 
 .btn {
+  border: none;
   border-radius: 14px;
   padding: 12px;
+  font-size: 16px;
   font-weight: 900;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.btn.thumb { background:#facc15; }
-.btn.ready { background:#22c55e; }
-.btn.heaven { background:#3b82f6; color:#fff; }
+.btn:disabled {
+  opacity: 0.45;
+}
 
-/* STATUS */
+.btn.thumb {
+  background: #facc15;
+  color: #000;
+}
+
+.btn.ready {
+  background: #22c55e;
+  color: #000;
+}
+
+.btn.heaven {
+  background: #3b82f6;
+  color: #fff;
+}
+
+/* STATUS BAR */
 .status-bar {
-  background: rgba(255,255,255,0.06);
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.06);
   padding: 10px;
   border-radius: 14px;
+  font-size: 13px;
   text-align: center;
 }
 
-/* PLAYERS */
+.status-main {
+  font-weight: 800;
+}
+
+.status-meta {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.meta-pill {
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.meta-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+/* PLAYERS (FILL REMAINING HEIGHT) */
 .players {
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
 .player {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   padding: 12px;
-  min-height: 120px;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
+  border: 2px solid transparent;
+  overflow: hidden;
+  min-height: 0;
 }
 
-.player.TURN { border:2px solid #22c55e; }
-.player.FLASH { border:2px solid red; }
+.player.TURN {
+  border-color: #22c55e;
+}
 
+/* 2s drink flash */
+.player.FLASH {
+  border-color: rgba(255, 80, 80, 0.95);
+  box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
+}
+.player.FLASH::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 80, 80, 0.28);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Video placeholder (prepared for real video later) */
 .video-slot {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   background: #000;
   border-radius: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  pointer-events: none; /* IMPORTANT: does not block taps on the tile */
 }
 
 .player-footer {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
+  gap: 10px;
+}
+
+.player-name {
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.player-beers {
+  opacity: 0.9;
   font-weight: 900;
 }
 
-/* FULLSCREEN SCALE */
-:fullscreen .player { min-height: 160px; }
-:fullscreen .row { font-size: 11px; }
+/* RULE INPUT */
+.rule-input {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+}
+
+.rule-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+.rule-input button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 900;
+}
+
+/* FULLSCREEN / LARGE VIEWPORT TUNING
+   - Enlarge player “video screens”
+   - Make mates/rules text smaller so it fits
+*/
+:fullscreen .top-grid,
+:-webkit-full-screen .top-grid {
+  height: 230px;
+}
+
+:fullscreen .row,
+:-webkit-full-screen .row {
+  height: 30px;
+}
+
+:fullscreen .row-text,
+:-webkit-full-screen .row-text {
+  font-size: 11px;
+}
+
+:fullscreen .panel-title,
+:-webkit-full-screen .panel-title {
+  font-size: 13px;
+}
+
+:fullscreen .players,
+:-webkit-full-screen .players {
+  gap: 12px;
+}
+
+:fullscreen .player,
+:-webkit-full-screen .player {
+  padding: 14px;
+}
+
+:fullscreen .video-slot,
+:-webkit-full-screen .video-slot {
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+:fullscreen .player-name,
+:-webkit-full-screen .player-name {
+  font-size: 20px;
+}
+
+:fullscreen .player-beers,
+:-webkit-full-screen .player-beers {
+  font-size: 14px;
+}
