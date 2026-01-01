@@ -50,13 +50,12 @@ export default function App() {
 
   const [turnIndex, setTurnIndex] = useState(0);
   const [phase, setPhase] = useState("WAITING");
-  // WAITING | IDLE | WATERFALL_READY | WATERFALL_ACTIVE | PICK_MATE | PICK_DRINK | RHYME | CATEGORIES | MAKE_RULE
 
   const [players, setPlayers] = useState(
     PLAYER_NAMES.map((name) => ({
       name,
       beers: 0,
-      gender: "M", // default; future UI hook
+      gender: "M",
       mates: [],
       ready: false,
     }))
@@ -68,15 +67,16 @@ export default function App() {
   const [rules, setRules] = useState([]);
   const [ruleDraft, setRuleDraft] = useState("");
 
-  // UI-only flash for "drink owed" (2s)
   const [flashNames, setFlashNames] = useState(() => new Set());
   const flashTimerRef = useRef(null);
 
-  // keep a fresh reference so mate-propagation doesn't use stale closures
   const playersRef = useRef(players);
   playersRef.current = players;
 
-  const currentPlayer = useMemo(() => players[turnIndex], [players, turnIndex]);
+  const currentPlayer = useMemo(
+    () => players[turnIndex],
+    [players, turnIndex]
+  );
 
   /* =========================
      HELPERS
@@ -88,33 +88,29 @@ export default function App() {
 
   function setStatusWithTurn(message) {
     const name = playersRef.current[turnIndex]?.name;
-    if (!name) return setStatusText(message);
-    setStatusText(`${message} — ${name}'s turn`);
+    setStatusText(name ? `${message} — ${name}'s turn` : message);
   }
 
   function addDrink(name) {
     setPlayers((p) =>
-      p.map((pl) => (pl.name === name ? { ...pl, beers: pl.beers + 1 } : pl))
+      p.map((pl) =>
+        pl.name === name ? { ...pl, beers: pl.beers + 1 } : pl
+      )
     );
   }
 
   function flashPlayers(names) {
-    if (flashTimerRef.current) {
-      clearTimeout(flashTimerRef.current);
-      flashTimerRef.current = null;
-    }
-
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
     setFlashNames(new Set(names));
-    flashTimerRef.current = setTimeout(() => {
-      setFlashNames(new Set());
-      flashTimerRef.current = null;
-    }, 2000);
+    flashTimerRef.current = setTimeout(
+      () => setFlashNames(new Set()),
+      2000
+    );
   }
 
   function propagateDrink(name, visited = new Set()) {
     if (visited.has(name)) return;
     visited.add(name);
-
     addDrink(name);
 
     const p = playersRef.current.find((x) => x.name === name);
@@ -140,18 +136,13 @@ export default function App() {
     const r = next.rank;
     setStatusWithTurn(RULE_TEXT[r]);
 
-    // === RULE HANDLING ===
-
     if (r === "A") {
       setPhase("WATERFALL_READY");
       setPlayers((p) => p.map((pl) => ({ ...pl, ready: false })));
       return;
     }
 
-    if (r === "2") {
-      setPhase("PICK_DRINK");
-      return;
-    }
+    if (r === "2") return setPhase("PICK_DRINK");
 
     if (r === "3") {
       flashPlayers([currentPlayer.name]);
@@ -164,8 +155,8 @@ export default function App() {
       const women = playersRef.current
         .filter((p) => p.gender === "F")
         .map((p) => p.name);
-      if (women.length) flashPlayers(women);
-      women.forEach((n) => propagateDrink(n));
+      flashPlayers(women);
+      women.forEach(propagateDrink);
       nextTurn();
       return;
     }
@@ -174,8 +165,8 @@ export default function App() {
       const guys = playersRef.current
         .filter((p) => p.gender === "M")
         .map((p) => p.name);
-      if (guys.length) flashPlayers(guys);
-      guys.forEach((n) => propagateDrink(n));
+      flashPlayers(guys);
+      guys.forEach(propagateDrink);
       nextTurn();
       return;
     }
@@ -183,49 +174,27 @@ export default function App() {
     if (r === "6") {
       const all = playersRef.current.map((p) => p.name);
       flashPlayers(all);
-      all.forEach((n) => propagateDrink(n));
+      all.forEach(propagateDrink);
       nextTurn();
       return;
     }
 
     if (r === "7") {
-      // Heaven resolved via Heaven button (later)
       setPhase("IDLE");
       nextTurn();
       return;
     }
 
-    if (r === "8") {
-      setPhase("PICK_MATE");
-      return;
-    }
+    if (r === "8") return setPhase("PICK_MATE");
+    if (r === "9") return setPhase("RHYME");
+    if (r === "10") return setPhase("CATEGORIES");
 
-    if (r === "9") {
-      setPhase("RHYME");
-      return;
-    }
-
-    if (r === "10") {
-      setPhase("CATEGORIES");
-      return;
-    }
-
-    if (r === "J") {
-      setStatusWithTurn("Thumbmaster active — can be triggered anytime");
+    if (r === "J" || r === "Q") {
       nextTurn();
       return;
     }
 
-    if (r === "Q") {
-      setStatusWithTurn("Question Master active — answers cause drinks");
-      nextTurn();
-      return;
-    }
-
-    if (r === "K") {
-      setPhase("MAKE_RULE");
-      return;
-    }
+    if (r === "K") return setPhase("MAKE_RULE");
   }
 
   /* =========================
@@ -253,7 +222,6 @@ export default function App() {
       setPhase("IDLE");
       nextTurn();
       setStatusWithTurn(`${currentPlayer.name} picked ${name} as a mate`);
-      return;
     }
   }
 
@@ -266,56 +234,23 @@ export default function App() {
     setStatusWithTurn("Rule saved");
   }
 
-  function onThumb() {
-    if (phase === "WAITING") return;
-    setStatusWithTurn("Thumb pressed");
-  }
-
-  function onHeaven() {
-    if (phase === "WAITING") return;
-    setStatusWithTurn("Heaven pressed");
-  }
-
   function onReadyAction() {
-    if (phase === "WAITING") {
-      startGame();
-      return;
-    }
-
-    if (phase === "WATERFALL_READY") {
-      // placeholder; later: ready-confirm waterfall flow
-      setPhase("IDLE");
-      nextTurn();
-      setStatusWithTurn("Waterfall confirmed");
-      return;
-    }
-
-    setStatusWithTurn("Ready");
+    if (phase === "WAITING") startGame();
   }
 
   function enterFullscreen() {
     const el = document.documentElement;
-    try {
-      if (document.fullscreenElement) {
-        document.exitFullscreen?.();
-        return;
-      }
-      el.requestFullscreen?.();
-    } catch {
-      // some browsers block; ignore
-    }
+    if (document.fullscreenElement) document.exitFullscreen?.();
+    else el.requestFullscreen?.();
   }
 
   /* =========================
-     MATES LIST (UI)
+     MATES LIST
   ========================= */
 
   const matesLines = useMemo(() => {
-    // A → B (not chained)
     const out = [];
-    players.forEach((p) => {
-      p.mates.forEach((m) => out.push(`${p.name} → ${m}`));
-    });
+    players.forEach((p) => p.mates.forEach((m) => out.push(`${p.name} → ${m}`)));
     return out;
   }, [players]);
 
@@ -325,100 +260,64 @@ export default function App() {
 
   return (
     <div className="app">
-      {/* HEADER */}
       <header className="header">
         <h1>KAD Kings</h1>
-
-        <button
-          className="fullscreen-btn"
-          onClick={enterFullscreen}
-          aria-label="Fullscreen"
-          title="Fullscreen"
-        >
-          ⛶
-        </button>
+        <button className="fullscreen-btn" onClick={enterFullscreen}>⛶</button>
       </header>
 
-      {/* TOP GRID */}
       <section className="top-grid">
         <Panel title="🤝 Mates" items={matesLines} />
 
+        {/* DECK / CARD — ALWAYS TAP TO DRAW */}
         <div className="panel card-panel">
-          {!card ? (
-            <div
-              className={`card draw ${phase !== "IDLE" ? "disabled" : ""}`}
-              onClick={drawCard}
-              role="button"
-              aria-disabled={phase !== "IDLE"}
-            >
-              DRAW
-            </div>
-          ) : (
-            <div className="card active">
-              <div className="rank">
-                {card.rank}
-                {card.suit}
-              </div>
-              <div className="rule-text">{RULE_TEXT[card.rank]}</div>
-              <div className="sub">{deck.length} cards remaining</div>
-            </div>
-          )}
+          <div
+            className={`card ${card ? "active" : "draw"} ${
+              phase !== "IDLE" ? "disabled" : ""
+            }`}
+            onClick={drawCard}
+            role="button"
+            aria-disabled={phase !== "IDLE"}
+          >
+            {!card ? (
+              "DRAW"
+            ) : (
+              <>
+                <div className="rank">
+                  {card.rank}
+                  {card.suit}
+                </div>
+                <div className="rule-text">{RULE_TEXT[card.rank]}</div>
+                <div className="sub">{deck.length} cards remaining</div>
+              </>
+            )}
+          </div>
         </div>
 
         <Panel title="📜 Rules" items={rules} />
       </section>
 
-      {/* ACTION BUTTONS (KEEP) */}
       <section className="actions">
-        <button
-          className="btn thumb"
-          onClick={onThumb}
-          disabled={phase === "WAITING"}
-        >
-          👍 Thumb
-        </button>
-
-        <button className="btn ready" onClick={onReadyAction}>
-          Ready
-        </button>
-
-        <button
-          className="btn heaven"
-          onClick={onHeaven}
-          disabled={phase === "WAITING"}
-        >
-          ☁ Heaven
-        </button>
+        <button className="btn ready" onClick={onReadyAction}>Ready</button>
       </section>
 
-      {/* STATUS BAR */}
-      <section className="status-bar">
-        <span>{statusText}</span>
-      </section>
+      <section className="status-bar">{statusText}</section>
 
-      {/* PLAYERS */}
       <section className="players">
-        {players.map((p) => {
-          const isTurn = p.name === currentPlayer?.name;
-          const isFlashing = flashNames.has(p.name);
-
-          return (
-            <div
-              key={p.name}
-              className={`player ${isTurn ? "TURN" : ""} ${
-                isFlashing ? "FLASH" : ""
-              }`}
-              onClick={() => tapPlayer(p.name)}
-            >
-              <div className="video-slot" />
-              <span className="player-name">{p.name}</span>
-              <span className="player-beers">🍺 {p.beers}</span>
-            </div>
-          );
-        })}
+        {players.map((p) => (
+          <div
+            key={p.name}
+            className={`player ${p.name === currentPlayer?.name ? "TURN" : ""} ${
+              flashNames.has(p.name) ? "FLASH" : ""
+            }`}
+            onClick={() => tapPlayer(p.name)}
+          >
+            <div className="video-slot" />
+            <span className="player-name">{p.name}</span>
+            <span className="player-beers">🍺 {p.beers}</span>
+          </div>
+        ))}
       </section>
 
-      {/* RULE INPUT */}
       {phase === "MAKE_RULE" && (
         <div className="rule-input">
           <input
@@ -444,4 +343,4 @@ function Panel({ title, items = [] }) {
       ))}
     </div>
   );
-         }
+}
