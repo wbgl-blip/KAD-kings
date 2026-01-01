@@ -10,7 +10,7 @@ const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 const RULE_TEXT = {
-  A: "Waterfall — wait for ready, drawer drinks first",
+  A: "Waterfall — drawer drinks first, clockwise",
   2: "Pick someone to drink",
   3: "Me — drawer drinks",
   4: "Women drink",
@@ -49,7 +49,7 @@ export default function App() {
 
   const [turnIndex, setTurnIndex] = useState(0);
   const [phase, setPhase] = useState("WAITING");
-  // WAITING | IDLE | PICK_DRINK | PICK_MATE | THUMB_RACE | HEAVEN_RACE | QUESTION_PICK | MAKE_RULE
+  // WAITING | IDLE | PICK_DRINK | PICK_MATE | THUMB_RACE | HEAVEN_RACE | MAKE_RULE
 
   const [players, setPlayers] = useState(
     PLAYER_NAMES.map(name => ({
@@ -62,18 +62,16 @@ export default function App() {
 
   const [statusText, setStatusText] = useState("Waiting for everyone to be ready");
 
-  const [thumbHolder, setThumbHolder] = useState(null);
-  const [heavenHolder, setHeavenHolder] = useState(null);
-  const [questionHolder, setQuestionHolder] = useState(null);
-
-  const [raceReacted, setRaceReacted] = useState(new Set());
   const [flashNames, setFlashNames] = useState(new Set());
-
   const flashTimer = useRef(null);
+
   const playersRef = useRef(players);
   playersRef.current = players;
 
-  const currentPlayer = players[turnIndex];
+  const currentPlayer = useMemo(
+    () => players[turnIndex],
+    [players, turnIndex]
+  );
 
   /* =========================
      HELPERS
@@ -91,7 +89,9 @@ export default function App() {
 
   function addDrink(name) {
     setPlayers(p =>
-      p.map(pl => pl.name === name ? { ...pl, beers: pl.beers + 1 } : pl)
+      p.map(pl =>
+        pl.name === name ? { ...pl, beers: pl.beers + 1 } : pl
+      )
     );
   }
 
@@ -124,9 +124,8 @@ export default function App() {
 
     if (r === "2") return setPhase("PICK_DRINK");
     if (r === "8") return setPhase("PICK_MATE");
-    if (r === "J") return setThumbHolder(currentPlayer.name);
-    if (r === "7") return setHeavenHolder(currentPlayer.name);
-    if (r === "Q") return setQuestionHolder(currentPlayer.name);
+    if (r === "7") return setPhase("HEAVEN_RACE");
+    if (r === "J") return setPhase("THUMB_RACE");
     if (r === "K") return setPhase("MAKE_RULE");
 
     if (r === "3") {
@@ -148,41 +147,6 @@ export default function App() {
   }
 
   /* =========================
-     RACES
-  ========================= */
-
-  function startThumb() {
-    if (!thumbHolder) return;
-    setRaceReacted(new Set());
-    setPhase("THUMB_RACE");
-    setStatusText("Thumbmaster active — tap your tile!");
-  }
-
-  function startHeaven() {
-    if (!heavenHolder) return;
-    setRaceReacted(new Set());
-    setPhase("HEAVEN_RACE");
-    setStatusText("Heaven active — tap your tile!");
-  }
-
-  function handleRaceTap(name) {
-    if (raceReacted.has(name)) return;
-
-    const next = new Set(raceReacted);
-    next.add(name);
-    setRaceReacted(next);
-
-    if (next.size === playersRef.current.length - 1) {
-      const loser = playersRef.current.find(p => !next.has(p.name)).name;
-      flash([loser]);
-      propagateDrink(loser);
-      setPhase("IDLE");
-      setStatusText(`${loser} was last — drinks`);
-      nextTurn();
-    }
-  }
-
-  /* =========================
      INTERACTIONS
   ========================= */
 
@@ -192,6 +156,7 @@ export default function App() {
       propagateDrink(name);
       setPhase("IDLE");
       nextTurn();
+      setStatusText(`${name} drinks`);
       return;
     }
 
@@ -205,19 +170,16 @@ export default function App() {
       );
       setPhase("IDLE");
       nextTurn();
+      setStatusText(`${currentPlayer.name} picked ${name} as a mate`);
       return;
     }
 
     if (phase === "THUMB_RACE" || phase === "HEAVEN_RACE") {
-      handleRaceTap(name);
-      return;
-    }
-
-    if (phase === "QUESTION_PICK") {
       flash([name]);
       propagateDrink(name);
       setPhase("IDLE");
-      setStatusText(`${name} answered — drinks`);
+      nextTurn();
+      setStatusText(`${name} was last — drinks`);
     }
   }
 
@@ -233,32 +195,47 @@ export default function App() {
 
       <section className="top-grid">
         <div className="panel" />
+
         <div className="panel card-panel">
-          <div className="card draw" onClick={drawCard}>
-            {card ? (
+          <div
+            className="card draw"
+            onClick={drawCard}
+          >
+            {!card ? (
+              "DRAW"
+            ) : (
               <>
-                <div className="rank">{card.rank}{card.suit}</div>
-                <div className="sub">{deck.length} cards left</div>
+                <div className="rank">
+                  {card.rank}{card.suit}
+                </div>
+                <div className="rule-text">{RULE_TEXT[card.rank]}</div>
+                <div className="sub">{deck.length} cards remaining</div>
               </>
-            ) : "DRAW"}
+            )}
           </div>
         </div>
+
         <div className="panel" />
       </section>
 
+      {/* ACTION BUTTONS — ALWAYS PRESENT */}
       <section className="actions">
-        <button className="btn thumb" onClick={startThumb}>👍 Thumb</button>
+        <button className="btn thumb">👍 Thumb</button>
         <button className="btn ready" onClick={startGame}>Ready</button>
-        <button className="btn heaven" onClick={startHeaven}>☁ Heaven</button>
+        <button className="btn heaven">☁ Heaven</button>
       </section>
 
-      <section className="status-bar">{statusText}</section>
+      <section className="status-bar">
+        {statusText}
+      </section>
 
       <section className="players">
         {players.map(p => (
           <div
             key={p.name}
-            className={`player ${p.name === currentPlayer?.name ? "TURN" : ""} ${flashNames.has(p.name) ? "FLASH" : ""}`}
+            className={`player ${p.name === currentPlayer?.name ? "TURN" : ""} ${
+              flashNames.has(p.name) ? "FLASH" : ""
+            }`}
             onClick={() => tapPlayer(p.name)}
           >
             <div className="video-slot" />
