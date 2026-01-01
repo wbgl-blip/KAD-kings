@@ -1,4 +1,3 @@
-/* src/styles.css */
 * {
   box-sizing: border-box;
 }
@@ -10,32 +9,14 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-button,
-input {
-  font: inherit;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
 .app {
   max-width: 430px;
   margin: 0 auto;
   padding: 14px;
 }
 
-/* In fullscreen, stop shrinking to 430px */
-:fullscreen .app {
-  max-width: none;
-  width: 100vw;
-  margin: 0;
-}
-
-/* =========================
-   HEADER
-========================= */
-
+/* HEADER */
 .header {
-  position: relative;
   text-align: center;
   margin-bottom: 10px;
 }
@@ -46,26 +27,7 @@ input {
   font-weight: 800;
 }
 
-/* Fullscreen button stays top-right */
-.fullscreen-btn {
-  position: fixed;
-  right: 12px;
-  top: 12px;
-  width: 44px;
-  height: 40px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
-  z-index: 50;
-}
-
-/* =========================
-   TOP GRID
-========================= */
-
+/* TOP GRID */
 .top-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -73,94 +35,36 @@ input {
 }
 
 .panel {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255,255,255,0.04);
   border-radius: 18px;
-  padding: 10px;
-  min-height: 220px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
+  min-height: 180px;
 }
-
-.panel-title {
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.row {
-  height: 36px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.6;
-}
-
-/* =========================
-   CARD / DECK
-========================= */
 
 .card-panel {
-  justify-content: center;
+  display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .card {
   width: 100%;
   height: 100%;
   border-radius: 16px;
+  background: #9ca3af;
+  color: #111;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  user-select: none;
-  cursor: pointer;
-}
-
-.card.draw {
-  background: #9ca3af;
-  color: #111;
-}
-
-.card.active {
-  background: #fff;
-  color: #000;
   flex-direction: column;
-  text-align: center;
-  padding: 10px;
 }
 
-/* Disabled state for BOTH draw + active card */
-.card.disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.rank {
-  font-size: 42px;
-}
-
-.rule-text {
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-.sub {
-  font-size: 12px;
-  opacity: 0.6;
-}
-
-/* =========================
-   ACTION BUTTONS
-========================= */
-
+/* ACTIONS */
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  margin: 12px 0 8px;
+  margin: 12px 0;
 }
 
 .btn {
@@ -169,11 +73,6 @@ input {
   padding: 12px;
   font-size: 16px;
   font-weight: 800;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.btn:disabled {
-  opacity: 0.45;
 }
 
 .btn.thumb {
@@ -191,23 +90,16 @@ input {
   color: #fff;
 }
 
-/* =========================
-   STATUS BAR
-========================= */
-
+/* STATUS */
 .status-bar {
-  margin: 0 0 10px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255,255,255,0.06);
   padding: 10px;
   border-radius: 14px;
-  font-size: 13px;
   text-align: center;
+  margin-bottom: 10px;
 }
 
-/* =========================
-   PLAYERS
-========================= */
-
+/* PLAYERS */
 .players {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -215,15 +107,14 @@ input {
 }
 
 .player {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255,255,255,0.05);
   border-radius: 18px;
   padding: 12px;
-  min-height: 100px;
+  min-height: 120px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   border: 2px solid transparent;
-  overflow: hidden;
 }
 
 .player.TURN {
@@ -231,8 +122,8 @@ input {
 }
 
 .player.FLASH {
-  border-color: rgba(255, 80, 80, 0.95);
-  box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
+  border-color: #ef4444;
+  box-shadow: inset 0 0 0 2px rgba(239,68,68,0.5);
 }
 
 .video-slot {
@@ -248,28 +139,4 @@ input {
 
 .player-beers {
   opacity: 0.85;
-}
-
-/* =========================
-   RULE INPUT
-========================= */
-
-.rule-input {
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
-}
-
-.rule-input input {
-  flex: 1;
-  padding: 8px;
-  border-radius: 8px;
-  border: none;
-}
-
-.rule-input button {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 800;
 }
