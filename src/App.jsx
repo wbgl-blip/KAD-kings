@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useState, useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import "./styles.css";
 
 /* =========================
@@ -58,7 +58,6 @@ export default function App() {
       beers: 0,
       gender: "M", // default; future UI hook
       mates: [],
-      status: null,
       ready: false,
     }))
   );
@@ -73,6 +72,10 @@ export default function App() {
   const [flashNames, setFlashNames] = useState(() => new Set());
   const flashTimerRef = useRef(null);
 
+  // keep a fresh reference so mate-propagation doesn't use stale closures
+  const playersRef = useRef(players);
+  playersRef.current = players;
+
   const currentPlayer = useMemo(() => players[turnIndex], [players, turnIndex]);
 
   /* =========================
@@ -80,7 +83,13 @@ export default function App() {
   ========================= */
 
   function nextTurn() {
-    setTurnIndex((i) => (i + 1) % players.length);
+    setTurnIndex((i) => (i + 1) % playersRef.current.length);
+  }
+
+  function setStatusWithTurn(message) {
+    const name = playersRef.current[turnIndex]?.name;
+    if (!name) return setStatusText(message);
+    setStatusText(`${message} — ${name}'s turn`);
   }
 
   function addDrink(name) {
@@ -95,9 +104,7 @@ export default function App() {
       flashTimerRef.current = null;
     }
 
-    const next = new Set(names);
-    setFlashNames(next);
-
+    setFlashNames(new Set(names));
     flashTimerRef.current = setTimeout(() => {
       setFlashNames(new Set());
       flashTimerRef.current = null;
@@ -110,13 +117,8 @@ export default function App() {
 
     addDrink(name);
 
-    const player = players.find((p) => p.name === name);
-    player?.mates.forEach((m) => propagateDrink(m, visited));
-  }
-
-  function setStatusWithTurn(message) {
-    const turn = currentPlayer?.name ? ` — ${currentPlayer.name}'s turn` : "";
-    setStatusText(`${message}${turn}`);
+    const p = playersRef.current.find((x) => x.name === name);
+    (p?.mates || []).forEach((m) => propagateDrink(m, visited));
   }
 
   /* =========================
@@ -159,7 +161,9 @@ export default function App() {
     }
 
     if (r === "4") {
-      const women = players.filter((p) => p.gender === "F").map((p) => p.name);
+      const women = playersRef.current
+        .filter((p) => p.gender === "F")
+        .map((p) => p.name);
       if (women.length) flashPlayers(women);
       women.forEach((n) => propagateDrink(n));
       nextTurn();
@@ -167,7 +171,9 @@ export default function App() {
     }
 
     if (r === "5") {
-      const guys = players.filter((p) => p.gender === "M").map((p) => p.name);
+      const guys = playersRef.current
+        .filter((p) => p.gender === "M")
+        .map((p) => p.name);
       if (guys.length) flashPlayers(guys);
       guys.forEach((n) => propagateDrink(n));
       nextTurn();
@@ -175,7 +181,7 @@ export default function App() {
     }
 
     if (r === "6") {
-      const all = players.map((p) => p.name);
+      const all = playersRef.current.map((p) => p.name);
       flashPlayers(all);
       all.forEach((n) => propagateDrink(n));
       nextTurn();
@@ -183,7 +189,7 @@ export default function App() {
     }
 
     if (r === "7") {
-      // Heaven trigger handled via Heaven button (later)
+      // Heaven resolved via Heaven button (later)
       setPhase("IDLE");
       nextTurn();
       return;
@@ -277,10 +283,10 @@ export default function App() {
     }
 
     if (phase === "WATERFALL_READY") {
-      // Placeholder (logic later)
-      setStatusWithTurn("Waterfall ready (logic coming next)");
+      // placeholder; later: ready-confirm waterfall flow
       setPhase("IDLE");
       nextTurn();
+      setStatusWithTurn("Waterfall confirmed");
       return;
     }
 
@@ -289,7 +295,6 @@ export default function App() {
 
   function enterFullscreen() {
     const el = document.documentElement;
-
     try {
       if (document.fullscreenElement) {
         document.exitFullscreen?.();
@@ -297,9 +302,22 @@ export default function App() {
       }
       el.requestFullscreen?.();
     } catch {
-      // do nothing; browser may block
+      // some browsers block; ignore
     }
   }
+
+  /* =========================
+     MATES LIST (UI)
+  ========================= */
+
+  const matesLines = useMemo(() => {
+    // A → B (not chained)
+    const out = [];
+    players.forEach((p) => {
+      p.mates.forEach((m) => out.push(`${p.name} → ${m}`));
+    });
+    return out;
+  }, [players]);
 
   /* =========================
      RENDER
@@ -310,6 +328,7 @@ export default function App() {
       {/* HEADER */}
       <header className="header">
         <h1>KAD Kings</h1>
+
         <button
           className="fullscreen-btn"
           onClick={enterFullscreen}
@@ -322,10 +341,16 @@ export default function App() {
 
       {/* TOP GRID */}
       <section className="top-grid">
-        <Panel title="🤝 Mates" />
+        <Panel title="🤝 Mates" items={matesLines} />
+
         <div className="panel card-panel">
           {!card ? (
-            <div className="card draw" onClick={drawCard}>
+            <div
+              className={`card draw ${phase !== "IDLE" ? "disabled" : ""}`}
+              onClick={drawCard}
+              role="button"
+              aria-disabled={phase !== "IDLE"}
+            >
               DRAW
             </div>
           ) : (
@@ -339,10 +364,11 @@ export default function App() {
             </div>
           )}
         </div>
+
         <Panel title="📜 Rules" items={rules} />
       </section>
 
-      {/* ACTION BUTTONS (RESTORED) */}
+      {/* ACTION BUTTONS (KEEP) */}
       <section className="actions">
         <button
           className="btn thumb"
@@ -373,7 +399,7 @@ export default function App() {
       {/* PLAYERS */}
       <section className="players">
         {players.map((p) => {
-          const isTurn = p.name === currentPlayer.name;
+          const isTurn = p.name === currentPlayer?.name;
           const isFlashing = flashNames.has(p.name);
 
           return (
@@ -402,13 +428,6 @@ export default function App() {
           />
           <button onClick={submitRule}>Save Rule</button>
         </div>
-      )}
-
-      {/* START (KEPT) */}
-      {phase === "WAITING" && (
-        <button className="start" onClick={startGame}>
-          Ready
-        </button>
       )}
     </div>
   );
