@@ -3,92 +3,124 @@ import "./styles.css";
 
 const PLAYER_NAMES = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
 
-const CARD_RULES = {
-  A: "Waterfall — everyone drinks together",
-  "2": "You — pick someone to drink",
-  "3": "Me — you drink",
-  "4": "Floor — last to touch drinks",
-  "5": "Guys drink",
-  "6": "Chicks drink",
-  "7": "Heaven — last to raise hand drinks",
-  "8": "Mate — choose a mate",
-  "9": "Rhyme — start a rhyme",
-  "10": "Categories — pick a category",
-  J: "Make a rule",
-  Q: "Question master",
-  K: "King — pour into the cup",
+const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+const SUITS = ["♠","♥","♦","♣"];
+
+// Reduced + locked rules
+const RULE_TEXT = {
+  "4": "4s for Whores — Everyone drinks",
+  "6": "6s for Dicks — Everyone drinks",
+  "7": "Heaven — Last to hit Heaven drinks",
+  "J": "Thumbmaster — Last to hit Thumb drinks",
+  "K": "Make a Rule — Create a house rule",
 };
 
+function buildDeck() {
+  const deck = [];
+  RANKS.forEach(r => SUITS.forEach(s => deck.push({ rank: r, suit: s })));
+  return deck.sort(() => Math.random() - 0.5);
+}
+
 export default function App() {
-  const [phase, setPhase] = useState("WAITING"); // WAITING | PLAYING
+  const [phase, setPhase] = useState("WAITING"); 
+  const [deck, setDeck] = useState(buildDeck);
+  const [card, setCard] = useState(null);
+
   const [players, setPlayers] = useState(
-    PLAYER_NAMES.map((name) => ({
+    PLAYER_NAMES.map(name => ({
       name,
       beers: 0,
       status: null,
     }))
   );
+
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [card, setCard] = useState(null);
-  const [statusMessage, setStatusMessage] = useState(
-    "Waiting for players to get ready"
-  );
+  const [statusText, setStatusText] = useState("Waiting to start");
+  const [houseRules, setHouseRules] = useState([]);
+  const [ruleInput, setRuleInput] = useState("");
+
+  /* =====================
+     GAME FLOW
+  ===================== */
 
   function startGame() {
     if (phase !== "WAITING") return;
-
     setPhase("PLAYING");
-    setCurrentIndex(0);
-    setPlayers((prev) =>
-      prev.map((p, i) => ({
-        ...p,
+    setPlayers(p =>
+      p.map((pl, i) => ({
+        ...pl,
         status: i === 0 ? "TURN" : null,
       }))
     );
-    setStatusMessage(`${players[0].name} starts`);
+    setStatusText(`${players[0].name} starts`);
   }
 
   function drawCard() {
     if (phase !== "PLAYING") return;
+    if (deck.length === 0) {
+      setStatusText("Deck empty — Game Over");
+      return;
+    }
 
-    const ranks = Object.keys(CARD_RULES);
-    const suits = ["♠", "♥", "♦", "♣"];
-    const rank = ranks[Math.floor(Math.random() * ranks.length)];
-    const suit = suits[Math.floor(Math.random() * suits.length)];
+    const [next, ...rest] = deck;
+    setDeck(rest);
+    setCard(next);
 
-    setCard({
-      rank,
-      suit,
-      remaining: Math.floor(Math.random() * 40) + 10,
-    });
-
-    setStatusMessage(
-      `${players[currentIndex].name}: ${CARD_RULES[rank]}`
+    const rule = RULE_TEXT[next.rank];
+    setStatusText(
+      rule
+        ? `${players[currentIndex].name}: ${rule}`
+        : `${players[currentIndex].name} drew ${next.rank}${next.suit}`
     );
+
+    if (next.rank === "K") {
+      setPhase("MAKE_RULE");
+    }
   }
 
   function nextTurn() {
-    const nextIndex = (currentIndex + 1) % players.length;
-
-    setPlayers((prev) =>
-      prev.map((p, i) => ({
-        ...p,
-        status: i === nextIndex ? "TURN" : null,
+    const next = (currentIndex + 1) % players.length;
+    setPlayers(p =>
+      p.map((pl, i) => ({
+        ...pl,
+        status: i === next ? "TURN" : null,
       }))
     );
-
-    setCurrentIndex(nextIndex);
+    setCurrentIndex(next);
     setCard(null);
-    setStatusMessage(`${players[nextIndex].name}'s turn`);
+    setPhase("PLAYING");
+    setStatusText(`${players[next].name}'s turn`);
   }
 
-  function loseTurn() {
-    setPlayers((prev) =>
-      prev.map((p, i) =>
-        i === currentIndex ? { ...p, beers: p.beers + 1 } : p
+  function giveDrink(index) {
+    setPlayers(p =>
+      p.map((pl, i) =>
+        i === index ? { ...pl, beers: pl.beers + 1 } : pl
       )
     );
+  }
+
+  /* =====================
+     KING → MAKE RULE
+  ===================== */
+
+  function submitRule() {
+    if (!ruleInput.trim()) return;
+    setHouseRules(r => [...r, ruleInput.trim()]);
+    setRuleInput("");
     nextTurn();
+  }
+
+  /* =====================
+     UI ACTIONS (STUBBED)
+  ===================== */
+
+  function triggerHeaven() {
+    setStatusText("Heaven triggered — last to press drinks");
+  }
+
+  function triggerThumb() {
+    setStatusText("Thumb triggered — last to press drinks");
   }
 
   return (
@@ -113,17 +145,21 @@ export default function App() {
                 {card.rank}
                 {card.suit}
               </div>
-              <div className="sub">{card.remaining} left</div>
+              <div className="sub">{deck.length} cards left</div>
             </div>
           )}
         </div>
 
-        <Panel title="📜 Rules" />
+        <Panel title="📜 Rules" items={houseRules} />
       </section>
 
-      {/* ACTIONS */}
+      {/* ACTION BUTTONS */}
       <section className="actions">
-        <button className="btn thumb" disabled={phase !== "PLAYING"}>
+        <button
+          className="btn thumb"
+          onClick={triggerThumb}
+          disabled={phase !== "PLAYING"}
+        >
           👍 Thumb
         </button>
 
@@ -135,25 +171,40 @@ export default function App() {
           Ready
         </button>
 
-        <button className="btn heaven" disabled={phase !== "PLAYING"}>
+        <button
+          className="btn heaven"
+          onClick={triggerHeaven}
+          disabled={phase !== "PLAYING"}
+        >
           ☁ Heaven
         </button>
       </section>
 
       {/* STATUS BAR */}
       <section className="status-bar">
-        <span className="status-text">{statusMessage}</span>
-        <button className="pill" onClick={nextTurn}>
-          Next
-        </button>
-        <button className="pill danger" onClick={loseTurn}>
-          Lose
-        </button>
+        <span className="status-text">{statusText}</span>
+        {phase === "PLAYING" && (
+          <button className="pill" onClick={nextTurn}>
+            Next
+          </button>
+        )}
       </section>
+
+      {/* KING RULE INPUT */}
+      {phase === "MAKE_RULE" && (
+        <div className="rule-input">
+          <input
+            value={ruleInput}
+            onChange={e => setRuleInput(e.target.value)}
+            placeholder="Type the new rule…"
+          />
+          <button onClick={submitRule}>Save Rule</button>
+        </div>
+      )}
 
       {/* PLAYERS */}
       <section className="players">
-        {players.map((p) => (
+        {players.map((p, i) => (
           <div key={p.name} className={`player ${p.status || ""}`}>
             <div className="video-tile" />
             <div className="player-info">
@@ -167,13 +218,17 @@ export default function App() {
   );
 }
 
-function Panel({ title }) {
+function Panel({ title, items = [] }) {
   return (
     <div className="panel">
       <div className="panel-title">{title}</div>
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className="row">—</div>
-      ))}
+      {items.length === 0
+        ? [...Array(4)].map((_, i) => (
+            <div key={i} className="row muted">—</div>
+          ))
+        : items.map((r, i) => (
+            <div key={i} className="row">{r}</div>
+          ))}
     </div>
   );
 }
