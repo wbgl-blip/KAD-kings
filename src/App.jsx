@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./styles.css";
 
 const PLAYER_NAMES = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
@@ -15,6 +15,24 @@ export default function App() {
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [enforcer, setEnforcer] = useState(null);
   const [card, setCard] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    function onFullscreenChange() {
+      setIsFullscreen(!!document.fullscreenElement);
+    }
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
 
   function startGame() {
     if (phase !== "WAITING") return;
@@ -47,14 +65,8 @@ export default function App() {
   }
 
   function gameMessage() {
-    if (phase === "WAITING") {
-      return "Waiting for players to get ready";
-    }
-
-    if (!card) {
-      return `${currentPlayer} is drawing a card`;
-    }
-
+    if (phase === "WAITING") return "Waiting for players to get ready";
+    if (!card) return `${currentPlayer} is drawing a card`;
     return `${currentPlayer} drew ${card.rank}${card.suit}`;
   }
 
@@ -63,6 +75,13 @@ export default function App() {
       {/* HEADER */}
       <header className="header">
         <h1>KAD Kings</h1>
+        <button
+          className="fullscreen-btn"
+          onClick={toggleFullscreen}
+          aria-label="Toggle Fullscreen"
+        >
+          {isFullscreen ? "⤢" : "⤢"}
+        </button>
       </header>
 
       {/* TOP GRID */}
@@ -110,7 +129,7 @@ export default function App() {
         </button>
       </section>
 
-      {/* GAME MESSAGE BAR */}
+      {/* MESSAGE BAR */}
       <section className="message-bar">
         <span className="message-text">{gameMessage()}</span>
         <div className="message-actions">
@@ -123,9 +142,7 @@ export default function App() {
       <section className="players">
         {players.map((p) => (
           <div key={p.name} className={`player ${p.status || ""}`}>
-            <div className="player-video">
-              {/* future <video /> goes here */}
-            </div>
+            <div className="player-video" />
             <div className="player-overlay">
               <span className="player-name">{p.name}</span>
               <span className="player-beers">🍺 {p.beers}</span>
