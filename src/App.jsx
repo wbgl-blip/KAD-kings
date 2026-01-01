@@ -3,6 +3,22 @@ import "./styles.css";
 
 const PLAYER_NAMES = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
 
+const CARD_RULES = {
+  A: "Waterfall — everyone drinks together",
+  "2": "You — pick someone to drink",
+  "3": "Me — you drink",
+  "4": "Floor — last to touch drinks",
+  "5": "Guys drink",
+  "6": "Chicks drink",
+  "7": "Heaven — last to raise hand drinks",
+  "8": "Mate — choose a mate",
+  "9": "Rhyme — start a rhyme",
+  "10": "Categories — pick a category",
+  J: "Make a rule",
+  Q: "Question master",
+  K: "King — pour into the cup",
+};
+
 export default function App() {
   const [phase, setPhase] = useState("WAITING"); // WAITING | PLAYING
   const [players, setPlayers] = useState(
@@ -12,7 +28,7 @@ export default function App() {
       status: null,
     }))
   );
-  const [currentPlayer, setCurrentPlayer] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [card, setCard] = useState(null);
   const [statusMessage, setStatusMessage] = useState(
     "Waiting for players to get ready"
@@ -21,35 +37,58 @@ export default function App() {
   function startGame() {
     if (phase !== "WAITING") return;
 
-    const first = players[0].name;
-
-    setPlayers((prev) =>
-      prev.map((p) =>
-        p.name === first ? { ...p, status: "TURN" } : { ...p, status: null }
-      )
-    );
-
-    setCurrentPlayer(first);
     setPhase("PLAYING");
-    setStatusMessage(`${first} draws first`);
+    setCurrentIndex(0);
+    setPlayers((prev) =>
+      prev.map((p, i) => ({
+        ...p,
+        status: i === 0 ? "TURN" : null,
+      }))
+    );
+    setStatusMessage(`${players[0].name} starts`);
   }
 
   function drawCard() {
     if (phase !== "PLAYING") return;
 
-    const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+    const ranks = Object.keys(CARD_RULES);
     const suits = ["♠", "♥", "♦", "♣"];
+    const rank = ranks[Math.floor(Math.random() * ranks.length)];
+    const suit = suits[Math.floor(Math.random() * suits.length)];
 
-    const nextCard = {
-      rank: ranks[Math.floor(Math.random() * ranks.length)],
-      suit: suits[Math.floor(Math.random() * suits.length)],
+    setCard({
+      rank,
+      suit,
       remaining: Math.floor(Math.random() * 40) + 10,
-    };
+    });
 
-    setCard(nextCard);
     setStatusMessage(
-      `${currentPlayer} drew ${nextCard.rank}${nextCard.suit}`
+      `${players[currentIndex].name}: ${CARD_RULES[rank]}`
     );
+  }
+
+  function nextTurn() {
+    const nextIndex = (currentIndex + 1) % players.length;
+
+    setPlayers((prev) =>
+      prev.map((p, i) => ({
+        ...p,
+        status: i === nextIndex ? "TURN" : null,
+      }))
+    );
+
+    setCurrentIndex(nextIndex);
+    setCard(null);
+    setStatusMessage(`${players[nextIndex].name}'s turn`);
+  }
+
+  function loseTurn() {
+    setPlayers((prev) =>
+      prev.map((p, i) =>
+        i === currentIndex ? { ...p, beers: p.beers + 1 } : p
+      )
+    );
+    nextTurn();
   }
 
   return (
@@ -65,13 +104,9 @@ export default function App() {
 
         <div className="panel card-panel">
           {!card ? (
-            <button
-              className="card draw"
-              onClick={drawCard}
-              disabled={phase !== "PLAYING"}
-            >
+            <div className="card draw" onClick={drawCard}>
               DRAW
-            </button>
+            </div>
           ) : (
             <div className="card active">
               <div className="rank">
@@ -86,9 +121,9 @@ export default function App() {
         <Panel title="📜 Rules" />
       </section>
 
-      {/* ACTION BUTTONS */}
+      {/* ACTIONS */}
       <section className="actions">
-        <button className="btn thumb" disabled={phase === "WAITING"}>
+        <button className="btn thumb" disabled={phase !== "PLAYING"}>
           👍 Thumb
         </button>
 
@@ -100,26 +135,28 @@ export default function App() {
           Ready
         </button>
 
-        <button className="btn heaven" disabled={phase === "WAITING"}>
+        <button className="btn heaven" disabled={phase !== "PLAYING"}>
           ☁ Heaven
         </button>
       </section>
 
-      {/* STATUS MESSAGE BAR */}
-      <section className="status-bar message">
+      {/* STATUS BAR */}
+      <section className="status-bar">
         <span className="status-text">{statusMessage}</span>
-        <div className="status-actions">
-          <button className="pill">Next</button>
-          <button className="pill danger">Lose</button>
-        </div>
+        <button className="pill" onClick={nextTurn}>
+          Next
+        </button>
+        <button className="pill danger" onClick={loseTurn}>
+          Lose
+        </button>
       </section>
 
       {/* PLAYERS */}
       <section className="players">
         {players.map((p) => (
           <div key={p.name} className={`player ${p.status || ""}`}>
-            <div className="video-slot" />
-            <div className="player-overlay">
+            <div className="video-tile" />
+            <div className="player-info">
               <span className="player-name">{p.name}</span>
               <span className="player-beers">🍺 {p.beers}</span>
             </div>
