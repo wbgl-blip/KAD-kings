@@ -2,8 +2,12 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
+  height: 100%;
+}
+
+body {
   background: radial-gradient(circle at top, #0f172a, #020617);
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -13,18 +17,40 @@ body {
   max-width: 430px;
   margin: 0 auto;
   padding: 14px;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* HEADER */
 .header {
+  position: relative;
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .header h1 {
   margin: 0;
   font-size: 26px;
   font-weight: 800;
+}
+
+/* FULLSCREEN BUTTON */
+.fullscreen-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.fullscreen-btn.active {
+  background: rgba(255,255,255,0.18);
 }
 
 /* TOP GRID */
@@ -50,20 +76,14 @@ body {
 }
 
 .row {
-  min-height: 36px;
+  height: 36px;
   border-radius: 999px;
   background: rgba(255,255,255,0.06);
   margin-bottom: 6px;
-  padding: 6px 10px;
-  font-size: 12px;
   display: flex;
   align-items: center;
-  opacity: 0.8;
-}
-
-.row.muted {
-  opacity: 0.4;
   justify-content: center;
+  opacity: 0.4;
 }
 
 /* CARD */
@@ -139,73 +159,56 @@ body {
 
 /* STATUS BAR */
 .status-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   background: rgba(255,255,255,0.05);
   padding: 10px;
   border-radius: 14px;
   font-size: 14px;
-}
-
-.status-text {
-  flex: 1;
-}
-
-/* RULE INPUT */
-.rule-input {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.rule-input input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 12px;
-  border: none;
-}
-
-.rule-input button {
-  border-radius: 12px;
-  border: none;
-  padding: 10px 14px;
-  font-weight: 700;
+  margin-bottom: 12px;
 }
 
 /* PLAYERS */
 .players {
+  flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-top: 12px;
 }
 
 .player {
-  background: rgba(255,255,255,0.05);
+  position: relative;
+  background: #000;
   border-radius: 18px;
-  padding: 10px;
-  min-height: 110px;
+  overflow: hidden;
   border: 2px solid transparent;
-  display: flex;
-  flex-direction: column;
 }
 
 .player.TURN {
   border-color: #22c55e;
 }
 
-.video-tile {
-  flex: 1;
-  border-radius: 12px;
-  background: radial-gradient(circle at top, #1e293b, #020617);
-  margin-bottom: 6px;
+/* VIDEO PLACEHOLDER (VIDEO-READY) */
+.video-placeholder {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,0.08), rgba(0,0,0,0.9)),
+    #000;
 }
 
-.player-info {
+/* OVERLAY */
+.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.8),
+    transparent
+  );
 }
 
 .player-name {
