@@ -1,126 +1,70 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./styles.css";
 
 const PLAYER_NAMES = ["Wes", "Zach", "Marsh", "Travis", "Kyle", "Jeff"];
 
-const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
-const SUITS = ["♠","♥","♦","♣"];
-
-// Reduced + locked rules
-const RULE_TEXT = {
-  "4": "4s for Whores — Everyone drinks",
-  "6": "6s for Dicks — Everyone drinks",
-  "7": "Heaven — Last to hit Heaven drinks",
-  "J": "Thumbmaster — Last to hit Thumb drinks",
-  "K": "Make a Rule — Create a house rule",
-};
-
-function buildDeck() {
-  const deck = [];
-  RANKS.forEach(r => SUITS.forEach(s => deck.push({ rank: r, suit: s })));
-  return deck.sort(() => Math.random() - 0.5);
-}
-
 export default function App() {
-  const [phase, setPhase] = useState("WAITING"); 
-  const [deck, setDeck] = useState(buildDeck);
-  const [card, setCard] = useState(null);
-
+  const [phase, setPhase] = useState("WAITING"); // WAITING | PLAYING
   const [players, setPlayers] = useState(
-    PLAYER_NAMES.map(name => ({
+    PLAYER_NAMES.map((name) => ({
       name,
       beers: 0,
       status: null,
     }))
   );
+  const [currentPlayer, setCurrentPlayer] = useState(null);
+  const [enforcer, setEnforcer] = useState(null);
+  const [card, setCard] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [statusText, setStatusText] = useState("Waiting to start");
-  const [houseRules, setHouseRules] = useState([]);
-  const [ruleInput, setRuleInput] = useState("");
+  /* =========================
+     FULLSCREEN
+  ========================= */
+  useEffect(() => {
+    function onFsChange() {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    }
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", onFsChange);
+  }, []);
 
-  /* =====================
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+  }
+
+  /* =========================
      GAME FLOW
-  ===================== */
-
+  ========================= */
   function startGame() {
     if (phase !== "WAITING") return;
-    setPhase("PLAYING");
-    setPlayers(p =>
-      p.map((pl, i) => ({
-        ...pl,
-        status: i === 0 ? "TURN" : null,
-      }))
+    const first = players[0].name;
+
+    setPlayers((prev) =>
+      prev.map((p) =>
+        p.name === first ? { ...p, status: "TURN" } : p
+      )
     );
-    setStatusText(`${players[0].name} starts`);
+
+    setCurrentPlayer(first);
+    setPhase("PLAYING");
   }
 
   function drawCard() {
     if (phase !== "PLAYING") return;
-    if (deck.length === 0) {
-      setStatusText("Deck empty — Game Over");
-      return;
-    }
 
-    const [next, ...rest] = deck;
-    setDeck(rest);
-    setCard(next);
+    const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+    const suits = ["♠","♥","♦","♣"];
 
-    const rule = RULE_TEXT[next.rank];
-    setStatusText(
-      rule
-        ? `${players[currentIndex].name}: ${rule}`
-        : `${players[currentIndex].name} drew ${next.rank}${next.suit}`
-    );
-
-    if (next.rank === "K") {
-      setPhase("MAKE_RULE");
-    }
-  }
-
-  function nextTurn() {
-    const next = (currentIndex + 1) % players.length;
-    setPlayers(p =>
-      p.map((pl, i) => ({
-        ...pl,
-        status: i === next ? "TURN" : null,
-      }))
-    );
-    setCurrentIndex(next);
-    setCard(null);
-    setPhase("PLAYING");
-    setStatusText(`${players[next].name}'s turn`);
-  }
-
-  function giveDrink(index) {
-    setPlayers(p =>
-      p.map((pl, i) =>
-        i === index ? { ...pl, beers: pl.beers + 1 } : pl
-      )
-    );
-  }
-
-  /* =====================
-     KING → MAKE RULE
-  ===================== */
-
-  function submitRule() {
-    if (!ruleInput.trim()) return;
-    setHouseRules(r => [...r, ruleInput.trim()]);
-    setRuleInput("");
-    nextTurn();
-  }
-
-  /* =====================
-     UI ACTIONS (STUBBED)
-  ===================== */
-
-  function triggerHeaven() {
-    setStatusText("Heaven triggered — last to press drinks");
-  }
-
-  function triggerThumb() {
-    setStatusText("Thumb triggered — last to press drinks");
+    setCard({
+      rank: ranks[Math.floor(Math.random() * ranks.length)],
+      suit: suits[Math.floor(Math.random() * suits.length)],
+      remaining: Math.floor(Math.random() * 40) + 10,
+    });
   }
 
   return (
@@ -128,6 +72,14 @@ export default function App() {
       {/* HEADER */}
       <header className="header">
         <h1>KAD Kings</h1>
+
+        <button
+          className={`fullscreen-btn ${isFullscreen ? "active" : ""}`}
+          onClick={toggleFullscreen}
+          aria-label="Toggle Fullscreen"
+        >
+          {isFullscreen ? "✕" : "⛶"}
+        </button>
       </header>
 
       {/* TOP GRID */}
@@ -145,21 +97,17 @@ export default function App() {
                 {card.rank}
                 {card.suit}
               </div>
-              <div className="sub">{deck.length} cards left</div>
+              <div className="sub">{card.remaining} left</div>
             </div>
           )}
         </div>
 
-        <Panel title="📜 Rules" items={houseRules} />
+        <Panel title="📜 Rules" />
       </section>
 
       {/* ACTION BUTTONS */}
       <section className="actions">
-        <button
-          className="btn thumb"
-          onClick={triggerThumb}
-          disabled={phase !== "PLAYING"}
-        >
+        <button className="btn thumb" disabled={phase === "WAITING"}>
           👍 Thumb
         </button>
 
@@ -171,43 +119,26 @@ export default function App() {
           Ready
         </button>
 
-        <button
-          className="btn heaven"
-          onClick={triggerHeaven}
-          disabled={phase !== "PLAYING"}
-        >
+        <button className="btn heaven" disabled={phase === "WAITING"}>
           ☁ Heaven
         </button>
       </section>
 
-      {/* STATUS BAR */}
+      {/* STATUS BAR (GAME MESSAGES ONLY) */}
       <section className="status-bar">
-        <span className="status-text">{statusText}</span>
-        {phase === "PLAYING" && (
-          <button className="pill" onClick={nextTurn}>
-            Next
-          </button>
-        )}
+        <span className="detail">
+          {phase === "WAITING"
+            ? "Waiting for everyone to be ready"
+            : "Draw a card or react to the game"}
+        </span>
       </section>
 
-      {/* KING RULE INPUT */}
-      {phase === "MAKE_RULE" && (
-        <div className="rule-input">
-          <input
-            value={ruleInput}
-            onChange={e => setRuleInput(e.target.value)}
-            placeholder="Type the new rule…"
-          />
-          <button onClick={submitRule}>Save Rule</button>
-        </div>
-      )}
-
-      {/* PLAYERS */}
+      {/* PLAYERS (VIDEO-READY) */}
       <section className="players">
-        {players.map((p, i) => (
+        {players.map((p) => (
           <div key={p.name} className={`player ${p.status || ""}`}>
-            <div className="video-tile" />
-            <div className="player-info">
+            <div className="video-placeholder" />
+            <div className="overlay">
               <span className="player-name">{p.name}</span>
               <span className="player-beers">🍺 {p.beers}</span>
             </div>
@@ -218,17 +149,13 @@ export default function App() {
   );
 }
 
-function Panel({ title, items = [] }) {
+function Panel({ title }) {
   return (
     <div className="panel">
       <div className="panel-title">{title}</div>
-      {items.length === 0
-        ? [...Array(4)].map((_, i) => (
-            <div key={i} className="row muted">—</div>
-          ))
-        : items.map((r, i) => (
-            <div key={i} className="row">{r}</div>
-          ))}
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="row">—</div>
+      ))}
     </div>
   );
 }
