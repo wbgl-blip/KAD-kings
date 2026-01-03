@@ -11,7 +11,7 @@ const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 const RULE_TEXT = {
-  A: "Waterfall — wait for ready, drawer drinks first",
+  A: "Waterfall — drawer starts when ready",
   2: "Pick someone to drink",
   3: "Me — drawer drinks",
   4: "Women drink",
@@ -22,7 +22,7 @@ const RULE_TEXT = {
   9: "Rhyme — loser drinks",
   10: "Categories — loser drinks",
   J: "Thumbmaster (Power) — owner can start anytime",
-  Q: "Question Master — QM taps who answered (+1)",
+  Q: "Question Master — QM tags who answered",
   K: "Make a rule",
 };
 
@@ -31,7 +31,7 @@ const LOSER_REASON_TEXT = {
   THUMB: "Thumb",
   RHYME: "Rhyme",
   CATEGORIES: "Categories",
-  RULE: "Rule Break",
+  RULEBREAK: "Rule Break",
 };
 
 const DRINK_FLASH_MS = 2000;
@@ -60,8 +60,8 @@ export default function App() {
   const [deck, setDeck] = useState(buildDeck);
   const [card, setCard] = useState(null);
 
-  // WAITING | IDLE | PICK_DRINK | PICK_MATE | PICK_LOSER | MAKE_RULE | WATERFALL_READY | REACTION_ACTIVE | QM_PICK | RULE_PICK
-  const [phase, setPhase] = useState("WAITING");
+  // IDLE | PICK_DRINK | PICK_MATE | PICK_LOSER | MAKE_RULE | WATERFALL_READY | REACTION_ACTIVE | QM_PICK | RULE_BREAK_PICK
+  const [phase, setPhase] = useState("IDLE");
   const [turnIndex, setTurnIndex] = useState(0);
 
   const [players, setPlayers] = useState(
@@ -73,33 +73,43 @@ export default function App() {
     }))
   );
 
-  // Power owners
+  // Power owners / roles
   const [thumbMaster, setThumbMaster] = useState(null); // J owner
   const [heavenMaster, setHeavenMaster] = useState(null); // 7 owner
   const [questionMaster, setQuestionMaster] = useState(null); // Q owner
 
   // Status + rules
-  const [statusText, setStatusText] = useState("Waiting for everyone to be ready");
+  const [statusText, setStatusText] = useState("Tap the deck to draw");
   const [rules, setRules] = useState([]);
   const [ruleDraft, setRuleDraft] = useState("");
 
-  // Loser reason context (9/10 + rule break, etc.)
+  // Loser context (9/10, plus RuleBreak)
   const [loserReason, setLoserReason] = useState(null);
+
+  // Waterfall context
+  const [waterfall, setWaterfall] = useState({
+    active: false,
+    drawer: null,
+    cardId: null,
+  });
 
   // Reaction state for 7/J power usage
   const [reaction, setReaction] = useState({
     type: null, // "HEAVEN" | "THUMB" | null
     owner: null,
-    tapped: [], // ordered list of player names who responded
+    tapped: [],
   });
 
   // Flash UI (tile-only)
   const [flashNames, setFlashNames] = useState(() => new Set());
   const flashTimerRef = useRef(null);
 
-  // Avoid stale closures in propagation + turn logic
+  // Avoid stale closures
   const playersRef = useRef(players);
   playersRef.current = players;
+
+  // Guard against rapid double taps that happen before React re-renders
+  const actionLockRef = useRef(false);
 
   const currentPlayer = useMemo(() => players[turnIndex], [players, turnIndex]);
 
@@ -112,7 +122,7 @@ export default function App() {
       "WATERFALL_READY",
       "REACTION_ACTIVE",
       "QM_PICK",
-      "RULE_PICK",
+      "RULE_BREAK_PICK",
     ].includes(phase);
   }, [phase]);
 
@@ -127,8 +137,12 @@ export default function App() {
     });
   }
 
-  function setStatusWithTurn(message, overrideTurnName = null) {
-    const name = overrideTurnName || playersRef.current[turnIndex]?.name;
+  function setStatus(message) {
+    setStatusText(message);
+  }
+
+  function setStatusWithTurn(message) {
+    const name = playersRef.current[turnIndex]?.name;
     setStatusText(name ? `${message} — ${name}'s turn` : message);
   }
 
@@ -148,6 +162,35 @@ export default function App() {
     }, DRINK_FLASH_MS);
   }
 
+  function addDrink(name) {
+    setPlayers((prev) =>
+      prev.map((p) => (p.name === name ? { ...p, beers: p.beers + 1 } : p))
+    );
+  }
+
+  // Returns the full affected chain: target + all mates (recursive), with cycle protection.
+  function computeDrinkChain(startName) {
+    const visited = new Set();
+    function walk(name) {
+      if (!name) return;
+      if (visited.has(name)) return;
+      visited.add(name);
+      const p = playersRef.current.find((x) => x.name === name);
+      const mates = p?.mates || [];
+      for (const m of mates) walk(m);
+    }
+    walk(startName);
+    return Array.from(visited);
+  }
+
+  // Apply +1 to chain, optionally flash ALL affected tiles (including mates)
+  function giveDrinkChain(startName, { flash = true } = {}) {
+    const chain = computeDrinkChain(startName);
+    for (const n of chain) addDrink(n);
+    if (flash && chain.length) flashPlayers(chain);
+    return chain;
+  }
+
   function enterFullscreen() {
     const el = document.documentElement;
     try {
@@ -158,75 +201,31 @@ export default function App() {
     }
   }
 
-  function safeStartGameIfWaiting() {
-    if (phase !== "WAITING") return false;
-    setPhase("IDLE");
-    setStatusWithTurn("Tap the deck to draw");
-    return true;
-  }
-
-  /* =========================
-     DRINK CHAIN (FIX #1)
-     - When someone drinks, all mates chained should:
-       - get +1
-       - flash (tile only)
-========================= */
-
-  function collectDrinkChain(startName) {
-    const visited = new Set();
-
-    function walk(name) {
-      if (!name) return;
-      if (visited.has(name)) return;
-      visited.add(name);
-
-      const p = playersRef.current.find((x) => x.name === name);
-      const mates = p?.mates || [];
-      for (const m of mates) walk(m);
+  function lockActionOnce(fn) {
+    if (actionLockRef.current) return;
+    actionLockRef.current = true;
+    try {
+      fn();
+    } finally {
+      // release after React has a chance to process this tick
+      Promise.resolve().then(() => {
+        actionLockRef.current = false;
+      });
     }
-
-    walk(startName);
-    return Array.from(visited);
-  }
-
-  function applyDrinkChain(names) {
-    if (!names || names.length === 0) return;
-    const nameSet = new Set(names);
-    setPlayers((prev) =>
-      prev.map((p) => (nameSet.has(p.name) ? { ...p, beers: p.beers + 1 } : p))
-    );
-  }
-
-  function drinkWithMatesAndFlash(startName) {
-    const chain = collectDrinkChain(startName);
-    if (chain.length === 0) return;
-    flashPlayers(chain);
-    applyDrinkChain(chain);
-  }
-
-  function drinkWithMatesNoFlash(startName) {
-    const chain = collectDrinkChain(startName);
-    if (chain.length === 0) return;
-    applyDrinkChain(chain);
   }
 
   /* =========================
-     GAME FLOW — DRAW
+     DRAW FLOW
   ========================= */
 
   function drawCard() {
-    if (phase === "WAITING") {
-      setStatusText("Press Ready to start");
-      return;
-    }
-
     if (phase !== "IDLE") {
       setStatusWithTurn("Finish the current action first");
       return;
     }
 
     if (deck.length === 0) {
-      setStatusText("Deck is empty — game over (all 52 cards drawn)");
+      setStatus("Deck is empty — game over (all 52 cards drawn)");
       return;
     }
 
@@ -237,12 +236,14 @@ export default function App() {
     const r = next.rank;
     const drawer = playersRef.current[turnIndex]?.name;
 
-    setStatusWithTurn(RULE_TEXT[r]);
+    // Default status: show rule (turn highlight already shows whose turn)
+    setStatus(RULE_TEXT[r]);
 
-    // A — Waterfall requires Ready (FIX #3: drawer drinks with NO flash)
+    // A — Waterfall requires banner start by drawer
     if (r === "A") {
+      setWaterfall({ active: true, drawer: drawer || null, cardId: `${r}${next.suit}-${rest.length}` });
       setPhase("WATERFALL_READY");
-      setStatusWithTurn("Waterfall — tap Ready when everyone is ready (drawer drinks first)");
+      setStatus("Waterfall ready — drawer starts when ready");
       return;
     }
 
@@ -253,87 +254,70 @@ export default function App() {
       return;
     }
 
-    // 3 — Me (drawer drinks)
+    // 3 — Me
     if (r === "3") {
-      if (drawer) {
-        drinkWithMatesAndFlash(drawer);
-      }
+      if (drawer) giveDrinkChain(drawer, { flash: true });
       nextTurn();
-      setStatusWithTurn("Tap the deck to draw");
+      setStatus("Tap the deck to draw");
       return;
     }
 
     // 4 — Women drink
     if (r === "4") {
-      const women = playersRef.current
-        .filter((p) => p.gender === "F")
-        .map((p) => p.name);
-
+      const women = playersRef.current.filter((p) => p.gender === "F").map((p) => p.name);
       if (women.length) {
-        // union all chains so everyone involved flashes once
         const all = new Set();
-        for (const w of women) collectDrinkChain(w).forEach((n) => all.add(n));
-        const list = Array.from(all);
-        flashPlayers(list);
-        applyDrinkChain(list);
+        for (const n of women) computeDrinkChain(n).forEach((x) => all.add(x));
+        for (const n of all) addDrink(n);
+        flashPlayers(Array.from(all));
       }
-
       nextTurn();
-      setStatusWithTurn("Tap the deck to draw");
+      setStatus("Tap the deck to draw");
       return;
     }
 
     // 5 — Guys drink
     if (r === "5") {
-      const men = playersRef.current
-        .filter((p) => p.gender === "M")
-        .map((p) => p.name);
-
+      const men = playersRef.current.filter((p) => p.gender === "M").map((p) => p.name);
       if (men.length) {
         const all = new Set();
-        for (const m of men) collectDrinkChain(m).forEach((n) => all.add(n));
-        const list = Array.from(all);
-        flashPlayers(list);
-        applyDrinkChain(list);
+        for (const n of men) computeDrinkChain(n).forEach((x) => all.add(x));
+        for (const n of all) addDrink(n);
+        flashPlayers(Array.from(all));
       }
-
       nextTurn();
-      setStatusWithTurn("Tap the deck to draw");
+      setStatus("Tap the deck to draw");
       return;
     }
 
     // 6 — Everyone drinks
     if (r === "6") {
       const allPlayers = playersRef.current.map((p) => p.name);
-      if (allPlayers.length) {
-        const all = new Set();
-        for (const a of allPlayers) collectDrinkChain(a).forEach((n) => all.add(n));
-        const list = Array.from(all);
-        flashPlayers(list);
-        applyDrinkChain(list);
-      }
-
+      const all = new Set();
+      for (const n of allPlayers) computeDrinkChain(n).forEach((x) => all.add(x));
+      for (const n of all) addDrink(n);
+      flashPlayers(Array.from(all));
       nextTurn();
-      setStatusWithTurn("Tap the deck to draw");
+      setStatus("Tap the deck to draw");
       return;
     }
 
-    // 7 — Heaven power (set owner)
+    // 7 — Heaven power owner
     if (r === "7") {
       setHeavenMaster(drawer || null);
       nextTurn();
-      setStatusWithTurn(`Heaven set: ${drawer || "—"} (owner can start anytime)`);
+      setStatus(`Heaven set: ${drawer || "—"} (owner can start anytime)`);
       return;
     }
 
-    // 8 — Pick a mate
+    // 8 — Pick mate
     if (r === "8") {
       setPhase("PICK_MATE");
       setStatusWithTurn("Pick a mate (tap a player)");
       return;
     }
 
-    // 9 — Rhyme loser (enforcer taps loser)
+    // 9 — Rhyme loser
     if (r === "9") {
       setLoserReason("RHYME");
       setPhase("PICK_LOSER");
@@ -341,7 +325,7 @@ export default function App() {
       return;
     }
 
-    // 10 — Categories loser (enforcer taps loser)
+    // 10 — Categories loser
     if (r === "10") {
       setLoserReason("CATEGORIES");
       setPhase("PICK_LOSER");
@@ -349,19 +333,19 @@ export default function App() {
       return;
     }
 
-    // J — Thumb power (set owner)
+    // J — Thumb power owner
     if (r === "J") {
       setThumbMaster(drawer || null);
       nextTurn();
-      setStatusWithTurn(`Thumbmaster set: ${drawer || "—"} (owner can start anytime)`);
+      setStatus(`Thumbmaster set: ${drawer || "—"} (owner can start anytime)`);
       return;
     }
 
-    // Q — Question master (set owner)
+    // Q — Question Master owner
     if (r === "Q") {
       setQuestionMaster(drawer || null);
       nextTurn();
-      setStatusWithTurn(`Question Master set: ${drawer || "—"} (QM taps who answered)`);
+      setStatus(`Question Master set: ${drawer || "—"} (use Question button)`);
       return;
     }
 
@@ -372,172 +356,145 @@ export default function App() {
       return;
     }
 
-    // fallback
     nextTurn();
-    setStatusWithTurn("Tap the deck to draw");
+    setStatus("Tap the deck to draw");
   }
 
   /* =========================
-     INTERACTIONS — PLAYER TAP
+     WATERFALL
+  ========================= */
+
+  function startWaterfallNow() {
+    if (phase !== "WATERFALL_READY") return;
+
+    lockActionOnce(() => {
+      const drawer = waterfall.drawer || playersRef.current[turnIndex]?.name;
+
+      // FIX #3: drawer should NOT flash red for starting waterfall
+      if (drawer) giveDrinkChain(drawer, { flash: false });
+
+      // Clear banner + continue
+      setWaterfall({ active: false, drawer: null, cardId: null });
+      setPhase("IDLE");
+      nextTurn();
+      setStatus("Waterfall started — drawer drank first. Tap the deck to draw");
+    });
+  }
+
+  function dismissWaterfallBanner() {
+    // optional: keep it simple; banner only appears in WATERFALL_READY anyway
+    // If you want a manual dismiss later, add logic here.
+  }
+
+  /* =========================
+     PLAYER TAP
   ========================= */
 
   function tapPlayer(name) {
-    const drawer = playersRef.current[turnIndex]?.name;
+    lockActionOnce(() => {
+      const drawer = playersRef.current[turnIndex]?.name;
 
-    // 2 — Pick drink
-    if (phase === "PICK_DRINK") {
-      drinkWithMatesAndFlash(name);
-      setPhase("IDLE");
-      nextTurn();
-      setStatusWithTurn(`Picked ${name} to drink (+1). Tap the deck to draw`);
-      return;
-    }
-
-    // 8 — Pick mate (cannot self; prevent duplicates)
-    if (phase === "PICK_MATE") {
-      if (!drawer) return;
-
-      if (name === drawer) {
-        setStatusWithTurn("You can’t pick yourself — tap someone else");
-        return;
-      }
-
-      // Ensure one mate per 8 (your request: stop accidental double picks)
-      // We lock immediately after a successful selection.
-      const drawerPlayer = playersRef.current.find((p) => p.name === drawer);
-      const alreadyHasMate = (drawerPlayer?.mates || []).length > 0;
-
-      if (alreadyHasMate) {
-        setStatusWithTurn("Mate already chosen — tap the deck to draw");
+      // 2 — Pick drink
+      if (phase === "PICK_DRINK") {
+        giveDrinkChain(name, { flash: true }); // FIX #1: mates flash too
         setPhase("IDLE");
         nextTurn();
+        setStatus(`Picked ${name} to drink (+1). Tap the deck to draw`);
         return;
       }
 
-      let didAdd = false;
+      // 8 — Pick mate (single pick only; lockActionOnce prevents double add)
+      if (phase === "PICK_MATE") {
+        if (!drawer) return;
 
-      setPlayers((prev) =>
-        prev.map((p) => {
-          if (p.name !== drawer) return p;
-          if (p.mates.includes(name)) return p;
-          didAdd = true;
-          return { ...p, mates: [...p.mates, name] };
-        })
-      );
+        if (name === drawer) {
+          setStatusWithTurn("You can’t pick yourself — tap someone else");
+          return;
+        }
 
-      if (!didAdd) {
-        setStatusWithTurn("That mate is already selected — pick someone else");
+        let didAdd = false;
+
+        setPlayers((prev) =>
+          prev.map((p) => {
+            if (p.name !== drawer) return p;
+            if (p.mates.includes(name)) return p;
+            didAdd = true;
+            return { ...p, mates: [...p.mates, name] };
+          })
+        );
+
+        if (!didAdd) {
+          setStatusWithTurn("That mate is already selected — pick someone else");
+          return;
+        }
+
+        setPhase("IDLE");
+        nextTurn();
+        setStatus(`${drawer} picked ${name} as a mate. Tap the deck to draw`);
         return;
       }
 
-      setPhase("IDLE");
-      nextTurn();
-      setStatusWithTurn(`${drawer} picked ${name} as a mate. Tap the deck to draw`);
-      return;
-    }
+      // 9/10 + RuleBreak — Enforcer taps loser/offender
+      if (phase === "PICK_LOSER" || phase === "RULE_BREAK_PICK") {
+        const reasonLabel =
+          phase === "RULE_BREAK_PICK"
+            ? LOSER_REASON_TEXT.RULEBREAK
+            : LOSER_REASON_TEXT[loserReason] || "Loser";
 
-    // 9/10 — Enforcer taps loser
-    if (phase === "PICK_LOSER") {
-      drinkWithMatesAndFlash(name);
-      const label = LOSER_REASON_TEXT[loserReason] || "Loser";
-      setLoserReason(null);
-      setPhase("IDLE");
-      nextTurn();
-      setStatusWithTurn(`${label} — ${name} drinks (+1). Tap the deck to draw`);
-      return;
-    }
+        giveDrinkChain(name, { flash: true }); // FIX #1
+        setLoserReason(null);
+        setPhase("IDLE");
+        nextTurn();
+        setStatus(`${reasonLabel} — ${name} drinks (+1). Tap the deck to draw`);
+        return;
+      }
 
-    // Reaction (7/J power) — players tap their tile; owner excluded; last tap drinks
-    if (phase === "REACTION_ACTIVE") {
-      const owner = reaction.owner;
-      if (!owner) return;
+      // Reaction (7/J power) — owner excluded, last tap drinks
+      if (phase === "REACTION_ACTIVE") {
+        const owner = reaction.owner;
+        if (!owner) return;
+        if (name === owner) return;
+        if (reaction.tapped.includes(name)) return;
 
-      // Owner cannot participate and cannot lose
-      if (name === owner) return;
+        const nextTapped = [...reaction.tapped, name];
+        const eligibleCount = playersRef.current.length - 1;
 
-      // Prevent duplicates
-      if (reaction.tapped.includes(name)) return;
+        setReaction((r) => ({ ...r, tapped: nextTapped }));
 
-      const nextTapped = [...reaction.tapped, name];
-      setReaction((r) => ({ ...r, tapped: nextTapped }));
+        if (nextTapped.length >= eligibleCount) {
+          const loser = nextTapped[nextTapped.length - 1];
+          const label = reaction.type === "THUMB" ? "Thumb" : "Heaven";
 
-      const eligibleCount = playersRef.current.length - 1;
+          giveDrinkChain(loser, { flash: true }); // FIX #1
 
-      // When everyone except owner has tapped, last tapper loses
-      if (nextTapped.length >= eligibleCount) {
-        const loser = nextTapped[nextTapped.length - 1];
-
-        drinkWithMatesAndFlash(loser);
+          setReaction({ type: null, owner: null, tapped: [] });
+          setPhase("IDLE");
+          setStatus(`${label} — ${loser} was last and drinks (+1). Tap the deck to draw`);
+          return;
+        }
 
         const label = reaction.type === "THUMB" ? "Thumb" : "Heaven";
-
-        setReaction({ type: null, owner: null, tapped: [] });
-        setPhase("IDLE");
-
-        // Does not change turn order
-        setStatusWithTurn(`${label} — ${loser} was last and drinks (+1). Tap the deck to draw`);
+        setStatus(`${label} active — players tap (${nextTapped.length}/${eligibleCount})`);
         return;
       }
 
-      const label = reaction.type === "THUMB" ? "Thumb" : "Heaven";
-      setStatusWithTurn(`${label} active — players tap their tile (${nextTapped.length}/${eligibleCount})`);
-      return;
-    }
+      // QM_PICK — QM tags who answered
+      if (phase === "QM_PICK") {
+        giveDrinkChain(name, { flash: true }); // FIX #1
+        setPhase("IDLE");
+        setStatus(`${name} answered (+1). Tap the deck to draw`);
+        return;
+      }
 
-    // QM_PICK — QM taps who answered
-    if (phase === "QM_PICK") {
-      drinkWithMatesAndFlash(name);
-      setPhase("IDLE");
-      setStatusWithTurn(`${name} answered (+1). Tap the deck to draw`);
-      return;
-    }
-
-    // RULE_PICK (FIX #2: rule enforcement is manual)
-    if (phase === "RULE_PICK") {
-      drinkWithMatesAndFlash(name);
-      setPhase("IDLE");
-      setLoserReason(null);
-      setStatusWithTurn(`Rule break — ${name} drinks (+1). Tap the deck to draw`);
-      return;
-    }
-
-    // Otherwise: do nothing
+      // otherwise: no-op
+    });
   }
 
   /* =========================
-     ACTION BUTTONS
-  ========================= */
-
-  function onReadyAction() {
-    if (safeStartGameIfWaiting()) return;
-
-    if (phase === "WATERFALL_READY") {
-      const drawer = playersRef.current[turnIndex]?.name;
-      if (drawer) {
-        // FIX #3: drawer drinks first, NO flash
-        drinkWithMatesNoFlash(drawer);
-      }
-      setPhase("IDLE");
-      nextTurn();
-      setStatusWithTurn("Waterfall started — drawer drank first. Tap the deck to draw");
-      return;
-    }
-
-    if (phase !== "IDLE") {
-      setStatusWithTurn("Finish the current action first");
-      return;
-    }
-
-    setStatusWithTurn("Tap the deck to draw");
-  }
+     ACTION BUTTONS (4)
+========================= */
 
   function startReaction(type) {
-    if (phase === "WAITING") {
-      setStatusText("Press Ready to start");
-      return;
-    }
-
-    // Lock pattern: cannot start reaction during other action phases
     if (phase !== "IDLE") {
       setStatusWithTurn("Finish the current action first");
       return;
@@ -546,9 +503,7 @@ export default function App() {
     const owner = type === "THUMB" ? thumbMaster : heavenMaster;
 
     if (!owner) {
-      setStatusWithTurn(
-        type === "THUMB" ? "No Thumbmaster yet (draw J first)" : "No Heaven owner yet (draw 7 first)"
-      );
+      setStatus(type === "THUMB" ? "No Thumbmaster yet (draw J first)" : "No Heaven owner yet (draw 7 first)");
       return;
     }
 
@@ -556,7 +511,7 @@ export default function App() {
     setPhase("REACTION_ACTIVE");
 
     const label = type === "THUMB" ? "Thumb" : "Heaven";
-    setStatusWithTurn(`${label} active — players tap their tile (owner: ${owner})`);
+    setStatus(`${label} active — everyone (except ${owner}) tap your tile`);
   }
 
   function onThumb() {
@@ -567,36 +522,27 @@ export default function App() {
     startReaction("HEAVEN");
   }
 
-  function onQM() {
-    if (phase === "WAITING") {
-      setStatusText("Press Ready to start");
+  // FIX #2: rule enforcement for K rules (and any rule) via "Rule Break" button
+  function onRuleBreak() {
+    if (phase !== "IDLE") {
+      setStatusWithTurn("Finish the current action first");
       return;
     }
+    setPhase("RULE_BREAK_PICK");
+    setStatus("Rule Break — tap who broke a rule (+1)");
+  }
+
+  function onQuestionAnswered() {
     if (phase !== "IDLE") {
       setStatusWithTurn("Finish the current action first");
       return;
     }
     if (!questionMaster) {
-      setStatusWithTurn("No Question Master yet (draw Q first)");
+      setStatus("No Question Master yet (draw Q first)");
       return;
     }
     setPhase("QM_PICK");
-    setStatusWithTurn(`QM active (${questionMaster}) — tap the player who answered (+1)`);
-  }
-
-  // FIX #2: Manual enforcement for K-rules (and any house rule)
-  function onRuleBreak() {
-    if (phase === "WAITING") {
-      setStatusText("Press Ready to start");
-      return;
-    }
-    if (phase !== "IDLE") {
-      setStatusWithTurn("Finish the current action first");
-      return;
-    }
-    setLoserReason("RULE");
-    setPhase("RULE_PICK");
-    setStatusWithTurn("Rule break — tap the offender (+1)");
+    setStatus(`Question answered — QM (${questionMaster}) tap who answered (+1)`);
   }
 
   /* =========================
@@ -611,7 +557,7 @@ export default function App() {
     setRuleDraft("");
     setPhase("IDLE");
     nextTurn();
-    setStatusWithTurn("Rule saved. Tap the deck to draw");
+    setStatus("Rule saved. Use Rule Break to enforce (+1). Tap the deck to draw");
   }
 
   /* =========================
@@ -629,7 +575,7 @@ export default function App() {
   }, [rules]);
 
   /* =========================
-     SELECTABILITY (UI LOCKING)
+     SELECTABILITY
   ========================= */
 
   function isTileSelectable(name) {
@@ -643,10 +589,8 @@ export default function App() {
     }
 
     if (phase === "PICK_LOSER") return true;
-
+    if (phase === "RULE_BREAK_PICK") return true;
     if (phase === "QM_PICK") return true;
-
-    if (phase === "RULE_PICK") return true;
 
     if (phase === "REACTION_ACTIVE") {
       const owner = reaction.owner;
@@ -665,7 +609,9 @@ export default function App() {
      RENDER
   ========================= */
 
-  const drawLocked = phase !== "IDLE" && phase !== "WAITING";
+  const drawLocked = phase !== "IDLE";
+
+  const showWaterfallBanner = phase === "WATERFALL_READY" && waterfall.active;
 
   return (
     <div className="app">
@@ -691,13 +637,7 @@ export default function App() {
             onClick={drawCard}
             role="button"
             aria-disabled={drawLocked}
-            title={
-              phase === "IDLE"
-                ? "Tap to draw"
-                : phase === "WAITING"
-                ? "Press Ready to start"
-                : "Finish current action"
-            }
+            title={drawLocked ? "Finish current action" : "Tap to draw"}
           >
             {!card ? (
               <div className="card-draw-label">DECK</div>
@@ -717,17 +657,33 @@ export default function App() {
         <Panel title="📜 Rules" items={rulesLines} />
       </section>
 
-      <section className="actions">
-        <button className="btn thumb" onClick={onThumb} disabled={phase === "WAITING"}>
+      {showWaterfallBanner && (
+        <div className="waterfall-banner" role="region" aria-label="Waterfall banner">
+          <div className="waterfall-text">
+            <strong>Waterfall ready</strong>
+            <span>{`Drawer: ${waterfall.drawer || currentPlayer?.name || "—"}`}</span>
+          </div>
+          <button className="waterfall-start" onClick={startWaterfallNow}>
+            Start Waterfall
+          </button>
+        </div>
+      )}
+
+      <section className="actions-4">
+        <button className="btn thumb" onClick={onThumb} disabled={phase !== "IDLE"}>
           👍 Thumb
         </button>
 
-        <button className="btn ready" onClick={onReadyAction}>
-          Ready
+        <button className="btn heaven" onClick={onHeaven} disabled={phase !== "IDLE"}>
+          ☁ Heaven
         </button>
 
-        <button className="btn heaven" onClick={onHeaven} disabled={phase === "WAITING"}>
-          ☁ Heaven
+        <button className="btn rulebreak" onClick={onRuleBreak} disabled={phase !== "IDLE"}>
+          🚫 Rule Break
+        </button>
+
+        <button className="btn qm" onClick={onQuestionAnswered} disabled={phase !== "IDLE"}>
+          ❓ Question
         </button>
       </section>
 
@@ -735,18 +691,9 @@ export default function App() {
         <div className="status-main">{statusText}</div>
 
         <div className="status-meta">
-          <span className="meta-pill">{`Turn: ${currentPlayer?.name || "—"}`}</span>
           <span className="meta-pill">{`7: ${heavenMaster || "—"}`}</span>
           <span className="meta-pill">{`J: ${thumbMaster || "—"}`}</span>
           <span className="meta-pill">{`Q: ${questionMaster || "—"}`}</span>
-
-          <button className="meta-btn" onClick={onQM} disabled={phase === "WAITING"}>
-            QM Tap
-          </button>
-
-          <button className="meta-btn" onClick={onRuleBreak} disabled={phase === "WAITING"}>
-            Rule Break
-          </button>
         </div>
       </section>
 
