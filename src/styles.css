@@ -13,7 +13,7 @@ body {
   background: radial-gradient(circle at top, #0f172a, #020617);
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow: hidden; /* no page scroll on mobile */
+  overflow: hidden;
 }
 
 button,
@@ -23,9 +23,9 @@ input {
   appearance: none;
 }
 
-/* =========================
-   APP LAYOUT (NO SCROLL)
-========================= */
+/* =====================================================
+   APP LAYOUT
+===================================================== */
 .app {
   height: 100svh;
   max-width: 430px;
@@ -47,9 +47,9 @@ input {
   padding: 16px;
 }
 
-/* =========================
+/* =====================================================
    HEADER
-========================= */
+===================================================== */
 .header {
   position: relative;
   text-align: center;
@@ -59,28 +59,12 @@ input {
 .header h1 {
   margin: 0;
   font-size: 26px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
-/* keep it top-right */
-.fullscreen-btn {
-  position: fixed;
-  right: 12px;
-  top: 12px;
-  width: 44px;
-  height: 40px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
-  z-index: 50;
-}
-
-/* =========================
+/* =====================================================
    TOP GRID
-========================= */
+===================================================== */
 .top-grid {
   flex: 0 0 auto;
   display: grid;
@@ -89,9 +73,9 @@ input {
   height: 200px;
 }
 
-/* =========================
+/* =====================================================
    PANELS
-========================= */
+===================================================== */
 .panel {
   background: rgba(255, 255, 255, 0.04);
   border-radius: 18px;
@@ -103,9 +87,8 @@ input {
 }
 
 .panel-title {
-  font-weight: 800;
+  font-weight: 900;
   margin-bottom: 8px;
-  opacity: 0.95;
   font-size: 14px;
 }
 
@@ -117,13 +100,10 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.78;
   padding: 0 10px;
-  overflow: hidden;
 }
 
 .row-text {
-  display: block;
   width: 100%;
   text-align: center;
   overflow: hidden;
@@ -132,9 +112,9 @@ input {
   font-size: 12px;
 }
 
-/* =========================
+/* =====================================================
    CARD / DECK
-========================= */
+===================================================== */
 .card-panel {
   display: flex;
   justify-content: center;
@@ -166,16 +146,14 @@ input {
 }
 
 .card.disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .card-face {
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 6px;
 }
 
@@ -192,23 +170,20 @@ input {
   opacity: 0.9;
 }
 
-.card-sub {
-  font-size: 12px;
-  font-weight: 800;
-  opacity: 0.6;
-}
+/* =====================================================
+   WATERFALL BANNER
+===================================================== */
 
-/* =========================
-   WATERFALL BANNER (RUNNING)
-========================= */
+/* Shared */
 .banner {
   flex: 0 0 auto;
   width: 100%;
   border-radius: 14px;
-  padding: 12px 14px;
+  padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
+/* Waterfall (READY + RUNNING visual) */
 .banner.waterfall {
   background: linear-gradient(
     90deg,
@@ -218,36 +193,24 @@ input {
   color: #06101a;
 }
 
-.banner.running {
-  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.35);
-}
-
-.banner-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.banner-title {
-  font-weight: 900;
-  font-size: 14px;
-}
-
-.banner-x {
+/* Start Waterfall button (READY state) */
+.wf-start {
+  width: 100%;
   border: none;
-  border-radius: 10px;
-  width: 34px;
-  height: 30px;
+  border-radius: 12px;
+  padding: 14px 0;
+  font-size: 16px;
   font-weight: 900;
-  background: rgba(0, 0, 0, 0.18);
+  background: rgba(255, 255, 255, 0.9);
   color: #06101a;
   cursor: pointer;
 }
 
-.banner-body {
-  margin-top: 10px;
+.wf-start:active {
+  transform: scale(0.98);
 }
 
+/* Optional RUNNING display (if enabled later) */
 .wf-running {
   display: flex;
   flex-direction: column;
@@ -258,7 +221,6 @@ input {
 .wf-count {
   font-size: 28px;
   font-weight: 900;
-  line-height: 1;
 }
 
 .wf-sub {
@@ -268,9 +230,9 @@ input {
   text-align: center;
 }
 
-/* =========================
-   ACTION BUTTONS — 4 IN ONE ROW
-========================= */
+/* =====================================================
+   ACTION BUTTONS (4 IN ONE ROW)
+===================================================== */
 .actions {
   flex: 0 0 auto;
   display: grid;
@@ -287,11 +249,10 @@ input {
   padding: 10px 0;
   font-size: 18px;
   font-weight: 900;
-  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
 }
 
 .btn:disabled {
@@ -318,9 +279,9 @@ input {
   color: #fff;
 }
 
-/* =========================
+/* =====================================================
    STATUS BAR
-========================= */
+===================================================== */
 .status-bar {
   flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.06);
@@ -331,12 +292,12 @@ input {
 }
 
 .status-main {
-  font-weight: 800;
+  font-weight: 900;
 }
 
-/* =========================
-   PLAYERS (FILL REMAINING HEIGHT)
-========================= */
+/* =====================================================
+   PLAYERS
+===================================================== */
 .players {
   flex: 1 1 auto;
   min-height: 0;
@@ -355,7 +316,6 @@ input {
   justify-content: flex-end;
   border: 2px solid transparent;
   overflow: hidden;
-  min-height: 0;
 }
 
 .player.TURN {
@@ -370,10 +330,9 @@ input {
   opacity: 0.55;
 }
 
-/* 2s drink flash (tile only) */
+/* Flash (NON-waterfall only) */
 .player.FLASH {
   border-color: rgba(255, 80, 80, 0.95);
-  box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
 }
 
 .player.FLASH::after {
@@ -381,33 +340,31 @@ input {
   position: absolute;
   inset: 0;
   background: rgba(255, 80, 80, 0.28);
-  pointer-events: none;
   border-radius: inherit;
+  pointer-events: none;
 }
 
 /* Video placeholder */
 .video-slot {
   flex: 1 1 auto;
-  min-height: 0;
   background: #000;
   border-radius: 12px;
   margin-bottom: 8px;
-  pointer-events: none;
 }
 
+/* Footer */
 .player-footer {
   display: flex;
-  align-items: baseline;
   justify-content: space-between;
+  align-items: baseline;
   gap: 10px;
 }
 
 .player-name {
-  font-weight: 900;
   font-size: 18px;
+  font-weight: 900;
 }
 
-/* right cluster (badges + beers) */
 .player-right {
   display: flex;
   align-items: center;
@@ -415,51 +372,46 @@ input {
 }
 
 .player-beers {
-  opacity: 0.9;
   font-weight: 900;
-  white-space: nowrap;
 }
 
-/* Badges between name and beers */
+/* Badges */
 .badges {
   display: flex;
-  align-items: center;
   gap: 6px;
 }
 
 .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   min-width: 18px;
   height: 18px;
   padding: 0 6px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 900;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .badge.b7 {
-  background: rgba(59, 130, 246, 0.95);
+  background: #3b82f6;
   color: #fff;
 }
 
 .badge.bJ {
-  background: rgba(250, 204, 21, 0.95);
+  background: #facc15;
   color: #111;
 }
 
 .badge.bQ {
-  background: rgba(168, 85, 247, 0.95);
+  background: #a855f7;
   color: #fff;
 }
 
-/* =========================
-   RULE INPUT (K)
-========================= */
+/* =====================================================
+   RULE INPUT
+===================================================== */
 .rule-input {
-  flex: 0 0 auto;
   display: flex;
   gap: 8px;
 }
@@ -478,127 +430,13 @@ input {
   font-weight: 900;
 }
 
-/* =========================
-   DEV TOOLS
-========================= */
-.dev {
-  margin-top: 10px;
-  padding: 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.dev-title {
-  font-weight: 900;
-  margin-bottom: 8px;
-}
-
-.dev-row {
-  margin-top: 10px;
-}
-
-.dev-hint {
-  margin-top: 6px;
-  font-size: 12px;
-  opacity: 0.75;
-}
-
-.dev-btn {
-  width: 100%;
-  border: none;
-  border-radius: 12px;
-  padding: 10px;
-  font-weight: 900;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-}
-
-.dev-subtitle {
-  font-weight: 900;
-  margin-bottom: 8px;
-}
-
-.dev-force-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-}
-
-.dev-chip {
-  border: none;
-  border-radius: 999px;
-  padding: 8px 0;
-  font-weight: 900;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-}
-
-.dev-chip:disabled {
-  opacity: 0.45;
-}
-
-.dev-deck {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.dev-card {
-  border-radius: 999px;
-  padding: 6px 8px;
-  font-size: 12px;
-  font-weight: 900;
-  background: rgba(255, 255, 255, 0.10);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-}
-
-/* =========================
-   FULLSCREEN / LARGE VIEWPORT TUNING
-========================= */
-:fullscreen .top-grid,
-:-webkit-full-screen .top-grid {
+/* =====================================================
+   FULLSCREEN TUNING
+===================================================== */
+:fullscreen .top-grid {
   height: 230px;
 }
 
-:fullscreen .row,
-:-webkit-full-screen .row {
-  height: 30px;
-}
-
-:fullscreen .row-text,
-:-webkit-full-screen .row-text {
-  font-size: 11px;
-}
-
-:fullscreen .panel-title,
-:-webkit-full-screen .panel-title {
-  font-size: 13px;
-}
-
-:fullscreen .players,
-:-webkit-full-screen .players {
-  gap: 12px;
-}
-
-:fullscreen .player,
-:-webkit-full-screen .player {
-  padding: 14px;
-}
-
-:fullscreen .video-slot,
-:-webkit-full-screen .video-slot {
-  border-radius: 14px;
-  margin-bottom: 10px;
-}
-
-:fullscreen .player-name,
-:-webkit-full-screen .player-name {
+:fullscreen .player-name {
   font-size: 20px;
-}
-
-:fullscreen .player-beers,
-:-webkit-full-screen .player-beers {
-  font-size: 14px;
 }
