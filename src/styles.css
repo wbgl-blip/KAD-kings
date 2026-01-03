@@ -1,4 +1,7 @@
-/* src/styles.css */
+/* =========================
+   GLOBAL RESET
+========================= */
+
 * {
   box-sizing: border-box;
 }
@@ -13,7 +16,7 @@ body {
   background: radial-gradient(circle at top, #0f172a, #020617);
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow: hidden; /* no page scroll on mobile */
+  overflow: hidden;
 }
 
 button,
@@ -23,7 +26,10 @@ input {
   appearance: none;
 }
 
-/* APP LAYOUT (NO SCROLL) */
+/* =========================
+   APP LAYOUT
+========================= */
+
 .app {
   height: 100svh;
   max-width: 430px;
@@ -35,17 +41,19 @@ input {
   overflow: hidden;
 }
 
-/* In fullscreen, stop shrinking to 430px and use the whole viewport */
+/* Fullscreen override */
 :fullscreen .app,
 :-webkit-full-screen .app {
   max-width: none;
   width: 100vw;
   height: 100vh;
-  margin: 0;
   padding: 16px;
 }
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
+
 .header {
   position: relative;
   text-align: center;
@@ -58,37 +66,40 @@ input {
   font-weight: 800;
 }
 
-/* keep it in the top-right even in fullscreen */
 .fullscreen-btn {
   position: fixed;
-  right: 12px;
   top: 12px;
+  right: 12px;
   width: 44px;
   height: 40px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
   color: #fff;
-  font-size: 16px;
   font-weight: 800;
   z-index: 50;
 }
 
-/* TOP GRID */
+/* =========================
+   TOP GRID
+========================= */
+
 .top-grid {
-  flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  height: 200px; /* fixed so players fill remaining */
+  height: 200px;
 }
 
-/* Panels */
+/* =========================
+   PANELS
+========================= */
+
 .panel {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255,255,255,0.04);
   border-radius: 18px;
   padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255,255,255,0.08);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -96,39 +107,37 @@ input {
 
 .panel-title {
   font-weight: 800;
-  margin-bottom: 8px;
-  opacity: 0.95;
   font-size: 14px;
+  margin-bottom: 8px;
 }
 
 .row {
   height: 34px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255,255,255,0.06);
   margin-bottom: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.78;
   padding: 0 10px;
-  overflow: hidden;
 }
 
 .row-text {
-  display: block;
-  width: 100%;
-  text-align: center;
+  font-size: 12px;
+  opacity: 0.85;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
 }
 
-/* CARD / DECK */
+/* =========================
+   CARD / DECK
+========================= */
+
 .card-panel {
-  display: flex;                 /* IMPORTANT */
-  justify-content: center;
+  display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .card {
@@ -149,11 +158,6 @@ input {
   cursor: pointer;
 }
 
-.card-draw-label {
-  font-size: 18px;
-  letter-spacing: 0.12em;
-}
-
 .card.active {
   background: #fff;
   color: #000;
@@ -166,71 +170,72 @@ input {
   cursor: not-allowed;
 }
 
+.card-draw-label {
+  font-size: 18px;
+  letter-spacing: 0.12em;
+}
+
 .rank {
   font-size: 42px;
-  line-height: 1.05;
 }
 
 .rule-text {
   font-size: 12px;
-  margin-top: 6px;
   font-weight: 800;
+  margin-top: 6px;
 }
 
 .sub {
   font-size: 12px;
-  opacity: 0.65;
+  opacity: 0.6;
   margin-top: 4px;
-  font-weight: 800;
 }
 
-/* WATERFALL BANNER */
+/* =========================
+   WATERFALL BANNER
+========================= */
+
 .banner {
-  flex: 0 0 auto;
   width: 100%;
-  border: none;
   border-radius: 14px;
-  padding: 12px 14px;
+  padding: 12px;
   font-weight: 900;
-  font-size: 14px;
+  border: none;
   cursor: pointer;
-  text-align: center;
 }
 
 .banner.waterfall {
   background: linear-gradient(
     90deg,
-    rgba(56, 189, 248, 0.95),
-    rgba(14, 165, 233, 0.95)
+    rgba(56,189,248,0.95),
+    rgba(14,165,233,0.95)
   );
   color: #06101a;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255,255,255,0.18);
 }
 
-/* ACTION BUTTONS — 4 IN ONE ROW */
+/* =========================
+   ACTION BUTTONS (4 IN ROW)
+========================= */
+
 .actions {
-  flex: 0 0 auto;
   display: grid;
-  gap: 10px;
 }
 
-/* 4 buttons fit one row */
 .actions-four {
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
 
 .btn {
-  border: none;
+  min-height: 44px;
   border-radius: 14px;
-  padding: 10px 0;              /* tighter to guarantee one row */
+  border: none;
   font-size: 18px;
   font-weight: 900;
-  -webkit-tap-highlight-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;             /* finger-friendly */
 }
 
 .btn:disabled {
@@ -257,10 +262,12 @@ input {
   color: #fff;
 }
 
-/* STATUS BAR */
+/* =========================
+   STATUS BAR
+========================= */
+
 .status-bar {
-  flex: 0 0 auto;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255,255,255,0.06);
   padding: 10px;
   border-radius: 14px;
   font-size: 13px;
@@ -271,33 +278,33 @@ input {
   font-weight: 800;
 }
 
-/* PLAYERS (FILL REMAINING HEIGHT) */
+/* =========================
+   PLAYERS GRID
+========================= */
+
 .players {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  min-height: 0;
 }
 
 .player {
   position: relative;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255,255,255,0.05);
   border-radius: 18px;
   padding: 12px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   border: 2px solid transparent;
-  overflow: hidden;
-  min-height: 0;
 }
 
 .player.TURN {
   border-color: #22c55e;
 }
 
-/* selectable + disabled feedback */
 .player.SELECTABLE {
   cursor: pointer;
 }
@@ -306,44 +313,46 @@ input {
   opacity: 0.55;
 }
 
-/* 2s drink flash (tile only) */
+/* Drink flash (tile only) */
 .player.FLASH {
-  border-color: rgba(255, 80, 80, 0.95);
-  box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
+  border-color: rgba(255,80,80,0.95);
 }
 
 .player.FLASH::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 80, 80, 0.28);
-  pointer-events: none;
+  background: rgba(255,80,80,0.28);
   border-radius: inherit;
+  pointer-events: none;
 }
 
-/* Video placeholder */
+/* =========================
+   VIDEO PLACEHOLDER
+========================= */
+
 .video-slot {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 1;
   background: #000;
   border-radius: 12px;
   margin-bottom: 8px;
-  pointer-events: none;
 }
+
+/* =========================
+   PLAYER FOOTER
+========================= */
 
 .player-footer {
   display: flex;
-  align-items: baseline;
   justify-content: space-between;
-  gap: 10px;
+  align-items: baseline;
 }
 
 .player-name {
-  font-weight: 900;
   font-size: 18px;
+  font-weight: 900;
 }
 
-/* right-side cluster (badges + beers) */
 .player-right {
   display: flex;
   align-items: center;
@@ -351,50 +360,47 @@ input {
 }
 
 .player-beers {
-  opacity: 0.9;
   font-weight: 900;
-  white-space: nowrap;
 }
 
-/* Badges between name and beers */
+/* =========================
+   BADGES
+========================= */
+
 .badges {
   display: flex;
-  align-items: center;
   gap: 6px;
 }
 
 .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   min-width: 18px;
   height: 18px;
-  padding: 0 6px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 900;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* badge colors */
 .badge.b7 {
-  background: rgba(59, 130, 246, 0.95);
-  color: #fff;
+  background: #3b82f6;
 }
 
 .badge.bJ {
-  background: rgba(250, 204, 21, 0.95);
-  color: #111;
+  background: #facc15;
+  color: #000;
 }
 
 .badge.bQ {
-  background: rgba(168, 85, 247, 0.95);
-  color: #fff;
+  background: #a855f7;
 }
 
-/* RULE INPUT (K) */
+/* =========================
+   RULE INPUT (K)
+========================= */
+
 .rule-input {
-  flex: 0 0 auto;
   display: flex;
   gap: 8px;
 }
@@ -411,51 +417,4 @@ input {
   border-radius: 10px;
   border: none;
   font-weight: 900;
-}
-
-/* FULLSCREEN / LARGE VIEWPORT TUNING */
-:fullscreen .top-grid,
-:-webkit-full-screen .top-grid {
-  height: 230px;
-}
-
-:fullscreen .row,
-:-webkit-full-screen .row {
-  height: 30px;
-}
-
-:fullscreen .row-text,
-:-webkit-full-screen .row-text {
-  font-size: 11px;
-}
-
-:fullscreen .panel-title,
-:-webkit-full-screen .panel-title {
-  font-size: 13px;
-}
-
-:fullscreen .players,
-:-webkit-full-screen .players {
-  gap: 12px;
-}
-
-:fullscreen .player,
-:-webkit-full-screen .player {
-  padding: 14px;
-}
-
-:fullscreen .video-slot,
-:-webkit-full-screen .video-slot {
-  border-radius: 14px;
-  margin-bottom: 10px;
-}
-
-:fullscreen .player-name,
-:-webkit-full-screen .player-name {
-  font-size: 20px;
-}
-
-:fullscreen .player-beers,
-:-webkit-full-screen .player-beers {
-  font-size: 14px;
 }
