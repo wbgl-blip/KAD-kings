@@ -62,8 +62,8 @@ input {
 
 .fullscreen-btn {
   position: fixed;
-  top: 12px;
   right: 12px;
+  top: 12px;
   width: 44px;
   height: 40px;
   border-radius: 12px;
@@ -186,8 +186,14 @@ input {
   cursor: not-allowed;
 }
 
+.card-draw-label {
+  font-size: 18px;
+  letter-spacing: 0.12em;
+}
+
 .rank {
   font-size: 42px;
+  line-height: 1.05;
 }
 
 .rule-text {
@@ -218,6 +224,10 @@ input {
   padding: 12px;
   font-size: 16px;
   font-weight: 900;
+}
+
+.btn:disabled {
+  opacity: 0.45;
 }
 
 .btn.thumb {
@@ -268,13 +278,13 @@ input {
 }
 
 .meta-btn {
+  border: none;
   border-radius: 999px;
   padding: 6px 10px;
   background: rgba(255, 255, 255, 0.14);
   color: #fff;
   font-weight: 900;
   font-size: 12px;
-  border: none;
 }
 
 /* =========================
@@ -282,6 +292,7 @@ input {
 ========================= */
 .players {
   flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
@@ -309,11 +320,26 @@ input {
   padding: 14px;
 }
 
+/* Current turn highlight */
 .player.TURN {
   border-color: #22c55e;
 }
 
-/* 2s DRINK FLASH — PLAYER TILE ONLY */
+/* Selectable during action */
+.player.SELECTABLE {
+  cursor: pointer;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Disabled during action */
+.player.DISABLED {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* =========================
+   DRINK FLASH (PLAYER TILE ONLY)
+========================= */
 .player.FLASH {
   border-color: rgba(255, 80, 80, 0.95);
   box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
@@ -328,6 +354,9 @@ input {
   border-radius: inherit;
 }
 
+/* =========================
+   PLAYER CONTENT
+========================= */
 .video-slot {
   flex: 1;
   background: #000;
@@ -346,6 +375,7 @@ input {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 10px;
 }
 
 .player-name {
@@ -366,4 +396,26 @@ input {
 :fullscreen .player-beers,
 :-webkit-full-screen .player-beers {
   font-size: 14px;
+}
+
+/* =========================
+   RULE INPUT (K)
+========================= */
+.rule-input {
+  display: flex;
+  gap: 8px;
+}
+
+.rule-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+.rule-input button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 900;
 }
