@@ -23,10 +23,6 @@ input {
   appearance: none;
 }
 
-button {
-  -webkit-tap-highlight-color: transparent;
-}
-
 /* APP LAYOUT (NO SCROLL) */
 .app {
   height: 100svh;
@@ -84,7 +80,7 @@ button {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  height: 200px; /* fixed block so players can fill remaining space */
+  height: 200px; /* fixed so players fill remaining */
 }
 
 /* Panels */
@@ -144,17 +140,12 @@ button {
   font-weight: 900;
   user-select: none;
   text-align: center;
-  transition: transform 0.08s ease, opacity 0.12s ease;
 }
 
 .card.draw {
   background: #9ca3af;
   color: #111;
   cursor: pointer;
-}
-
-.card.draw:active {
-  transform: scale(0.99);
 }
 
 .card-draw-label {
@@ -193,78 +184,51 @@ button {
 }
 
 /* WATERFALL BANNER */
-.waterfall-banner {
+.banner {
   flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-}
-
-.waterfall-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.waterfall-text strong {
-  font-size: 13px;
-}
-
-.waterfall-text span {
-  font-size: 12px;
-  opacity: 0.85;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.waterfall-start {
+  width: 100%;
   border: none;
-  border-radius: 12px;
-  padding: 10px 12px;
+  border-radius: 14px;
+  padding: 12px 14px;
   font-weight: 900;
-  background: rgba(255, 255, 255, 0.18);
-  color: #fff;
+  font-size: 14px;
   cursor: pointer;
-  white-space: nowrap;
-  transition: transform 0.08s ease, opacity 0.12s ease;
+  text-align: center;
 }
 
-.waterfall-start:active {
-  transform: scale(0.99);
+.banner.waterfall {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.95), rgba(14, 165, 233, 0.95));
+  color: #06101a;
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-/* ACTION BUTTONS (4) */
-.actions-4 {
+/* ACTION BUTTONS — 4 IN ONE ROW */
+.actions {
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 10px;
+}
+
+/* 4 buttons fit one row (your request) */
+.actions-four {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 }
 
 .btn {
   border: none;
   border-radius: 14px;
-  padding: 12px;
-  font-size: 16px;
+  padding: 12px 0;
+  font-size: 18px;
   font-weight: 900;
-  cursor: pointer;
-  transition: transform 0.08s ease, opacity 0.12s ease;
-}
-
-.btn:active {
-  transform: scale(0.99);
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn:disabled {
   opacity: 0.45;
-  cursor: not-allowed;
 }
 
 .btn.thumb {
@@ -282,12 +246,12 @@ button {
   color: #fff;
 }
 
-.btn.qm {
+.btn.question {
   background: #a855f7;
   color: #fff;
 }
 
-/* STATUS BAR (SMALLER) */
+/* STATUS BAR */
 .status-bar {
   flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.06);
@@ -299,23 +263,6 @@ button {
 
 .status-main {
   font-weight: 800;
-}
-
-.status-meta {
-  margin-top: 8px;
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.meta-pill {
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.09);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  font-weight: 900;
-  font-size: 12px;
 }
 
 /* PLAYERS (FILL REMAINING HEIGHT) */
@@ -338,29 +285,22 @@ button {
   border: 2px solid transparent;
   overflow: hidden;
   min-height: 0;
-  transition: transform 0.08s ease, opacity 0.12s ease;
-}
-
-.player:active {
-  transform: scale(0.995);
 }
 
 .player.TURN {
   border-color: #22c55e;
 }
 
+/* selectable + disabled feedback */
 .player.SELECTABLE {
-  outline: 2px solid rgba(255, 255, 255, 0.16);
-  outline-offset: -2px;
   cursor: pointer;
 }
 
 .player.DISABLED {
   opacity: 0.55;
-  cursor: not-allowed;
 }
 
-/* 2s drink flash (PLAYER TILE ONLY) */
+/* 2s drink flash (tile only) */
 .player.FLASH {
   border-color: rgba(255, 80, 80, 0.95);
   box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
@@ -382,7 +322,7 @@ button {
   background: #000;
   border-radius: 12px;
   margin-bottom: 8px;
-  pointer-events: none; /* does not block taps */
+  pointer-events: none;
 }
 
 .player-footer {
@@ -397,12 +337,56 @@ button {
   font-size: 18px;
 }
 
+/* right-side cluster (badges + beers) */
+.player-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .player-beers {
   opacity: 0.9;
   font-weight: 900;
+  white-space: nowrap;
 }
 
-/* RULE INPUT */
+/* Badges between name and beers */
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* badge colors */
+.badge.b7 {
+  background: rgba(59, 130, 246, 0.95);
+  color: #fff;
+}
+
+.badge.bJ {
+  background: rgba(250, 204, 21, 0.95);
+  color: #111;
+}
+
+.badge.bQ {
+  background: rgba(168, 85, 247, 0.95);
+  color: #fff;
+}
+
+/* RULE INPUT (K) */
 .rule-input {
   flex: 0 0 auto;
   display: flex;
@@ -421,7 +405,6 @@ button {
   border-radius: 10px;
   border: none;
   font-weight: 900;
-  cursor: pointer;
 }
 
 /* FULLSCREEN / LARGE VIEWPORT TUNING */
