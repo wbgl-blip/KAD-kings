@@ -160,43 +160,34 @@ input {
 }
 
 .card-face {
-  width: 100%;
-  height: 100%;
-  padding: 10px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-}
-
-.card-draw-label {
-  font-size: 18px;
-  letter-spacing: 0.12em;
+  padding: 10px;
 }
 
 .rank {
-  font-size: 42px;
+  font-size: 44px;
   line-height: 1.05;
+  font-weight: 900;
 }
 
-.rule-text {
-  font-size: 12px;
+.card-label {
   margin-top: 6px;
-  font-weight: 800;
-  opacity: 0.9;
+  font-size: 14px;
+  font-weight: 900;
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
-.sub {
-  font-size: 12px;
-  opacity: 0.65;
-  margin-top: 4px;
-  font-weight: 800;
-}
-
-/* WATERFALL BANNER (CONFIG + RUNNING) */
+/* WATERFALL BANNER */
 .banner {
   flex: 0 0 auto;
   width: 100%;
   border-radius: 14px;
+  padding: 12px 12px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(255, 255, 255, 0.06);
   overflow: hidden;
@@ -205,7 +196,7 @@ input {
 .banner.waterfall {
   background: linear-gradient(
     90deg,
-    rgba(56, 189, 248, 0.22),
+    rgba(56, 189, 248, 0.18),
     rgba(14, 165, 233, 0.18)
   );
 }
@@ -213,7 +204,7 @@ input {
 .banner.waterfall.running {
   background: linear-gradient(
     90deg,
-    rgba(56, 189, 248, 0.26),
+    rgba(56, 189, 248, 0.22),
     rgba(14, 165, 233, 0.22)
   );
 }
@@ -222,18 +213,18 @@ input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .banner-title {
   font-weight: 900;
-  font-size: 14px;
+  letter-spacing: 0.02em;
 }
 
 .banner-x {
   border: none;
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.12);
   color: #fff;
   border-radius: 10px;
   width: 36px;
@@ -242,7 +233,6 @@ input {
 }
 
 .banner-body {
-  padding: 10px 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -256,10 +246,8 @@ input {
 }
 
 .wf-label {
-  font-size: 12px;
   font-weight: 900;
   opacity: 0.9;
-  white-space: nowrap;
 }
 
 .wf-controls {
@@ -267,24 +255,28 @@ input {
   align-items: center;
   gap: 10px;
   flex: 1;
+  justify-content: flex-end;
 }
 
 .wf-range {
   width: 100%;
+  max-width: 190px;
 }
 
 .wf-seconds {
-  min-width: 44px;
+  min-width: 38px;
   text-align: right;
   font-weight: 900;
-  opacity: 0.95;
+}
+
+.wf-row-bottom {
+  align-items: center;
 }
 
 .wf-toggle {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
   font-weight: 900;
   opacity: 0.95;
 }
@@ -294,22 +286,22 @@ input {
   border-radius: 12px;
   padding: 10px 14px;
   font-weight: 900;
-  background: rgba(14, 165, 233, 0.95);
+  background: rgba(56, 189, 248, 0.95);
   color: #06101a;
-  min-width: 92px;
 }
 
 .wf-foot {
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 800;
   opacity: 0.85;
   line-height: 1.25;
 }
 
 .wf-running {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 }
 
 .wf-count {
@@ -318,17 +310,16 @@ input {
 }
 
 .wf-sub {
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 800;
   opacity: 0.9;
   text-align: right;
-  line-height: 1.25;
 }
 
 /* ACTION BUTTONS — 4 IN ONE ROW */
 .actions {
   flex: 0 0 auto;
   display: grid;
-  gap: 10px;
 }
 
 .actions-four {
@@ -339,14 +330,14 @@ input {
 .btn {
   border: none;
   border-radius: 14px;
-  padding: 10px 0; /* tight to guarantee one row */
+  padding: 10px 0;
   font-size: 18px;
   font-weight: 900;
   -webkit-tap-highlight-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px; /* finger-friendly */
+  min-height: 44px;
 }
 
 .btn:disabled {
@@ -377,14 +368,14 @@ input {
 .status-bar {
   flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.06);
-  padding: 8px 10px;
+  padding: 10px;
   border-radius: 14px;
   font-size: 13px;
   text-align: center;
 }
 
 .status-main {
-  font-weight: 800;
+  font-weight: 900;
 }
 
 /* PLAYERS (FILL REMAINING HEIGHT) */
@@ -530,12 +521,11 @@ input {
 
 /* DEV PANEL */
 .dev {
-  flex: 0 0 auto;
-  margin-top: 6px;
+  margin-top: 8px;
   padding: 10px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   overflow: hidden;
 }
 
@@ -545,39 +535,33 @@ input {
 }
 
 .dev-row {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   margin-bottom: 10px;
 }
 
 .dev-btn {
   border: none;
   border-radius: 12px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.10);
-  color: #fff;
+  padding: 10px 12px;
   font-weight: 900;
-}
-
-.dev-btn:disabled {
-  opacity: 0.5;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
 }
 
 .dev-hint {
-  font-size: 11px;
-  opacity: 0.75;
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+  font-weight: 800;
 }
 
 .dev-subtitle {
   font-weight: 900;
-  font-size: 12px;
-  opacity: 0.9;
+  margin-bottom: 6px;
 }
 
 .dev-force-grid {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 6px;
 }
 
@@ -585,31 +569,27 @@ input {
   border: none;
   border-radius: 10px;
   padding: 8px 0;
-  background: rgba(255, 255, 255, 0.10);
-  color: #fff;
   font-weight: 900;
-  font-size: 12px;
-}
-
-.dev-chip:disabled {
-  opacity: 0.5;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
 }
 
 .dev-deck {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  max-height: 86px;
+  max-height: 90px;
   overflow: auto;
-  padding: 6px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.28);
+  padding-right: 4px;
 }
 
 .dev-card {
-  font-size: 12px;
   font-weight: 900;
-  opacity: 0.9;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 /* FULLSCREEN / LARGE VIEWPORT TUNING */
