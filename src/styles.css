@@ -13,7 +13,7 @@ body {
   background: radial-gradient(circle at top, #0f172a, #020617);
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow: hidden; /* prevent page scroll */
+  overflow: hidden; /* no page scroll on mobile */
 }
 
 button,
@@ -23,9 +23,7 @@ input {
   appearance: none;
 }
 
-/* =========================
-   APP LAYOUT
-========================= */
+/* APP LAYOUT (NO SCROLL) */
 .app {
   height: 100svh;
   max-width: 430px;
@@ -37,6 +35,7 @@ input {
   overflow: hidden;
 }
 
+/* Fullscreen: use the whole viewport */
 :fullscreen .app,
 :-webkit-full-screen .app {
   max-width: none;
@@ -46,12 +45,11 @@ input {
   padding: 16px;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 .header {
   position: relative;
   text-align: center;
+  flex: 0 0 auto;
 }
 
 .header h1 {
@@ -60,6 +58,7 @@ input {
   font-weight: 800;
 }
 
+/* Fullscreen button */
 .fullscreen-btn {
   position: fixed;
   right: 12px;
@@ -75,14 +74,13 @@ input {
   z-index: 50;
 }
 
-/* =========================
-   TOP GRID
-========================= */
+/* TOP GRID */
 .top-grid {
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  height: 200px;
+  height: 200px; /* fixed block so players can fill remaining space */
 }
 
 :fullscreen .top-grid,
@@ -90,9 +88,7 @@ input {
   height: 230px;
 }
 
-/* =========================
-   PANELS
-========================= */
+/* Panels */
 .panel {
   background: rgba(255, 255, 255, 0.04);
   border-radius: 18px;
@@ -134,6 +130,7 @@ input {
 }
 
 .row-text {
+  display: block;
   width: 100%;
   text-align: center;
   overflow: hidden;
@@ -147,13 +144,10 @@ input {
   font-size: 11px;
 }
 
-/* =========================
-   CARD / DECK
-========================= */
+/* CARD / DECK */
 .card-panel {
-  display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .card {
@@ -174,6 +168,11 @@ input {
   cursor: pointer;
 }
 
+.card-draw-label {
+  font-size: 18px;
+  letter-spacing: 0.12em;
+}
+
 .card.active {
   background: #fff;
   color: #000;
@@ -184,11 +183,6 @@ input {
 .card.disabled {
   opacity: 0.55;
   cursor: not-allowed;
-}
-
-.card-draw-label {
-  font-size: 18px;
-  letter-spacing: 0.12em;
 }
 
 .rank {
@@ -209,10 +203,9 @@ input {
   font-weight: 800;
 }
 
-/* =========================
-   ACTION BUTTONS
-========================= */
+/* ACTION BUTTONS */
 .actions {
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
@@ -224,6 +217,7 @@ input {
   padding: 12px;
   font-size: 16px;
   font-weight: 900;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn:disabled {
@@ -245,10 +239,9 @@ input {
   color: #fff;
 }
 
-/* =========================
-   STATUS BAR
-========================= */
+/* STATUS BAR */
 .status-bar {
+  flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.06);
   padding: 10px;
   border-radius: 14px;
@@ -287,9 +280,7 @@ input {
   font-size: 12px;
 }
 
-/* =========================
-   PLAYERS GRID
-========================= */
+/* PLAYERS (FILL REMAINING HEIGHT) */
 .players {
   flex: 1 1 auto;
   min-height: 0;
@@ -304,7 +295,7 @@ input {
 }
 
 .player {
-  position: relative;
+  position: relative; /* required for FLASH overlay */
   background: rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   padding: 12px;
@@ -313,6 +304,7 @@ input {
   justify-content: flex-end;
   border: 2px solid transparent;
   overflow: hidden;
+  min-height: 0;
 }
 
 :fullscreen .player,
@@ -320,26 +312,20 @@ input {
   padding: 14px;
 }
 
-/* Current turn highlight */
 .player.TURN {
   border-color: #22c55e;
 }
 
-/* Selectable during action */
+/* Optional UI helpers (not required, but safe) */
 .player.SELECTABLE {
-  cursor: pointer;
-  border-color: rgba(255, 255, 255, 0.25);
+  outline: 2px solid rgba(255, 255, 255, 0.16);
+  outline-offset: -2px;
 }
-
-/* Disabled during action */
 .player.DISABLED {
-  opacity: 0.45;
-  pointer-events: none;
+  opacity: 0.6;
 }
 
-/* =========================
-   DRINK FLASH (PLAYER TILE ONLY)
-========================= */
+/* 2s drink flash — PLAYER TILE ONLY */
 .player.FLASH {
   border-color: rgba(255, 80, 80, 0.95);
   box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
@@ -354,15 +340,14 @@ input {
   border-radius: inherit;
 }
 
-/* =========================
-   PLAYER CONTENT
-========================= */
+/* Video placeholder */
 .video-slot {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   background: #000;
   border-radius: 12px;
   margin-bottom: 8px;
-  pointer-events: none;
+  pointer-events: none; /* IMPORTANT: does not block taps on the tile */
 }
 
 :fullscreen .video-slot,
@@ -373,8 +358,8 @@ input {
 
 .player-footer {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
+  justify-content: space-between;
   gap: 10px;
 }
 
@@ -389,8 +374,8 @@ input {
 }
 
 .player-beers {
-  font-weight: 900;
   opacity: 0.9;
+  font-weight: 900;
 }
 
 :fullscreen .player-beers,
@@ -398,10 +383,9 @@ input {
   font-size: 14px;
 }
 
-/* =========================
-   RULE INPUT (K)
-========================= */
+/* RULE INPUT */
 .rule-input {
+  flex: 0 0 auto;
   display: flex;
   gap: 8px;
 }
