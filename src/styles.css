@@ -1,7 +1,4 @@
-/* =========================
-   GLOBAL RESET
-========================= */
-
+/* src/styles.css */
 * {
   box-sizing: border-box;
 }
@@ -16,7 +13,7 @@ body {
   background: radial-gradient(circle at top, #0f172a, #020617);
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow: hidden;
+  overflow: hidden; /* no page scroll on mobile */
 }
 
 button,
@@ -26,10 +23,11 @@ input {
   appearance: none;
 }
 
-/* =========================
-   APP LAYOUT
-========================= */
+button {
+  -webkit-tap-highlight-color: transparent;
+}
 
+/* APP LAYOUT (NO SCROLL) */
 .app {
   height: 100svh;
   max-width: 430px;
@@ -41,103 +39,126 @@ input {
   overflow: hidden;
 }
 
-/* Fullscreen override */
+/* In fullscreen, stop shrinking to 430px and use the whole viewport */
 :fullscreen .app,
 :-webkit-full-screen .app {
   max-width: none;
   width: 100vw;
   height: 100vh;
+  margin: 0;
   padding: 16px;
 }
 
-/* =========================
-   HEADER
-========================= */
-
+/* HEADER */
 .header {
-  position: relative;
-  text-align: center;
   flex: 0 0 auto;
+}
+
+.header-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 10px;
 }
 
 .header h1 {
   margin: 0;
+  text-align: center;
   font-size: 26px;
-  font-weight: 800;
+  font-weight: 900;
+  letter-spacing: 0.02em;
 }
 
-.fullscreen-btn {
-  position: fixed;
-  top: 12px;
-  right: 12px;
+/* left dev icon */
+.icon-btn {
   width: 44px;
   height: 40px;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
   color: #fff;
-  font-weight: 800;
-  z-index: 50;
+  font-size: 16px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* =========================
-   TOP GRID
-========================= */
+.icon-btn:disabled {
+  opacity: 0.35;
+}
 
+/* fullscreen button (top-right) */
+.fullscreen-btn {
+  width: 44px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* TOP GRID */
 .top-grid {
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  height: 200px;
+  height: 200px; /* fixed so players fill remaining */
 }
 
-/* =========================
-   PANELS
-========================= */
-
+/* Panels */
 .panel {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 18px;
   padding: 10px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
 .panel-title {
-  font-weight: 800;
-  font-size: 14px;
+  font-weight: 900;
   margin-bottom: 8px;
+  opacity: 0.95;
+  font-size: 14px;
 }
 
 .row {
   height: 34px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   margin-bottom: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.8;
   padding: 0 10px;
+  overflow: hidden;
 }
 
 .row-text {
-  font-size: 12px;
-  opacity: 0.85;
-  white-space: nowrap;
+  display: block;
+  width: 100%;
+  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
 }
 
-/* =========================
-   CARD / DECK
-========================= */
-
+/* CARD / DECK */
 .card-panel {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .card {
@@ -147,7 +168,7 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
+  font-weight: 950;
   user-select: none;
   text-align: center;
 }
@@ -156,6 +177,11 @@ input {
   background: #9ca3af;
   color: #111;
   cursor: pointer;
+}
+
+.card-draw-label {
+  font-size: 18px;
+  letter-spacing: 0.12em;
 }
 
 .card.active {
@@ -170,56 +196,53 @@ input {
   cursor: not-allowed;
 }
 
-.card-draw-label {
-  font-size: 18px;
-  letter-spacing: 0.12em;
-}
-
 .rank {
   font-size: 42px;
+  line-height: 1.05;
 }
 
 .rule-text {
   font-size: 12px;
-  font-weight: 800;
   margin-top: 6px;
+  font-weight: 900;
 }
 
 .sub {
   font-size: 12px;
-  opacity: 0.6;
+  opacity: 0.65;
   margin-top: 4px;
+  font-weight: 900;
 }
 
-/* =========================
-   WATERFALL BANNER
-========================= */
-
+/* WATERFALL BANNER */
 .banner {
+  flex: 0 0 auto;
   width: 100%;
-  border-radius: 14px;
-  padding: 12px;
-  font-weight: 900;
   border: none;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 950;
+  font-size: 14px;
   cursor: pointer;
+  text-align: center;
+  min-height: 44px;
 }
 
 .banner.waterfall {
   background: linear-gradient(
     90deg,
-    rgba(56,189,248,0.95),
-    rgba(14,165,233,0.95)
+    rgba(56, 189, 248, 0.95),
+    rgba(14, 165, 233, 0.95)
   );
   color: #06101a;
-  border: 1px solid rgba(255,255,255,0.18);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-/* =========================
-   ACTION BUTTONS (4 IN ROW)
-========================= */
-
+/* ACTION BUTTONS — 4 IN ONE ROW */
 .actions {
+  flex: 0 0 auto;
   display: grid;
+  gap: 10px;
 }
 
 .actions-four {
@@ -228,14 +251,15 @@ input {
 }
 
 .btn {
-  min-height: 44px;
-  border-radius: 14px;
   border: none;
+  border-radius: 14px;
+  padding: 10px 0; /* tighter to guarantee one row */
   font-size: 18px;
-  font-weight: 900;
-  display: flex;
+  font-weight: 950;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 44px; /* finger-friendly */
 }
 
 .btn:disabled {
@@ -262,12 +286,10 @@ input {
   color: #fff;
 }
 
-/* =========================
-   STATUS BAR
-========================= */
-
+/* STATUS BAR (compact) */
 .status-bar {
-  background: rgba(255,255,255,0.06);
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.06);
   padding: 10px;
   border-radius: 14px;
   font-size: 13px;
@@ -275,84 +297,84 @@ input {
 }
 
 .status-main {
-  font-weight: 800;
+  font-weight: 900;
 }
 
-/* =========================
-   PLAYERS GRID
-========================= */
-
+/* PLAYERS (FILL REMAINING HEIGHT) */
 .players {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  min-height: 0;
 }
 
 .player {
   position: relative;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   padding: 12px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   border: 2px solid transparent;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .player.TURN {
   border-color: #22c55e;
 }
 
+/* selectable + disabled feedback */
 .player.SELECTABLE {
   cursor: pointer;
+  outline: 2px solid rgba(255, 255, 255, 0.08);
+  outline-offset: -2px;
 }
 
 .player.DISABLED {
   opacity: 0.55;
 }
 
-/* Drink flash (tile only) */
+/* 2s drink flash (tile only) */
 .player.FLASH {
-  border-color: rgba(255,80,80,0.95);
+  border-color: rgba(255, 80, 80, 0.95);
+  box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
 }
 
 .player.FLASH::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255,80,80,0.28);
-  border-radius: inherit;
+  background: rgba(255, 80, 80, 0.28);
   pointer-events: none;
+  border-radius: inherit;
 }
 
-/* =========================
-   VIDEO PLACEHOLDER
-========================= */
-
+/* Video placeholder */
 .video-slot {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   background: #000;
   border-radius: 12px;
   margin-bottom: 8px;
+  pointer-events: none;
 }
-
-/* =========================
-   PLAYER FOOTER
-========================= */
 
 .player-footer {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .player-name {
+  font-weight: 950;
   font-size: 18px;
-  font-weight: 900;
 }
 
+/* right-side cluster (badges + beers) */
 .player-right {
   display: flex;
   align-items: center;
@@ -360,47 +382,50 @@ input {
 }
 
 .player-beers {
-  font-weight: 900;
+  opacity: 0.9;
+  font-weight: 950;
+  white-space: nowrap;
 }
 
-/* =========================
-   BADGES
-========================= */
-
+/* Badges between name and beers */
 .badges {
   display: flex;
+  align-items: center;
   gap: 6px;
 }
 
 .badge {
-  min-width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 900;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1;
 }
 
+/* badge colors */
 .badge.b7 {
-  background: #3b82f6;
+  background: rgba(59, 130, 246, 0.95);
+  color: #fff;
 }
 
 .badge.bJ {
-  background: #facc15;
-  color: #000;
+  background: rgba(250, 204, 21, 0.95);
+  color: #111;
 }
 
 .badge.bQ {
-  background: #a855f7;
+  background: rgba(168, 85, 247, 0.95);
+  color: #fff;
 }
 
-/* =========================
-   RULE INPUT (K)
-========================= */
-
+/* RULE INPUT (K) */
 .rule-input {
+  flex: 0 0 auto;
   display: flex;
   gap: 8px;
 }
@@ -416,5 +441,192 @@ input {
   padding: 10px 14px;
   border-radius: 10px;
   border: none;
+  font-weight: 950;
+}
+
+/* DEV OVERLAY */
+.dev-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+}
+
+.dev-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.65);
+  border: none;
+  z-index: 201;
+}
+
+.dev-modal {
+  position: relative;
+  z-index: 202;
+  width: min(92vw, 520px);
+  max-height: 78vh;
+  overflow: hidden;
+  background: rgba(2, 6, 23, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 10px 60px rgba(0, 0, 0, 0.45);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dev-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dev-title {
+  font-weight: 950;
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.dev-close {
+  width: 40px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-weight: 950;
+}
+
+.dev-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dev-pill {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+}
+
+.dev-pill-k {
+  opacity: 0.75;
+  font-weight: 800;
+}
+
+.dev-pill-v {
+  font-weight: 950;
+}
+
+.dev-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.dev-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 10px 12px;
+  min-height: 44px;
+  font-weight: 950;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.dev-btn.secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.dev-list {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dev-list-title {
+  font-size: 12px;
   font-weight: 900;
+  opacity: 0.8;
+}
+
+.dev-cards {
+  overflow: auto;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dev-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-weight: 950;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* FULLSCREEN / LARGE VIEWPORT TUNING */
+:fullscreen .top-grid,
+:-webkit-full-screen .top-grid {
+  height: 230px;
+}
+
+:fullscreen .row,
+:-webkit-full-screen .row {
+  height: 30px;
+}
+
+:fullscreen .row-text,
+:-webkit-full-screen .row-text {
+  font-size: 11px;
+}
+
+:fullscreen .panel-title,
+:-webkit-full-screen .panel-title {
+  font-size: 13px;
+}
+
+:fullscreen .players,
+:-webkit-full-screen .players {
+  gap: 12px;
+}
+
+:fullscreen .player,
+:-webkit-full-screen .player {
+  padding: 14px;
+}
+
+:fullscreen .video-slot,
+:-webkit-full-screen .video-slot {
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+:fullscreen .player-name,
+:-webkit-full-screen .player-name {
+  font-size: 20px;
+}
+
+:fullscreen .player-beers,
+:-webkit-full-screen .player-beers {
+  font-size: 14px;
 }
