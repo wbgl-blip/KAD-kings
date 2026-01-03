@@ -126,6 +126,7 @@ input {
 
 /* CARD / DECK */
 .card-panel {
+  display: flex;                 /* IMPORTANT */
   justify-content: center;
   align-items: center;
 }
@@ -197,7 +198,11 @@ input {
 }
 
 .banner.waterfall {
-  background: linear-gradient(90deg, rgba(56, 189, 248, 0.95), rgba(14, 165, 233, 0.95));
+  background: linear-gradient(
+    90deg,
+    rgba(56, 189, 248, 0.95),
+    rgba(14, 165, 233, 0.95)
+  );
   color: #06101a;
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
@@ -209,7 +214,7 @@ input {
   gap: 10px;
 }
 
-/* 4 buttons fit one row (your request) */
+/* 4 buttons fit one row */
 .actions-four {
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
@@ -218,13 +223,14 @@ input {
 .btn {
   border: none;
   border-radius: 14px;
-  padding: 12px 0;
+  padding: 10px 0;              /* tighter to guarantee one row */
   font-size: 18px;
   font-weight: 900;
   -webkit-tap-highlight-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 44px;             /* finger-friendly */
 }
 
 .btn:disabled {
