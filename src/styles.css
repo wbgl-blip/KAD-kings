@@ -23,10 +23,6 @@ input {
   appearance: none;
 }
 
-button {
-  -webkit-tap-highlight-color: transparent;
-}
-
 /* APP LAYOUT (NO SCROLL) */
 .app {
   height: 100svh;
@@ -60,23 +56,6 @@ button {
   margin: 0;
   font-size: 26px;
   font-weight: 800;
-  letter-spacing: 0.01em;
-}
-
-/* DEV pill */
-.dev-pill {
-  position: fixed;
-  left: 12px;
-  top: 12px;
-  height: 32px;
-  padding: 0 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  font-weight: 900;
-  font-size: 13px;
-  z-index: 60;
 }
 
 /* keep it in the top-right even in fullscreen */
@@ -92,7 +71,7 @@ button {
   color: #fff;
   font-size: 16px;
   font-weight: 800;
-  z-index: 60;
+  z-index: 50;
 }
 
 /* TOP GRID */
@@ -116,7 +95,7 @@ button {
 }
 
 .panel-title {
-  font-weight: 900;
+  font-weight: 800;
   margin-bottom: 8px;
   opacity: 0.95;
   font-size: 14px;
@@ -133,23 +112,6 @@ button {
   opacity: 0.78;
   padding: 0 10px;
   overflow: hidden;
-  position: relative;
-}
-
-/* mates-row flash */
-.row.FLASH {
-  opacity: 1;
-  background: rgba(255, 80, 80, 0.18);
-  border: 1px solid rgba(255, 80, 80, 0.25);
-}
-
-.row.FLASH::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 80, 80, 0.14);
-  pointer-events: none;
-  border-radius: inherit;
 }
 
 .row-text {
@@ -165,8 +127,8 @@ button {
 /* CARD / DECK */
 .card-panel {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
 .card {
@@ -174,12 +136,13 @@ button {
   height: 100%;
   border-radius: 16px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-weight: 900;
   user-select: none;
   text-align: center;
-  overflow: hidden; /* prevents weird overlap artifacts */
+  padding: 10px;
 }
 
 .card.draw {
@@ -188,25 +151,10 @@ button {
   cursor: pointer;
 }
 
-.card-draw-label {
-  font-size: 18px;
-  letter-spacing: 0.12em;
-}
-
 .card.active {
   background: #fff;
   color: #000;
-  padding: 10px;
-}
-
-.card-inner {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
+  cursor: default;
 }
 
 .card.disabled {
@@ -214,25 +162,36 @@ button {
   cursor: not-allowed;
 }
 
+.card-draw-label {
+  font-size: 18px;
+  letter-spacing: 0.12em;
+}
+
 .rank {
-  font-size: 44px;
+  font-size: 42px;
   line-height: 1.05;
-  font-weight: 1000;
 }
 
 .rule-text {
-  width: 100%;
-  max-width: 95%;
-  font-size: 12px;
-  line-height: 1.25;
+  font-size: 13px;
+  margin-top: 6px;
   font-weight: 900;
-  text-wrap: pretty;
+}
+
+.card-instruction {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.85;
+  line-height: 1.25;
+  max-width: 96%;
 }
 
 .sub {
   font-size: 12px;
   opacity: 0.65;
-  font-weight: 900;
+  margin-top: 6px;
+  font-weight: 800;
 }
 
 /* WATERFALL BANNER */
@@ -242,45 +201,40 @@ button {
   border: none;
   border-radius: 14px;
   padding: 12px 14px;
-  font-weight: 1000;
+  font-weight: 900;
   font-size: 14px;
   cursor: pointer;
   text-align: center;
 }
 
 .banner.waterfall {
-  background: linear-gradient(
-    90deg,
-    rgba(56, 189, 248, 0.95),
-    rgba(14, 165, 233, 0.95)
-  );
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.95), rgba(14, 165, 233, 0.95));
   color: #06101a;
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-/* ACTION BUTTONS — 4 IN ONE ROW (icon-only, guaranteed fit) */
+/* ACTION BUTTONS — 4 IN ONE ROW */
 .actions {
   flex: 0 0 auto;
   display: grid;
 }
 
-/* Fit one row on small phones */
 .actions-four {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
 
 .btn {
   border: none;
   border-radius: 14px;
-  padding: 10px 0; /* tight to guarantee one row */
+  padding: 10px 0;
   font-size: 18px;
-  font-weight: 1000;
+  font-weight: 900;
+  -webkit-tap-highlight-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 44px; /* finger-friendly */
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
 }
 
 .btn:disabled {
@@ -305,20 +259,6 @@ button {
 .btn.question {
   background: #a855f7;
   color: #fff;
-}
-
-/* STATUS BAR */
-.status-bar {
-  flex: 0 0 auto;
-  background: rgba(255, 255, 255, 0.06);
-  padding: 12px 10px;
-  border-radius: 14px;
-  font-size: 14px;
-  text-align: center;
-}
-
-.status-main {
-  font-weight: 900;
 }
 
 /* PLAYERS (FILL REMAINING HEIGHT) */
@@ -389,7 +329,7 @@ button {
 }
 
 .player-name {
-  font-weight: 1000;
+  font-weight: 900;
   font-size: 18px;
 }
 
@@ -402,7 +342,7 @@ button {
 
 .player-beers {
   opacity: 0.9;
-  font-weight: 1000;
+  font-weight: 900;
   white-space: nowrap;
 }
 
@@ -422,7 +362,7 @@ button {
   padding: 0 6px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 1000;
+  font-weight: 900;
   line-height: 1;
 }
 
@@ -454,147 +394,83 @@ button {
   padding: 10px;
   border-radius: 10px;
   border: none;
-  background: rgba(255, 255, 255, 0.92);
-  color: #111;
-  outline: none;
 }
 
 .rule-input button {
   padding: 10px 14px;
   border-radius: 10px;
   border: none;
-  font-weight: 1000;
-}
-
-/* =========================
-   DEV MODAL
-========================= */
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(2, 6, 23, 0.7);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 12px;
-  z-index: 80;
-}
-
-.modal {
-  width: 100%;
-  max-width: 560px;
-  background: rgba(15, 23, 42, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 18px;
-  padding: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.modal-title {
-  font-weight: 1000;
-  font-size: 16px;
-}
-
-.modal-close {
-  border: none;
-  background: rgba(255, 255, 255, 0.10);
-  color: #fff;
-  border-radius: 12px;
-  width: 40px;
-  height: 36px;
   font-weight: 900;
 }
 
-.modal-section {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+/* DEV PANEL */
+.dev-panel {
+  flex: 0 0 auto;
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
 }
 
-.modal-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-.modal-actions {
-  margin-top: 10px;
-}
-
-.small-btn {
-  border: none;
-  border-radius: 12px;
-  padding: 10px 12px;
-  font-weight: 1000;
-  background: rgba(255, 255, 255, 0.10);
-  color: #fff;
-}
-
-.modal-subtitle {
-  font-weight: 1000;
+.dev-title {
+  font-weight: 900;
   margin-bottom: 8px;
 }
 
-.muted {
-  opacity: 0.8;
-}
-
-.mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
-  font-weight: 900;
-}
-
-.force-grid {
-  display: grid;
-  grid-template-columns: repeat(13, minmax(0, 1fr));
-  gap: 6px;
-}
-
-.force-btn {
-  border: none;
-  border-radius: 10px;
-  padding: 10px 0;
-  font-weight: 1000;
-  background: rgba(255, 255, 255, 0.10);
-  color: #fff;
-}
-
-.force-btn:disabled {
-  opacity: 0.45;
-}
-
-.deck-list {
+.dev-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  max-height: 34vh;
-  overflow: auto;
-  padding-right: 6px;
+  margin-bottom: 10px;
 }
 
-.deck-chip {
+.dev-btn {
   border: none;
   border-radius: 999px;
-  padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.10);
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.14);
   color: #fff;
-  font-weight: 1000;
+  font-weight: 900;
   font-size: 12px;
 }
 
-.deck-chip:disabled {
-  opacity: 0.45;
+.dev-decklist {
+  opacity: 0.95;
+}
+
+.dev-subtitle {
+  font-weight: 900;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.dev-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 78px;
+  overflow: hidden;
+}
+
+.dev-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.dev-more {
+  font-size: 12px;
+  opacity: 0.85;
+  font-weight: 900;
+  padding: 4px 8px;
 }
 
 /* FULLSCREEN / LARGE VIEWPORT TUNING */
