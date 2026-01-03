@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./styles.css";
 
@@ -27,8 +26,6 @@ const CARD_LABEL = {
 };
 
 const DRINK_FLASH_MS = 2000;
-
-// Waterfall (Ace)
 const WF_MIN_S = 3;
 const WF_MAX_S = 20;
 
@@ -46,30 +43,15 @@ function buildDeck() {
   return deck;
 }
 
-function randInt(min, max) {
-  return Math.floor(min + Math.random() * (max - min + 1));
-}
+const randInt = (min, max) =>
+  Math.floor(min + Math.random() * (max - min + 1));
 
 /* =====================================================
    APP
 ===================================================== */
 
 export default function App() {
-  /**
-   * PHASES
-   * IDLE
-   * WATERFALL_READY
-   * WATERFALL_RUNNING
-   * PICK_DRINK
-   * PICK_MATE
-   * PICK_LOSER
-   * MAKE_RULE
-   * REACTION_ACTIVE
-   * QM_PICK
-   * RULE_BREAK_PICK
-   */
   const [phase, setPhase] = useState("IDLE");
-
   const [deck, setDeck] = useState(buildDeck);
   const [card, setCard] = useState(null);
   const [turnIndex, setTurnIndex] = useState(0);
@@ -89,6 +71,7 @@ export default function App() {
 
   const [rules, setRules] = useState([]);
   const [ruleDraft, setRuleDraft] = useState("");
+
   const [pendingLoserMode, setPendingLoserMode] = useState(null);
 
   const [reaction, setReaction] = useState({
@@ -99,6 +82,10 @@ export default function App() {
 
   const [flashNames, setFlashNames] = useState(new Set());
   const flashTimerRef = useRef(null);
+  const consumeTapRef = useRef(false);
+
+  const [wfRemaining, setWfRemaining] = useState(0);
+  const wfIntervalRef = useRef(null);
 
   const playersRef = useRef(players);
   playersRef.current = players;
@@ -111,18 +98,14 @@ export default function App() {
 
   const currentPlayer = players[turnIndex];
 
-  // Waterfall
-  const [wfRemaining, setWfRemaining] = useState(0);
-  const wfIntervalRef = useRef(null);
-
   /* =====================================================
      CLEANUP
   ===================================================== */
 
   useEffect(() => {
     return () => {
-      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
-      if (wfIntervalRef.current) clearInterval(wfIntervalRef.current);
+      clearTimeout(flashTimerRef.current);
+      clearInterval(wfIntervalRef.current);
     };
   }, []);
 
@@ -167,26 +150,21 @@ export default function App() {
     flashPlayers([...affected]);
   }
 
-  function giveManyWithFlash(names) {
-    const union = new Set();
-    names.forEach((n) => mateClosure(n).forEach((x) => union.add(x)));
+  function giveEveryone(amount) {
     setPlayers((prev) =>
-      prev.map((p) =>
-        union.has(p.name) ? { ...p, beers: p.beers + 1 } : p
-      )
-    );
-    flashPlayers([...union]);
-  }
-
-  function addEveryoneNoMates() {
-    setPlayers((prev) =>
-      prev.map((p) => ({ ...p, beers: p.beers + 1 }))
+      prev.map((p) => ({ ...p, beers: p.beers + amount }))
     );
   }
 
   /* =====================================================
-     WATERFALL (ACE) — FINAL
+     WATERFALL (ACE)
 ===================================================== */
+
+  function beginWaterfallReady() {
+    clearInterval(wfIntervalRef.current);
+    setWfRemaining(0);
+    setPhase("WATERFALL_READY");
+  }
 
   function startWaterfall() {
     if (phaseRef.current !== "WATERFALL_READY") return;
@@ -196,45 +174,50 @@ export default function App() {
     setPhase("WATERFALL_RUNNING");
 
     wfIntervalRef.current = setInterval(() => {
-      setWfRemaining((prev) => {
-        if (prev <= 1) {
+      giveEveryone(1);
+      setWfRemaining((s) => {
+        if (s <= 1) {
           clearInterval(wfIntervalRef.current);
-          wfIntervalRef.current = null;
           setPhase("IDLE");
           nextTurn();
           return 0;
         }
-
-        // +1 EVERY SECOND (no mates, no flash)
-        addEveryoneNoMates();
-        return prev - 1;
+        return s - 1;
       });
     }, 1000);
+  }
+
+  function cancelWaterfall() {
+    clearInterval(wfIntervalRef.current);
+    setWfRemaining(0);
+    setPhase("IDLE");
   }
 
   /* =====================================================
      DRAW CARD
 ===================================================== */
 
-  function applyDraw(rank) {
-    const drawer = playersRef.current[turnIndex]?.name;
+  function drawCard() {
+    if (phaseRef.current !== "IDLE") return;
+    if (!deckRef.current.length) return;
 
-    if (rank === "A") return setPhase("WATERFALL_READY");
+    const [next, ...rest] = deckRef.current;
+    setDeck(rest);
+    setCard(next);
+    applyCard(next.rank);
+  }
+
+  function applyCard(rank) {
+    const drawer = currentPlayer?.name;
+
+    if (rank === "A") return beginWaterfallReady();
     if (rank === "2") return setPhase("PICK_DRINK");
     if (rank === "3") {
       giveDrinkWithFlash(drawer);
       return nextTurn();
     }
-    if (rank === "4") {
-      giveManyWithFlash(playersRef.current.filter(p => p.gender === "F").map(p => p.name));
-      return nextTurn();
-    }
-    if (rank === "5") {
-      giveManyWithFlash(playersRef.current.filter(p => p.gender === "M").map(p => p.name));
-      return nextTurn();
-    }
     if (rank === "6") {
-      giveManyWithFlash(playersRef.current.map(p => p.name));
+      playersRef.current.forEach((p) => giveDrinkWithFlash(p.name));
       return nextTurn();
     }
     if (rank === "7") {
@@ -263,30 +246,61 @@ export default function App() {
     nextTurn();
   }
 
-  function drawCard() {
-    if (phaseRef.current !== "IDLE") return;
-    const [next, ...rest] = deckRef.current;
-    if (!next) return;
-    setDeck(rest);
-    setCard(next);
-    applyDraw(next.rank);
+  /* =====================================================
+     PLAYER TAP
+===================================================== */
+
+  function tapPlayer(name) {
+    if (consumeTapRef.current) return;
+
+    if (phaseRef.current === "PICK_DRINK") {
+      consumeTapRef.current = true;
+      giveDrinkWithFlash(name);
+      setPhase("IDLE");
+      nextTurn();
+    }
+
+    if (phaseRef.current === "PICK_MATE") {
+      const drawer = currentPlayer.name;
+      if (name === drawer) return;
+      consumeTapRef.current = true;
+      setPlayers((p) =>
+        p.map((x) =>
+          x.name === drawer
+            ? { ...x, mates: [...new Set([...x.mates, name])] }
+            : x
+        )
+      );
+      setPhase("IDLE");
+      nextTurn();
+    }
+
+    if (phaseRef.current === "PICK_LOSER") {
+      consumeTapRef.current = true;
+      giveDrinkWithFlash(name);
+      setPendingLoserMode(null);
+      setPhase("IDLE");
+      nextTurn();
+    }
+
+    setTimeout(() => (consumeTapRef.current = false), 0);
   }
 
   /* =====================================================
-     STATUS
+     STATUS TEXT
 ===================================================== */
 
-  function statusCopy() {
+  function statusText() {
     if (!card) return "Tap the deck to start";
     if (phase === "WATERFALL_READY")
-      return "Waterfall — tap Start when ready";
+      return "🌊 Waterfall — press Start (random 3–20s, +1 per second)";
     if (phase === "WATERFALL_RUNNING")
-      return `🌊 Waterfall — +1 drink per second (${wfRemaining}s)`;
+      return `🌊 Waterfall running — ${wfRemaining}s`;
     if (phase === "PICK_MATE") return "Pick ONE mate";
     if (phase === "PICK_DRINK") return "Pick someone to drink";
     if (phase === "PICK_LOSER")
-      return `${pendingLoserMode === "CATEGORIES" ? "Categories" : "Rhyme"} — tap loser`;
-    if (phase === "MAKE_RULE") return "Make a rule";
+      return `${pendingLoserMode} — tap the loser`;
+    if (phase === "MAKE_RULE") return "Create a rule";
     return CARD_LABEL[card.rank];
   }
 
@@ -301,10 +315,17 @@ export default function App() {
       </header>
 
       <section className="top-grid">
-        <Panel title="🤝 Mates" items={[]} />
+        <Panel title="🤝 Mates" items={players.flatMap((p) =>
+          p.mates.map((m) => `${p.name} → ${m}`)
+        )} />
 
         <div className="panel card-panel">
-          <div className={`card ${card ? "active" : "draw"}`} onClick={drawCard}>
+          <div
+            className={`card ${card ? "active" : "draw"} ${
+              phase !== "IDLE" ? "disabled" : ""
+            }`}
+            onClick={drawCard}
+          >
             <div className="card-face">
               <div className="card-rank">
                 {card ? `${card.rank}${card.suit}` : "DECK"}
@@ -312,6 +333,7 @@ export default function App() {
               <div className="card-label">
                 {card ? CARD_LABEL[card.rank] : "Tap to Start"}
               </div>
+              <div className="card-sub">{deck.length} cards left</div>
             </div>
           </div>
         </div>
@@ -319,17 +341,24 @@ export default function App() {
         <Panel title="📜 Rules" items={rules} />
       </section>
 
-      {phase === "WATERFALL_READY" && (
+      {(phase === "WATERFALL_READY" || phase === "WATERFALL_RUNNING") && (
         <div className="banner waterfall">
-          <button className="wf-start" onClick={startWaterfall}>
-            🌊 Start Waterfall
-          </button>
+          <div className="banner-top">
+            <strong>🌊 Waterfall</strong>
+            <button onClick={cancelWaterfall}>✕</button>
+          </div>
+
+          {phase === "WATERFALL_READY" ? (
+            <button className="wf-start" onClick={startWaterfall}>
+              Start
+            </button>
+          ) : (
+            <div className="wf-count">{wfRemaining}s</div>
+          )}
         </div>
       )}
 
-      <section className="status-bar">
-        <div className="status-main">{statusCopy()}</div>
-      </section>
+      <div className="status-bar">{statusText()}</div>
 
       <section className="players">
         {players.map((p) => (
@@ -338,11 +367,12 @@ export default function App() {
             className={`player ${
               p.name === currentPlayer?.name ? "TURN" : ""
             } ${flashNames.has(p.name) ? "FLASH" : ""}`}
+            onClick={() => tapPlayer(p.name)}
           >
             <div className="video-slot" />
             <div className="player-footer">
-              <span className="player-name">{p.name}</span>
-              <span className="player-beers">🍺 {p.beers}</span>
+              <span>{p.name}</span>
+              <span>🍺 {p.beers}</span>
             </div>
           </div>
         ))}
@@ -353,12 +383,11 @@ export default function App() {
           <input
             value={ruleDraft}
             onChange={(e) => setRuleDraft(e.target.value)}
-            placeholder="Type the rule…"
+            placeholder="Type rule..."
           />
           <button
             onClick={() => {
-              if (!ruleDraft.trim()) return;
-              setRules((r) => [...r, ruleDraft.trim()]);
+              setRules((r) => [...r, ruleDraft]);
               setRuleDraft("");
               setPhase("IDLE");
               nextTurn();
@@ -376,13 +405,13 @@ export default function App() {
    PANEL
 ===================================================== */
 
-function Panel({ title, items }) {
+function Panel({ title, items = [] }) {
   return (
     <div className="panel">
       <div className="panel-title">{title}</div>
       {[...Array(4)].map((_, i) => (
         <div key={i} className="row">
-          <span className="row-text">{items[i] || "—"}</span>
+          {items[i] || "—"}
         </div>
       ))}
     </div>
