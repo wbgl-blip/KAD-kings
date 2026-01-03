@@ -13,7 +13,7 @@ body {
   background: radial-gradient(circle at top, #0f172a, #020617);
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow: hidden; /* no page scroll on mobile */
+  overflow: hidden;
 }
 
 button,
@@ -23,11 +23,7 @@ input {
   appearance: none;
 }
 
-button {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* APP LAYOUT (NO SCROLL) */
+/* APP LAYOUT */
 .app {
   height: 100svh;
   max-width: 430px;
@@ -39,7 +35,6 @@ button {
   overflow: hidden;
 }
 
-/* In fullscreen, stop shrinking to 430px and use the whole viewport */
 :fullscreen .app,
 :-webkit-full-screen .app {
   max-width: none;
@@ -51,46 +46,21 @@ button {
 
 /* HEADER */
 .header {
-  flex: 0 0 auto;
-}
-
-.header-row {
   position: relative;
-  display: grid;
-  grid-template-columns: 44px 1fr 44px;
-  align-items: center;
-  gap: 10px;
+  text-align: center;
+  flex: 0 0 auto;
 }
 
 .header h1 {
   margin: 0;
-  text-align: center;
   font-size: 26px;
-  font-weight: 900;
-  letter-spacing: 0.02em;
+  font-weight: 800;
 }
 
-/* left dev icon */
-.icon-btn {
-  width: 44px;
-  height: 40px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 900;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-btn:disabled {
-  opacity: 0.35;
-}
-
-/* fullscreen button (top-right) */
 .fullscreen-btn {
+  position: fixed;
+  right: 12px;
+  top: 12px;
   width: 44px;
   height: 40px;
   border-radius: 12px;
@@ -98,10 +68,8 @@ button {
   background: rgba(255, 255, 255, 0.06);
   color: #fff;
   font-size: 16px;
-  font-weight: 900;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  font-weight: 800;
+  z-index: 50;
 }
 
 /* TOP GRID */
@@ -110,7 +78,7 @@ button {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  height: 200px; /* fixed so players fill remaining */
+  height: 200px;
 }
 
 /* Panels */
@@ -125,7 +93,7 @@ button {
 }
 
 .panel-title {
-  font-weight: 900;
+  font-weight: 800;
   margin-bottom: 8px;
   opacity: 0.95;
   font-size: 14px;
@@ -139,9 +107,19 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.8;
+  opacity: 0.78;
   padding: 0 10px;
   overflow: hidden;
+}
+
+.row.ROW_CLICK {
+  cursor: pointer;
+  opacity: 0.92;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.row.ROW_CLICK:active {
+  transform: scale(0.99);
 }
 
 .row-text {
@@ -168,7 +146,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 950;
+  font-weight: 900;
   user-select: none;
   text-align: center;
 }
@@ -204,14 +182,31 @@ button {
 .rule-text {
   font-size: 12px;
   margin-top: 6px;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .sub {
   font-size: 12px;
   opacity: 0.65;
   margin-top: 4px;
+  font-weight: 800;
+}
+
+.mini-history {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0.7;
   font-weight: 900;
+  font-size: 12px;
+}
+
+.mini-history span {
+  background: rgba(0, 0, 0, 0.08);
+  padding: 4px 8px;
+  border-radius: 999px;
 }
 
 /* WATERFALL BANNER */
@@ -221,28 +216,26 @@ button {
   border: none;
   border-radius: 14px;
   padding: 12px 14px;
-  font-weight: 950;
+  font-weight: 900;
   font-size: 14px;
   cursor: pointer;
   text-align: center;
-  min-height: 44px;
 }
 
 .banner.waterfall {
-  background: linear-gradient(
-    90deg,
-    rgba(56, 189, 248, 0.95),
-    rgba(14, 165, 233, 0.95)
-  );
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.95), rgba(14, 165, 233, 0.95));
   color: #06101a;
   border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.banner.waterfall:active {
+  transform: scale(0.99);
 }
 
 /* ACTION BUTTONS — 4 IN ONE ROW */
 .actions {
   flex: 0 0 auto;
   display: grid;
-  gap: 10px;
 }
 
 .actions-four {
@@ -253,13 +246,14 @@ button {
 .btn {
   border: none;
   border-radius: 14px;
-  padding: 10px 0; /* tighter to guarantee one row */
+  padding: 10px 0;
   font-size: 18px;
-  font-weight: 950;
-  display: inline-flex;
+  font-weight: 900;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px; /* finger-friendly */
+  min-height: 44px;
 }
 
 .btn:disabled {
@@ -286,7 +280,7 @@ button {
   color: #fff;
 }
 
-/* STATUS BAR (compact) */
+/* STATUS BAR */
 .status-bar {
   flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.06);
@@ -297,10 +291,10 @@ button {
 }
 
 .status-main {
-  font-weight: 900;
+  font-weight: 800;
 }
 
-/* PLAYERS (FILL REMAINING HEIGHT) */
+/* PLAYERS GRID */
 .players {
   flex: 1 1 auto;
   min-height: 0;
@@ -326,11 +320,8 @@ button {
   border-color: #22c55e;
 }
 
-/* selectable + disabled feedback */
 .player.SELECTABLE {
   cursor: pointer;
-  outline: 2px solid rgba(255, 255, 255, 0.08);
-  outline-offset: -2px;
 }
 
 .player.DISABLED {
@@ -370,7 +361,7 @@ button {
 }
 
 .player-name {
-  font-weight: 950;
+  font-weight: 900;
   font-size: 18px;
 }
 
@@ -383,7 +374,7 @@ button {
 
 .player-beers {
   opacity: 0.9;
-  font-weight: 950;
+  font-weight: 900;
   white-space: nowrap;
 }
 
@@ -403,11 +394,10 @@ button {
   padding: 0 6px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 950;
+  font-weight: 900;
   line-height: 1;
 }
 
-/* badge colors */
 .badge.b7 {
   background: rgba(59, 130, 246, 0.95);
   color: #fff;
@@ -441,150 +431,106 @@ button {
   padding: 10px 14px;
   border-radius: 10px;
   border: none;
-  font-weight: 950;
+  font-weight: 900;
 }
 
-/* DEV OVERLAY */
-.dev-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: grid;
-  place-items: center;
-}
+/* =========================
+   DEV DECK (DEV ONLY)
+========================= */
 
-.dev-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(2, 6, 23, 0.65);
-  border: none;
-  z-index: 201;
-}
-
-.dev-modal {
-  position: relative;
-  z-index: 202;
-  width: min(92vw, 520px);
-  max-height: 78vh;
+.dev-deck {
+  flex: 0 0 auto;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  max-height: 230px;
   overflow: hidden;
-  background: rgba(2, 6, 23, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  box-shadow: 0 10px 60px rgba(0, 0, 0, 0.45);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.dev-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .dev-title {
-  font-weight: 950;
-  font-size: 14px;
-  opacity: 0.95;
-}
-
-.dev-close {
-  width: 40px;
-  height: 34px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-weight: 950;
-}
-
-.dev-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.dev-pill {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 12px;
+  font-weight: 900;
+  opacity: 0.8;
+  margin-bottom: 8px;
+  text-align: center;
 }
 
-.dev-pill-k {
-  opacity: 0.75;
-  font-weight: 800;
-}
-
-.dev-pill-v {
-  font-weight: 950;
-}
-
-.dev-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+.dev-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
 .dev-btn {
   border: none;
-  border-radius: 14px;
-  padding: 10px 12px;
-  min-height: 44px;
-  font-weight: 950;
-  background: rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.14);
   color: #fff;
 }
 
-.dev-btn.secondary {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.dev-list {
-  min-height: 0;
-  overflow: hidden;
+.dev-meta {
   display: flex;
-  flex-direction: column;
   gap: 8px;
-}
-
-.dev-list-title {
+  flex-wrap: wrap;
   font-size: 12px;
   font-weight: 900;
-  opacity: 0.8;
+  opacity: 0.75;
 }
 
 .dev-cards {
-  overflow: auto;
-  padding: 10px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
 }
 
 .dev-card {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 28px;
-  padding: 0 10px;
-  border-radius: 999px;
-  font-weight: 950;
-  font-size: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 36px;
+  height: 44px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
 }
 
-/* FULLSCREEN / LARGE VIEWPORT TUNING */
+.dev-card.next {
+  outline: 2px solid #22c55e;
+}
+
+.dev-discard {
+  margin-top: 8px;
+  opacity: 0.95;
+}
+
+.dev-discard summary {
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.dev-discard-list {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dev-discard-list span {
+  background: rgba(255, 255, 255, 0.10);
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+/* FULLSCREEN TUNING */
 :fullscreen .top-grid,
 :-webkit-full-screen .top-grid {
   height: 230px;
@@ -629,47 +575,4 @@ button {
 :fullscreen .player-beers,
 :-webkit-full-screen .player-beers {
   font-size: 14px;
-}
-/* =========================
-   DEV DECK
-========================= */
-
-.dev-deck {
-  margin-top: 8px;
-  padding: 10px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px dashed rgba(255, 255, 255, 0.25);
-  max-height: 160px;
-  overflow: hidden;
-}
-
-.dev-title {
-  font-size: 12px;
-  font-weight: 900;
-  opacity: 0.8;
-  margin-bottom: 6px;
-  text-align: center;
-}
-
-.dev-cards {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-.dev-card {
-  min-width: 36px;
-  height: 44px;
-  border-radius: 10px;
-  border: none;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  font-weight: 900;
-  cursor: pointer;
-}
-
-.dev-card.next {
-  outline: 2px solid #22c55e;
 }
