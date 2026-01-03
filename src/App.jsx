@@ -28,6 +28,14 @@ const RULE_TEXT = {
 
 const DRINK_FLASH_MS = 2000;
 
+// Dev-only gating (works in Vite + CRA-like)
+const IS_DEV =
+  (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.DEV) ||
+  (typeof process !== "undefined" &&
+    process.env &&
+    process.env.NODE_ENV &&
+    process.env.NODE_ENV !== "production");
+
 /* =========================
    DECK
 ========================= */
@@ -44,73 +52,73 @@ function buildDeck() {
   return deck;
 }
 
+function cardToString(c) {
+  if (!c) return "";
+  return `${c.rank}${c.suit}`;
+}
+
 /* =========================
    APP
 ========================= */
 
 export default function App() {
-  /* ---------- CORE GAME STATE ---------- */
-
-  const [deck, setDeck] = useState(buildDeck);
-  const [card, setCard] = useState(null);
-
   /**
    * PHASES
    * IDLE
-   * WATERFALL_READY
-   * PICK_DRINK
-   * PICK_MATE
-   * PICK_LOSER          (used for 9/10)
-   * MAKE_RULE           (K)
-   * REACTION_ACTIVE     (7/J buttons)
-   * QM_PICK             (Q button)
-   * RULE_BREAK_PICK     (manual enforcement)
+   * WATERFALL_READY    (A banner visible; tap banner to start waterfall)
+   * PICK_DRINK         (2)
+   * PICK_MATE          (8)
+   * PICK_LOSER         (9/10: enforcer taps loser)
+   * MAKE_RULE          (K)
+   * REACTION_ACTIVE    (Thumb/Heaven triggered)
+   * QM_PICK            (Question answered button -> pick player)
+   * RULE_BREAK_PICK    (Rule break button -> pick offender)
    */
   const [phase, setPhase] = useState("IDLE");
   const [turnIndex, setTurnIndex] = useState(0);
+
+  const [deck, setDeck] = useState(buildDeck);
+  const [card, setCard] = useState(null);
 
   const [players, setPlayers] = useState(
     PLAYER_NAMES.map((name) => ({
       name,
       beers: 0,
-      gender: "M", // hook for later
+      gender: "M", // hook for later UI
       mates: [],
     }))
   );
 
-  /* ---------- POWER OWNERS / BADGES ---------- */
-
+  // Power owners / badges (transfer on redraw of matching card)
   const [heavenMaster, setHeavenMaster] = useState(null); // 7 owner
   const [thumbMaster, setThumbMaster] = useState(null); // J owner
   const [questionMaster, setQuestionMaster] = useState(null); // Q owner
 
-  /* ---------- RULES ---------- */
-
+  // K rules
   const [rules, setRules] = useState([]);
   const [ruleDraft, setRuleDraft] = useState("");
 
-  /* ---------- REACTION STATE ---------- */
-
+  // Reaction state for Thumb/Heaven
   const [reaction, setReaction] = useState({
     type: null, // "THUMB" | "HEAVEN" | null
     owner: null,
-    tapped: [], // ordered names who tapped
+    tapped: [], // ordered player names who tapped
   });
 
-  /* ---------- FLASH UI STATE ---------- */
-
+  // Flash UI (tile-only)
   const [flashNames, setFlashNames] = useState(() => new Set());
   const flashTimerRef = useRef(null);
 
-  /* ---------- REFS (to avoid stale closures + prevent double-taps) ---------- */
+  // Dev-only deck inspector
+  const [showDevDeck, setShowDevDeck] = useState(false);
 
+  // Refs to avoid stale closures + prevent multi-tap races
   const playersRef = useRef(players);
   playersRef.current = players;
 
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
 
-  // Prevent "double mate selection" and other rapid multi-taps before React state applies
   const consumeTapRef = useRef(false);
 
   const currentPlayer = useMemo(() => players[turnIndex], [players, turnIndex]);
@@ -162,8 +170,10 @@ export default function App() {
   }
 
   /**
-   * Recursively applies drink (+1) through mate links and returns the full affected set.
-   * This ensures mates tiles ALSO flash when they drink due to mate propagation.
+   * Drink propagation:
+   * - Adds +1 to target
+   * - Recursively adds +1 to mates (and mates-of-mates)
+   * - Returns the full affected set (so we can flash ALL impacted tiles)
    */
   function propagateDrinkAndCollect(name, visited = new Set()) {
     if (!name) return visited;
@@ -184,6 +194,11 @@ export default function App() {
     flashPlayers(Array.from(affected));
   }
 
+  function giveDrinkNoFlash(targetName) {
+    // used only where you explicitly asked “no red flash”
+    propagateDrinkAndCollect(targetName, new Set());
+  }
+
   function enterFullscreen() {
     const el = document.documentElement;
     try {
@@ -195,18 +210,17 @@ export default function App() {
   }
 
   function resetTapConsumptionSoon() {
-    // release next tick to avoid multi-tap races
     setTimeout(() => {
       consumeTapRef.current = false;
     }, 0);
   }
 
   /* =========================
-     DRAW CARD
+     DRAW CARD (game starts on first tap)
   ========================= */
 
   function drawCard() {
-    if (phase !== "IDLE") return;
+    if (phaseRef.current !== "IDLE") return;
     if (deck.length === 0) return;
 
     const [next, ...rest] = deck;
@@ -216,19 +230,20 @@ export default function App() {
     const r = next.rank;
     const drawer = playersRef.current[turnIndex]?.name;
 
-    // A — Waterfall requires banner tap; DO NOT flash just for starting waterfall
+    // A — Waterfall banner appears; drawer starts when ready.
+    // Per your requirement: do NOT flash red for starting waterfall.
     if (r === "A") {
       setPhase("WATERFALL_READY");
       return;
     }
 
-    // 2 — Pick someone to drink
+    // 2 — Pick someone
     if (r === "2") {
       setPhase("PICK_DRINK");
       return;
     }
 
-    // 3 — Drawer drinks (+ mates) and flash all affected
+    // 3 — Drawer drinks (+ mates), flash all affected
     if (r === "3") {
       if (drawer) giveDrinkWithFlash(drawer);
       nextTurn();
@@ -237,10 +252,7 @@ export default function App() {
 
     // 4 — Women drink
     if (r === "4") {
-      const women = playersRef.current
-        .filter((p) => p.gender === "F")
-        .map((p) => p.name);
-
+      const women = playersRef.current.filter((p) => p.gender === "F").map((p) => p.name);
       if (women.length) {
         const union = new Set();
         for (const n of women) propagateDrinkAndCollect(n, union);
@@ -252,10 +264,7 @@ export default function App() {
 
     // 5 — Guys drink
     if (r === "5") {
-      const men = playersRef.current
-        .filter((p) => p.gender === "M")
-        .map((p) => p.name);
-
+      const men = playersRef.current.filter((p) => p.gender === "M").map((p) => p.name);
       if (men.length) {
         const union = new Set();
         for (const n of men) propagateDrinkAndCollect(n, union);
@@ -281,13 +290,13 @@ export default function App() {
       return;
     }
 
-    // 8 — Pick a mate (ONE selection)
+    // 8 — Pick a mate (ONE selection then advance)
     if (r === "8") {
       setPhase("PICK_MATE");
       return;
     }
 
-    // 9/10 — Enforcer taps loser
+    // 9 / 10 — Enforcer taps loser
     if (r === "9" || r === "10") {
       setPhase("PICK_LOSER");
       return;
@@ -313,7 +322,7 @@ export default function App() {
       return;
     }
 
-    // default
+    // fallback
     nextTurn();
   }
 
@@ -351,13 +360,13 @@ export default function App() {
   }
 
   /* =========================
-     PLAYER TAP HANDLER
+     PLAYER TAP
   ========================= */
 
   function tapPlayer(name) {
     if (consumeTapRef.current) return;
 
-    // PICK_DRINK (2)
+    // 2 — Pick someone to drink
     if (phaseRef.current === "PICK_DRINK") {
       consumeTapRef.current = true;
       giveDrinkWithFlash(name);
@@ -367,7 +376,7 @@ export default function App() {
       return;
     }
 
-    // PICK_MATE (8) — ONE mate only, lock instantly to prevent double selection
+    // 8 — Pick mate (ONE pick); lock immediately to prevent double selection
     if (phaseRef.current === "PICK_MATE") {
       const drawer = playersRef.current[turnIndex]?.name;
       if (!drawer) return;
@@ -375,7 +384,7 @@ export default function App() {
 
       consumeTapRef.current = true;
 
-      // lock phase first so repeated taps cannot add multiple mates
+      // lock first so repeated taps cannot add multiple mates
       setPhase("IDLE");
 
       setPlayers((prev) =>
@@ -391,7 +400,7 @@ export default function App() {
       return;
     }
 
-    // PICK_LOSER (9/10)
+    // 9/10 — Enforcer taps loser
     if (phaseRef.current === "PICK_LOSER") {
       consumeTapRef.current = true;
       giveDrinkWithFlash(name);
@@ -401,7 +410,7 @@ export default function App() {
       return;
     }
 
-    // RULE_BREAK_PICK — manual enforcement for K/custom rules
+    // Manual Rule Break — tap offender
     if (phaseRef.current === "RULE_BREAK_PICK") {
       consumeTapRef.current = true;
       giveDrinkWithFlash(name);
@@ -410,7 +419,7 @@ export default function App() {
       return;
     }
 
-    // QM_PICK — QM taps who answered
+    // Question answered — QM taps who answered
     if (phaseRef.current === "QM_PICK") {
       consumeTapRef.current = true;
       giveDrinkWithFlash(name);
@@ -419,7 +428,7 @@ export default function App() {
       return;
     }
 
-    // REACTION_ACTIVE — 7/J started; last tile tapped drinks; owner excluded
+    // Thumb/Heaven Reaction active — last to tap drinks (owner excluded)
     if (phaseRef.current === "REACTION_ACTIVE") {
       const owner = reaction.owner;
       if (!owner) return;
@@ -438,17 +447,15 @@ export default function App() {
       }
       return;
     }
-
-    // otherwise no-op
   }
 
   /* =========================
-     ACTION BUTTONS
-  ========================= */
+     ACTION BUTTONS (4 in a row)
+========================= */
 
   function startReaction(type) {
-    // “Anytime” means: only when not locked in another action
-    if (phase !== "IDLE") return;
+    // “Anytime” except when locked in another action
+    if (phaseRef.current !== "IDLE") return;
 
     const owner = type === "THUMB" ? thumbMaster : heavenMaster;
     if (!owner) return;
@@ -465,26 +472,34 @@ export default function App() {
     startReaction("HEAVEN");
   }
 
+  /**
+   * Rule enforcement for K / custom rules:
+   * - App stores rules (K)
+   * - When someone breaks a rule in real life, press 🚫 and tap offender tile (+1)
+   */
   function onRuleBreak() {
-    if (phase !== "IDLE") return;
+    if (phaseRef.current !== "IDLE") return;
     setPhase("RULE_BREAK_PICK");
   }
 
   function onQuestion() {
-    if (phase !== "IDLE") return;
+    if (phaseRef.current !== "IDLE") return;
     if (!questionMaster) return;
     setPhase("QM_PICK");
   }
 
-  // Waterfall banner action — drawer drinks first, but DO NOT flash red for starting waterfall
+  /**
+   * Waterfall banner:
+   * - Drawer drinks first when they tap banner
+   * - Per your requirement: do NOT flash red for starting waterfall
+   * - Still applies mate propagation (drinks happen), but no flash
+   */
   function startWaterfall() {
-    if (phase !== "WATERFALL_READY") return;
+    if (phaseRef.current !== "WATERFALL_READY") return;
 
     const drawer = playersRef.current[turnIndex]?.name;
     if (drawer) {
-      // Drink occurs, but per your request: no red flash for starting waterfall.
-      addDrink(drawer);
-      // NOTE: no mate propagation here by design; if you want mates to chain on waterfall, say so.
+      giveDrinkNoFlash(drawer);
     }
 
     setPhase("IDLE");
@@ -493,7 +508,7 @@ export default function App() {
 
   /* =========================
      RULE INPUT (K)
-  ========================= */
+========================= */
 
   function submitRule() {
     const text = ruleDraft.trim();
@@ -507,7 +522,7 @@ export default function App() {
 
   /* =========================
      LISTS
-  ========================= */
+========================= */
 
   const matesLines = useMemo(() => {
     const out = [];
@@ -519,10 +534,11 @@ export default function App() {
 
   /* =========================
      STATUS COPY
-  ========================= */
+========================= */
 
   function statusCopy() {
     if (!card) return "Tap the deck to start";
+
     const r = card.rank;
 
     if (phase === "WATERFALL_READY") return "Waterfall — tap banner when ready";
@@ -543,23 +559,69 @@ export default function App() {
   }
 
   /* =========================
+     DEV: DECK INSPECTOR
+========================= */
+
+  function resetGame() {
+    clearFlashTimer();
+    setFlashNames(new Set());
+    setPhase("IDLE");
+    setTurnIndex(0);
+    setDeck(buildDeck());
+    setCard(null);
+
+    setPlayers(
+      PLAYER_NAMES.map((name) => ({
+        name,
+        beers: 0,
+        gender: "M",
+        mates: [],
+      }))
+    );
+
+    setHeavenMaster(null);
+    setThumbMaster(null);
+    setQuestionMaster(null);
+
+    setRules([]);
+    setRuleDraft("");
+
+    setReaction({ type: null, owner: null, tapped: [] });
+
+    consumeTapRef.current = false;
+  }
+
+  /* =========================
      RENDER
-  ========================= */
+========================= */
 
   const drawLocked = phase !== "IDLE";
 
   return (
     <div className="app">
       <header className="header">
-        <h1>KAD Kings</h1>
-        <button
-          className="fullscreen-btn"
-          onClick={enterFullscreen}
-          aria-label="Fullscreen"
-          title="Fullscreen"
-        >
-          ⛶
-        </button>
+        <div className="header-row">
+          <button
+            className="icon-btn"
+            onClick={IS_DEV ? () => setShowDevDeck((v) => !v) : undefined}
+            disabled={!IS_DEV}
+            title={IS_DEV ? "Dev tools" : "Dev tools (disabled in production)"}
+            aria-label="Dev tools"
+          >
+            🛠
+          </button>
+
+          <h1>KAD Kings</h1>
+
+          <button
+            className="fullscreen-btn"
+            onClick={enterFullscreen}
+            aria-label="Fullscreen"
+            title="Fullscreen"
+          >
+            ⛶
+          </button>
+        </div>
       </header>
 
       <section className="top-grid">
@@ -603,6 +665,7 @@ export default function App() {
           onClick={onThumb}
           disabled={phase !== "IDLE" || !thumbMaster}
           title={thumbMaster ? `Thumb (Owner: ${thumbMaster})` : "Draw J to assign Thumb"}
+          aria-label="Thumb"
         >
           👍
         </button>
@@ -612,6 +675,7 @@ export default function App() {
           onClick={onHeaven}
           disabled={phase !== "IDLE" || !heavenMaster}
           title={heavenMaster ? `Heaven (Owner: ${heavenMaster})` : "Draw 7 to assign Heaven"}
+          aria-label="Heaven"
         >
           ☁
         </button>
@@ -621,6 +685,7 @@ export default function App() {
           onClick={onRuleBreak}
           disabled={phase !== "IDLE"}
           title="Rule Break (tap offender)"
+          aria-label="Rule Break"
         >
           🚫
         </button>
@@ -630,6 +695,7 @@ export default function App() {
           onClick={onQuestion}
           disabled={phase !== "IDLE" || !questionMaster}
           title={questionMaster ? `Question (QM: ${questionMaster})` : "Draw Q to assign QM"}
+          aria-label="Question"
         >
           ❓
         </button>
@@ -665,10 +731,12 @@ export default function App() {
               title={selectable ? "Tap" : isActionPhase ? "Not selectable" : "Player"}
             >
               <div className="video-slot" />
+
               <div className="player-footer">
                 <span className="player-name">{p.name}</span>
 
                 <div className="player-right">
+                  {/* badges BETWEEN name and beer counter */}
                   <div className="badges">
                     {p.name === heavenMaster && <span className="badge b7">7</span>}
                     {p.name === thumbMaster && <span className="badge bJ">J</span>}
@@ -695,6 +763,77 @@ export default function App() {
           <button onClick={submitRule}>Save</button>
         </div>
       )}
+
+      {/* DEV-ONLY: Deck inspector */}
+      {IS_DEV && showDevDeck && (
+        <div className="dev-overlay" role="dialog" aria-modal="true">
+          <div className="dev-modal">
+            <div className="dev-head">
+              <div className="dev-title">Dev Deck Inspector</div>
+              <button className="dev-close" onClick={() => setShowDevDeck(false)}>
+                ✕
+              </button>
+            </div>
+
+            <div className="dev-meta">
+              <div className="dev-pill">
+                <span className="dev-pill-k">Turn</span>
+                <span className="dev-pill-v">{currentPlayer?.name || "—"}</span>
+              </div>
+
+              <div className="dev-pill">
+                <span className="dev-pill-k">Phase</span>
+                <span className="dev-pill-v">{phase}</span>
+              </div>
+
+              <div className="dev-pill">
+                <span className="dev-pill-k">Card</span>
+                <span className="dev-pill-v">{card ? cardToString(card) : "—"}</span>
+              </div>
+
+              <div className="dev-pill">
+                <span className="dev-pill-k">Remaining</span>
+                <span className="dev-pill-v">{deck.length}</span>
+              </div>
+            </div>
+
+            <div className="dev-actions">
+              <button className="dev-btn" onClick={resetGame}>
+                Reset Game
+              </button>
+              <button
+                className="dev-btn secondary"
+                onClick={() => {
+                  // quick reshuffle remaining deck only (keeps state)
+                  setDeck((d) => {
+                    const copy = [...d];
+                    for (let i = copy.length - 1; i > 0; i--) {
+                      const j = Math.floor(Math.random() * (i + 1));
+                      [copy[i], copy[j]] = [copy[j], copy[i]];
+                    }
+                    return copy;
+                  });
+                }}
+              >
+                Reshuffle Remaining
+              </button>
+            </div>
+
+            <div className="dev-list">
+              <div className="dev-list-title">Next cards (top of deck first)</div>
+              <div className="dev-cards">
+                {deck.map((c, idx) => (
+                  <span key={`${c.rank}${c.suit}-${idx}`} className="dev-card">
+                    {cardToString(c)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <button className="dev-backdrop" onClick={() => setShowDevDeck(false)} aria-label="Close dev tools" />
+        </div>
+      )}
     </div>
   );
 }
@@ -714,4 +853,4 @@ function Panel({ title, items = [] }) {
       ))}
     </div>
   );
-  }
+                     }
