@@ -50,12 +50,12 @@ function buildDeck() {
   return deck;
 }
 
-function cardToString(c) {
-  return `${c.rank}${c.suit}`;
-}
-
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
+}
+
+function cardToString(c) {
+  return `${c.rank}${c.suit}`;
 }
 
 /* =========================
@@ -91,7 +91,7 @@ export default function App() {
     }))
   );
 
-  // Badges (transfer on redraw)
+  // Badges (transfer on re-draw)
   const [heavenMaster, setHeavenMaster] = useState(null); // 7 owner
   const [thumbMaster, setThumbMaster] = useState(null); // J owner
   const [questionMaster, setQuestionMaster] = useState(null); // Q owner
@@ -100,7 +100,7 @@ export default function App() {
   const [rules, setRules] = useState([]);
   const [ruleDraft, setRuleDraft] = useState("");
 
-  // For 9/10, we want better status text
+  // For 9/10
   const [pendingLoserMode, setPendingLoserMode] = useState(null); // "RHYME" | "CATEGORIES" | null
 
   // Reaction state (7/J power usage)
@@ -172,67 +172,6 @@ export default function App() {
     });
   }
 
-  function addDrinkNoMates(name) {
-    if (!name) return;
-    setPlayers((prev) =>
-      prev.map((p) => (p.name === name ? { ...p, beers: p.beers + 1 } : p))
-    );
-  }
-
-  function addDrinkNoMatesMany(names, amount = 1) {
-    if (!names?.length) return;
-    setPlayers((prev) =>
-      prev.map((p) =>
-        names.includes(p.name) ? { ...p, beers: p.beers + amount } : p
-      )
-    );
-  }
-
-  /**
-   * Mate propagation:
-   * - Adds +1 to target
-   * - Recursively adds +1 to mates (and mates-of-mates), no duplicates
-   * Returns affected set so we can flash ALL impacted tiles.
-   */
-  function propagateDrinkAndCollect(name, visited = new Set()) {
-    if (!name) return visited;
-    if (visited.has(name)) return visited;
-
-    visited.add(name);
-
-    // increment this player
-    setPlayers((prev) =>
-      prev.map((p) => (p.name === name ? { ...p, beers: p.beers + 1 } : p))
-    );
-
-    const p = playersRef.current.find((x) => x.name === name);
-    const mates = p?.mates || [];
-    for (const m of mates) propagateDrinkAndCollect(m, visited);
-
-    return visited;
-  }
-
-  function giveDrinkWithFlash(targetName) {
-    const affected = propagateDrinkAndCollect(targetName, new Set());
-    flashPlayers(Array.from(affected));
-  }
-
-  function giveManyWithFlash(targetNames) {
-    const union = new Set();
-    for (const n of targetNames) propagateDrinkAndCollect(n, union);
-    flashPlayers(Array.from(union));
-  }
-
-  function enterFullscreen() {
-    const el = document.documentElement;
-    try {
-      if (document.fullscreenElement) document.exitFullscreen?.();
-      else el.requestFullscreen?.();
-    } catch {
-      // ignore
-    }
-  }
-
   function resetConsumeSoon() {
     setTimeout(() => {
       consumeTapRef.current = false;
@@ -255,11 +194,64 @@ export default function App() {
   }, []);
 
   /* =========================
+     DRINK LOGIC
+  ========================= */
+
+  function addDrinkNoMates(name, amount = 1) {
+    if (!name) return;
+    setPlayers((prev) =>
+      prev.map((p) => (p.name === name ? { ...p, beers: p.beers + amount } : p))
+    );
+  }
+
+  function addDrinkNoMatesMany(names, amount = 1) {
+    if (!names?.length) return;
+    setPlayers((prev) =>
+      prev.map((p) => (names.includes(p.name) ? { ...p, beers: p.beers + amount } : p))
+    );
+  }
+
+  /**
+   * Mate propagation:
+   * - Adds +1 to target
+   * - Recursively adds +1 to mates (and mates-of-mates), no duplicates
+   * Returns affected set so we can flash ALL impacted tiles.
+   *
+   * NOTE: This is used for EVERYTHING except waterfall (per your rule: no mates on waterfall).
+   */
+  function propagateDrinkAndCollect(name, visited = new Set()) {
+    if (!name) return visited;
+    if (visited.has(name)) return visited;
+
+    visited.add(name);
+
+    setPlayers((prev) =>
+      prev.map((p) => (p.name === name ? { ...p, beers: p.beers + 1 } : p))
+    );
+
+    const p = playersRef.current.find((x) => x.name === name);
+    const mates = p?.mates || [];
+    for (const m of mates) propagateDrinkAndCollect(m, visited);
+
+    return visited;
+  }
+
+  function giveDrinkWithFlash(targetName) {
+    const affected = propagateDrinkAndCollect(targetName, new Set());
+    flashPlayers(Array.from(affected));
+  }
+
+  function giveManyWithFlash(targetNames) {
+    const union = new Set();
+    for (const n of targetNames) propagateDrinkAndCollect(n, union);
+    flashPlayers(Array.from(union));
+  }
+
+  /* =========================
      DRAW CARD
   ========================= */
 
   function drawCard() {
-    // lock draws during any action
     if (phaseRef.current !== "IDLE") return;
     if (deckRef.current.length === 0) return;
 
@@ -270,9 +262,7 @@ export default function App() {
     const r = next.rank;
     const drawer = playersRef.current[turnIndex]?.name;
 
-    // Per-card logic
     if (r === "A") {
-      // Waterfall uses banner and timer (no mates)
       setPhase("WATERFALL_READY");
       return;
     }
@@ -283,7 +273,6 @@ export default function App() {
     }
 
     if (r === "3") {
-      // drawer drinks (+ mates), flash all affected
       if (drawer) giveDrinkWithFlash(drawer);
       nextTurn();
       return;
@@ -311,14 +300,13 @@ export default function App() {
     }
 
     if (r === "7") {
-      // assign badge to drawer (transfer)
       setHeavenMaster(drawer || null);
       nextTurn();
       return;
     }
 
     if (r === "8") {
-      // Mate selection: keep turn highlight on drawer until selection is made
+      // IMPORTANT: turn stays on drawer until mate is chosen (we do not nextTurn here)
       setPhase("PICK_MATE");
       return;
     }
@@ -380,13 +368,11 @@ export default function App() {
 
     if (phase === "PICK_MATE") {
       if (!drawer) return false;
-      return name !== drawer; // cannot pick self
+      return name !== drawer;
     }
 
     if (phase === "PICK_LOSER") return true;
-
     if (phase === "QM_PICK") return true;
-
     if (phase === "RULE_BREAK_PICK") return true;
 
     if (phase === "REACTION_ACTIVE") {
@@ -409,7 +395,6 @@ export default function App() {
   function tapPlayer(name) {
     if (consumeTapRef.current) return;
 
-    // PICK_DRINK (2)
     if (phaseRef.current === "PICK_DRINK") {
       consumeTapRef.current = true;
       giveDrinkWithFlash(name);
@@ -419,7 +404,6 @@ export default function App() {
       return;
     }
 
-    // PICK_MATE (8) — ONE mate only; keep drawer highlighted until chosen
     if (phaseRef.current === "PICK_MATE") {
       const drawer = playersRef.current[turnIndex]?.name;
       if (!drawer) return;
@@ -433,17 +417,17 @@ export default function App() {
       setPlayers((prev) =>
         prev.map((p) => {
           if (p.name !== drawer) return p;
-          if (p.mates.includes(name)) return p; // no duplicates
+          if (p.mates.includes(name)) return p;
           return { ...p, mates: [...p.mates, name] };
         })
       );
 
+      // NOW advance turn (this is what keeps the drawer highlighted until they pick)
       nextTurn();
       resetConsumeSoon();
       return;
     }
 
-    // PICK_LOSER (9/10)
     if (phaseRef.current === "PICK_LOSER") {
       consumeTapRef.current = true;
       giveDrinkWithFlash(name);
@@ -454,7 +438,6 @@ export default function App() {
       return;
     }
 
-    // RULE_BREAK_PICK (manual enforcement)
     if (phaseRef.current === "RULE_BREAK_PICK") {
       consumeTapRef.current = true;
       giveDrinkWithFlash(name);
@@ -463,7 +446,6 @@ export default function App() {
       return;
     }
 
-    // QM_PICK (Q action)
     if (phaseRef.current === "QM_PICK") {
       consumeTapRef.current = true;
       giveDrinkWithFlash(name);
@@ -472,11 +454,9 @@ export default function App() {
       return;
     }
 
-    // REACTION_ACTIVE (7/J)
     if (phaseRef.current === "REACTION_ACTIVE") {
       const owner = reaction.owner;
       if (!owner) return;
-
       if (name === owner) return;
       if (reaction.tapped.includes(name)) return;
 
@@ -500,7 +480,6 @@ export default function App() {
   ========================= */
 
   function startReaction(type) {
-    // allow anytime ONLY if idle
     if (phaseRef.current !== "IDLE") return;
 
     const owner = type === "THUMB" ? thumbMaster : heavenMaster;
@@ -536,15 +515,12 @@ export default function App() {
   function resolvedWaterfallSeconds() {
     const base = clamp(waterfallSeconds, WATERFALL_MIN_S, WATERFALL_MAX_S);
     if (!waterfallRandom) return base;
-    const lo = WATERFALL_MIN_S;
-    const hi = WATERFALL_MAX_S;
-    return Math.floor(lo + Math.random() * (hi - lo + 1));
+    return Math.floor(WATERFALL_MIN_S + Math.random() * (WATERFALL_MAX_S - WATERFALL_MIN_S + 1));
   }
 
   function startWaterfall() {
     if (phaseRef.current !== "WATERFALL_READY") return;
 
-    // Start countdown
     const seconds = resolvedWaterfallSeconds();
     setWaterfallRemaining(seconds);
     setPhase("WATERFALL_RUNNING");
@@ -554,13 +530,14 @@ export default function App() {
       setWaterfallRemaining((prev) => {
         const next = prev - 1;
         if (next <= 0) {
-          // End waterfall: everyone gets +3 (NO mates, NO flashing by default)
           stopWaterfallTimer();
+
+          // END: everyone gets +3 (NO mates)
           const all = playersRef.current.map((p) => p.name);
           addDrinkNoMatesMany(all, WATERFALL_END_DRINKS);
 
           setPhase("IDLE");
-          nextTurn();
+          nextTurn(); // end waterfall advances turn once
           return 0;
         }
         return next;
@@ -569,12 +546,11 @@ export default function App() {
   }
 
   function cancelWaterfall() {
-    // optional escape hatch
     if (phaseRef.current !== "WATERFALL_READY" && phaseRef.current !== "WATERFALL_RUNNING") return;
     stopWaterfallTimer();
     setWaterfallRemaining(0);
     setPhase("IDLE");
-    // do not advance turn on cancel
+    // Do not advance turn on cancel
   }
 
   /* =========================
@@ -592,42 +568,29 @@ export default function App() {
   }
 
   /* =========================
-     LISTS FOR PANELS
+     STATUS COPY
   ========================= */
 
-  const matesLines = useMemo(() => {
-    const out = [];
-    for (const p of players) for (const m of p.mates) out.push(`${p.name} → ${m}`);
-    return out;
-  }, [players]);
-
-  const rulesLines = useMemo(() => rules, [rules]);
-
-  /* =========================
-     STATUS COPY (NOT ON CARD)
-========================= */
-
   function statusCopy() {
-    // No card yet
     if (!card) return "Tap the deck to start";
 
-    // Action-specific instructions
-    if (phase === "WATERFALL_READY") return "Waterfall — set timer and start when ready (end: everyone +3)";
-    if (phase === "WATERFALL_RUNNING") return "Waterfall — everyone drinks (end: everyone +3)";
-    if (phase === "PICK_DRINK") return "Pick someone to drink (+ mates)";
-    if (phase === "PICK_MATE") return "Pick ONE mate (tap a player)";
-    if (phase === "PICK_LOSER") return `${pendingLoserMode === "CATEGORIES" ? "Categories" : "Rhyme"} — tap the loser (+ mates)`;
-    if (phase === "MAKE_RULE") return "Make a rule — type it and save";
-    if (phase === "RULE_BREAK_PICK") return "Rule Break — tap the offender (+ mates)";
-    if (phase === "QM_PICK") return "Question — tap who answered (+ mates)";
+    if (phase === "WATERFALL_READY") return "Waterfall: set timer then Start (end: everyone +3, no mates)";
+    if (phase === "WATERFALL_RUNNING") return `Waterfall running: ${waterfallRemaining}s (end: everyone +3)`;
+    if (phase === "PICK_DRINK") return "Tap a player to drink (+ mates)";
+    if (phase === "PICK_MATE") return "Tap ONE mate (drawer stays highlighted)";
+    if (phase === "PICK_LOSER")
+      return `${pendingLoserMode === "CATEGORIES" ? "Categories" : "Rhyme"}: tap loser (+ mates)`;
+    if (phase === "MAKE_RULE") return "Type a rule and Save";
+    if (phase === "RULE_BREAK_PICK") return "Rule break: tap offender (+ mates)";
+    if (phase === "QM_PICK") return "Question: tap who answered (+ mates)";
     if (phase === "REACTION_ACTIVE") {
       const label = reaction.type === "THUMB" ? "Thumb" : "Heaven";
       const eligible = Math.max(0, players.length - 1);
-      return `${label} active — last tap drinks (${reaction.tapped.length}/${eligible})`;
+      return `${label}: last tap drinks (${reaction.tapped.length}/${eligible})`;
     }
 
-    // Default: just show what the card means (short)
-    return `${CARD_LABEL[card.rank] || "Draw"} — ${card.rank}${card.suit}`;
+    // Default: keep it short
+    return "Tap the deck to draw";
   }
 
   /* =========================
@@ -636,12 +599,12 @@ export default function App() {
 
   function reshuffleNewDeck() {
     if (phaseRef.current !== "IDLE") return;
+    stopWaterfallTimer();
     setDeck(buildDeck());
     setCard(null);
     setPendingLoserMode(null);
     setReaction({ type: null, owner: null, tapped: [] });
     setWaterfallRemaining(0);
-    stopWaterfallTimer();
   }
 
   function forceDrawRank(rank) {
@@ -656,90 +619,76 @@ export default function App() {
     setDeck(rest);
     setCard(picked);
 
-    // run normal draw logic for that card
+    // Run same logic as drawCard for that rank
     const drawer = playersRef.current[turnIndex]?.name;
 
-    if (rank === "A") {
-      setPhase("WATERFALL_READY");
-      return;
-    }
-    if (rank === "2") {
-      setPhase("PICK_DRINK");
-      return;
-    }
+    if (rank === "A") return setPhase("WATERFALL_READY");
+    if (rank === "2") return setPhase("PICK_DRINK");
     if (rank === "3") {
       if (drawer) giveDrinkWithFlash(drawer);
-      nextTurn();
-      return;
+      return nextTurn();
     }
     if (rank === "4") {
       const women = playersRef.current.filter((p) => p.gender === "F").map((p) => p.name);
       if (women.length) giveManyWithFlash(women);
-      nextTurn();
-      return;
+      return nextTurn();
     }
     if (rank === "5") {
       const men = playersRef.current.filter((p) => p.gender === "M").map((p) => p.name);
       if (men.length) giveManyWithFlash(men);
-      nextTurn();
-      return;
+      return nextTurn();
     }
     if (rank === "6") {
       const all = playersRef.current.map((p) => p.name);
       if (all.length) giveManyWithFlash(all);
-      nextTurn();
-      return;
+      return nextTurn();
     }
     if (rank === "7") {
       setHeavenMaster(drawer || null);
-      nextTurn();
-      return;
+      return nextTurn();
     }
-    if (rank === "8") {
-      setPhase("PICK_MATE");
-      return;
-    }
+    if (rank === "8") return setPhase("PICK_MATE");
     if (rank === "9") {
       setPendingLoserMode("RHYME");
-      setPhase("PICK_LOSER");
-      return;
+      return setPhase("PICK_LOSER");
     }
     if (rank === "10") {
       setPendingLoserMode("CATEGORIES");
-      setPhase("PICK_LOSER");
-      return;
+      return setPhase("PICK_LOSER");
     }
     if (rank === "J") {
       setThumbMaster(drawer || null);
-      nextTurn();
-      return;
+      return nextTurn();
     }
     if (rank === "Q") {
       setQuestionMaster(drawer || null);
-      nextTurn();
-      return;
+      return nextTurn();
     }
-    if (rank === "K") {
-      setPhase("MAKE_RULE");
-      return;
-    }
+    if (rank === "K") return setPhase("MAKE_RULE");
 
     nextTurn();
   }
 
   /* =========================
-     RENDER
+     RENDER HELPERS
   ========================= */
 
-  const drawLocked = phase !== "IDLE";
+  function enterFullscreen() {
+    const el = document.documentElement;
+    try {
+      if (document.fullscreenElement) document.exitFullscreen?.();
+      else el.requestFullscreen?.();
+    } catch {
+      // ignore
+    }
+  }
 
-  // Turn highlight rule:
-  // - Keep highlighting current player even during PICK_MATE until mate picked (we do NOT advance turn until pick)
-  // - For other action phases, we still keep highlighting the "turnIndex" player (drawer/enforcer)
+  // Turn highlight is ALWAYS the current turnIndex player
   function isTurnHighlighted(playerName) {
     return playerName === playersRef.current[turnIndex]?.name;
   }
 
+  const drawLocked = phase !== "IDLE";
   const cardFaceTitle = card ? `${card.rank}${card.suit}` : "DECK";
   const cardFaceLabel = card ? (CARD_LABEL[card.rank] || "Draw") : "Tap to Start";
 
@@ -759,7 +708,8 @@ export default function App() {
       </header>
 
       <section className="top-grid">
-        <Panel title="🤝 Mates" items={matesLines} />
+        <Panel title="🤝 Mates" items={matesLines(players)} />
+
         <div className="panel card-panel">
           <div
             className={`card ${card ? "active" : "draw"} ${drawLocked ? "disabled" : ""}`}
@@ -770,12 +720,12 @@ export default function App() {
           >
             <div className="card-face">
               <div className="rank">{cardFaceTitle}</div>
-              <div className="rule-text">{cardFaceLabel}</div>
-              <div className="sub">{deck.length} cards left</div>
+              <div className="card-label">{cardFaceLabel}</div>
             </div>
           </div>
         </div>
-        <Panel title="📜 Rules" items={rulesLines} />
+
+        <Panel title="📜 Rules" items={rules} />
       </section>
 
       {/* Waterfall banner */}
@@ -783,7 +733,7 @@ export default function App() {
         <div className={`banner waterfall ${phase === "WATERFALL_RUNNING" ? "running" : ""}`}>
           <div className="banner-top">
             <div className="banner-title">🌊 Waterfall</div>
-            <button className="banner-x" onClick={cancelWaterfall} title="Close">
+            <button className="banner-x" onClick={cancelWaterfall} title="Close" aria-label="Close">
               ✕
             </button>
           </div>
@@ -808,7 +758,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="wf-row">
+                <div className="wf-row wf-row-bottom">
                   <label className="wf-toggle">
                     <input
                       type="checkbox"
@@ -824,16 +774,16 @@ export default function App() {
                 </div>
 
                 <div className="wf-foot">
-                  Everyone drinks while timer runs. End of timer: everyone gets +{WATERFALL_END_DRINKS}. (No mates)
+                  Everyone drinks while timer runs. End: everyone +{WATERFALL_END_DRINKS}. (No mates)
                 </div>
               </>
             ) : (
-              <>
-                <div className="wf-running">
-                  <div className="wf-count">{waterfallRemaining}s</div>
-                  <div className="wf-sub">Everyone drinks. End: +{WATERFALL_END_DRINKS} each.</div>
+              <div className="wf-running">
+                <div className="wf-count">{waterfallRemaining}s</div>
+                <div className="wf-sub">
+                  Everyone drinks. End: +{WATERFALL_END_DRINKS} each. (No mates)
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
@@ -949,7 +899,7 @@ export default function App() {
             <button className="dev-btn" onClick={reshuffleNewDeck} disabled={phase !== "IDLE"}>
               Reshuffle New Deck
             </button>
-            <div className="dev-hint">Enable with ?dev=1 (IDLE only)</div>
+            <div className="dev-hint">Enabled with ?dev=1 (IDLE only)</div>
           </div>
 
           <div className="dev-row dev-force">
@@ -993,7 +943,6 @@ function Panel({ title, items = [] }) {
   return (
     <div className="panel">
       <div className="panel-title">{title}</div>
-
       {[...Array(4)].map((_, i) => (
         <div key={i} className="row" title={items[i] || ""}>
           <span className="row-text">{items[i] || "—"}</span>
@@ -1001,4 +950,12 @@ function Panel({ title, items = [] }) {
       ))}
     </div>
   );
-        }
+}
+
+function matesLines(players) {
+  const out = [];
+  for (const p of players) {
+    for (const m of p.mates) out.push(`${p.name} → ${m}`);
+  }
+  return out;
+       }
