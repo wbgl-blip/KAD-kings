@@ -23,10 +23,6 @@ input {
   appearance: none;
 }
 
-button {
-  -webkit-tap-highlight-color: transparent;
-}
-
 /* APP LAYOUT (NO SCROLL) */
 .app {
   height: 100svh;
@@ -62,16 +58,11 @@ button {
   font-weight: 800;
 }
 
-.header-actions {
+/* keep it in the top-right even in fullscreen */
+.fullscreen-btn {
   position: fixed;
   right: 12px;
   top: 12px;
-  display: flex;
-  gap: 10px;
-  z-index: 50;
-}
-
-.header-btn {
   width: 44px;
   height: 40px;
   border-radius: 12px;
@@ -80,6 +71,7 @@ button {
   color: #fff;
   font-size: 16px;
   font-weight: 800;
+  z-index: 50;
 }
 
 /* TOP GRID */
@@ -157,21 +149,28 @@ button {
   cursor: pointer;
 }
 
-.card-draw-label {
-  font-size: 18px;
-  letter-spacing: 0.12em;
-}
-
 .card.active {
   background: #fff;
   color: #000;
-  flex-direction: column;
-  padding: 10px;
 }
 
 .card.disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.card-face {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-draw-label {
+  font-size: 18px;
+  letter-spacing: 0.12em;
 }
 
 .rank {
@@ -183,46 +182,39 @@ button {
   font-size: 12px;
   margin-top: 6px;
   font-weight: 800;
-}
-
-.rule-title {
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.rule-sub {
-  margin-top: 3px;
-  font-size: 11px;
-  font-weight: 800;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .sub {
   font-size: 12px;
   opacity: 0.65;
-  margin-top: 6px;
+  margin-top: 4px;
   font-weight: 800;
 }
 
-/* WATERFALL BANNER (CARD-LIKE) */
-.banner.waterfall {
+/* WATERFALL BANNER (CONFIG + RUNNING) */
+.banner {
   flex: 0 0 auto;
   width: 100%;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.banner.waterfall {
   background: linear-gradient(
     90deg,
     rgba(56, 189, 248, 0.22),
-    rgba(14, 165, 233, 0.22)
+    rgba(14, 165, 233, 0.18)
   );
-  padding: 12px;
 }
 
 .banner.waterfall.running {
   background: linear-gradient(
     90deg,
-    rgba(56, 189, 248, 0.28),
-    rgba(14, 165, 233, 0.28)
+    rgba(56, 189, 248, 0.26),
+    rgba(14, 165, 233, 0.22)
   );
 }
 
@@ -230,8 +222,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .banner-title {
@@ -239,44 +231,21 @@ button {
   font-size: 14px;
 }
 
-.banner-meta {
+.banner-x {
+  border: none;
+  background: rgba(255, 255, 255, 0.10);
+  color: #fff;
+  border-radius: 10px;
+  width: 36px;
+  height: 32px;
+  font-weight: 900;
+}
+
+.banner-body {
+  padding: 10px 12px;
   display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.banner-pill {
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  font-weight: 900;
-  font-size: 12px;
-}
-
-.banner-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  flex-direction: column;
   gap: 10px;
-  align-items: start;
-}
-
-.toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 900;
-  font-size: 13px;
-}
-
-.toggle input {
-  width: 18px;
-  height: 18px;
-}
-
-.wf-range {
-  display: grid;
-  gap: 8px;
 }
 
 .wf-row {
@@ -287,54 +256,72 @@ button {
 }
 
 .wf-label {
-  font-weight: 900;
   font-size: 12px;
-  opacity: 0.9;
-}
-
-.wf-row input {
-  width: 72px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(0, 0, 0, 0.18);
-  color: #fff;
   font-weight: 900;
+  opacity: 0.9;
+  white-space: nowrap;
 }
 
-.wf-row input:disabled {
-  opacity: 0.55;
+.wf-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
 }
 
-.banner-btn {
-  grid-column: 1 / -1;
+.wf-range {
+  width: 100%;
+}
+
+.wf-seconds {
+  min-width: 44px;
+  text-align: right;
+  font-weight: 900;
+  opacity: 0.95;
+}
+
+.wf-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  opacity: 0.95;
+}
+
+.wf-start {
   border: none;
   border-radius: 12px;
-  padding: 12px 14px;
+  padding: 10px 14px;
   font-weight: 900;
-  font-size: 14px;
-  cursor: pointer;
+  background: rgba(14, 165, 233, 0.95);
   color: #06101a;
-  background: linear-gradient(90deg, rgba(56, 189, 248, 0.95), rgba(14, 165, 233, 0.95));
+  min-width: 92px;
 }
 
-.banner-btn.subtle {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+.wf-foot {
+  font-size: 11px;
+  opacity: 0.85;
+  line-height: 1.25;
 }
 
-.banner-running {
+.wf-running {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-.banner-running-text {
+.wf-count {
+  font-size: 22px;
   font-weight: 900;
-  font-size: 13px;
-  opacity: 0.95;
+}
+
+.wf-sub {
+  font-size: 11px;
+  opacity: 0.9;
+  text-align: right;
+  line-height: 1.25;
 }
 
 /* ACTION BUTTONS — 4 IN ONE ROW */
@@ -344,7 +331,6 @@ button {
   gap: 10px;
 }
 
-/* 4 buttons fit one row */
 .actions-four {
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
@@ -353,9 +339,10 @@ button {
 .btn {
   border: none;
   border-radius: 14px;
-  padding: 10px 0; /* tight so it stays one row */
+  padding: 10px 0; /* tight to guarantee one row */
   font-size: 18px;
   font-weight: 900;
+  -webkit-tap-highlight-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -386,6 +373,20 @@ button {
   color: #fff;
 }
 
+/* STATUS BAR */
+.status-bar {
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 8px 10px;
+  border-radius: 14px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.status-main {
+  font-weight: 800;
+}
+
 /* PLAYERS (FILL REMAINING HEIGHT) */
 .players {
   flex: 1 1 auto;
@@ -412,6 +413,7 @@ button {
   border-color: #22c55e;
 }
 
+/* selectable + disabled feedback */
 .player.SELECTABLE {
   cursor: pointer;
 }
@@ -526,120 +528,88 @@ button {
   font-weight: 900;
 }
 
-/* =========================
-   DEV MODAL
-========================= */
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(2, 6, 23, 0.72);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 14px;
-  z-index: 200;
+/* DEV PANEL */
+.dev {
+  flex: 0 0 auto;
+  margin-top: 6px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
 }
 
-.modal {
-  width: 100%;
-  max-width: 520px;
-  max-height: 80vh;
-  background: rgba(15, 23, 42, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  overflow: hidden;
+.dev-title {
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.dev-row {
   display: flex;
   flex-direction: column;
-}
-
-.modal-header {
-  padding: 12px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modal-title {
-  font-weight: 900;
-}
-
-.modal-close {
-  border: none;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  padding: 8px 10px;
-  font-weight: 900;
-}
-
-.modal-body {
-  padding: 12px;
-  overflow: auto;
-}
-
-.modal-hint {
-  font-size: 12px;
-  opacity: 0.85;
-  font-weight: 800;
+  gap: 8px;
   margin-bottom: 10px;
 }
 
-.deck-list {
-  display: grid;
-  gap: 8px;
-}
-
-.deck-item {
-  width: 100%;
-  text-align: left;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+.dev-btn {
+  border: none;
   border-radius: 12px;
-  padding: 10px 10px;
-  display: grid;
-  grid-template-columns: 54px 70px 1fr;
-  gap: 10px;
-  align-items: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.10);
+  color: #fff;
+  font-weight: 900;
 }
 
-.deck-item:disabled {
+.dev-btn:disabled {
   opacity: 0.5;
 }
 
-.deck-item-left {
-  opacity: 0.8;
-  font-weight: 900;
+.dev-hint {
+  font-size: 11px;
+  opacity: 0.75;
 }
 
-.deck-item-card {
+.dev-subtitle {
   font-weight: 900;
-}
-
-.deck-item-right {
+  font-size: 12px;
   opacity: 0.9;
-  font-weight: 800;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.modal-footer {
-  padding: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+.dev-force-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
 }
 
-.modal-btn {
-  width: 100%;
+.dev-chip {
   border: none;
-  border-radius: 12px;
-  padding: 12px 14px;
-  font-weight: 900;
-  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 8px 0;
+  background: rgba(255, 255, 255, 0.10);
   color: #fff;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.dev-chip:disabled {
+  opacity: 0.5;
+}
+
+.dev-deck {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 86px;
+  overflow: auto;
+  padding: 6px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.dev-card {
+  font-size: 12px;
+  font-weight: 900;
+  opacity: 0.9;
 }
 
 /* FULLSCREEN / LARGE VIEWPORT TUNING */
