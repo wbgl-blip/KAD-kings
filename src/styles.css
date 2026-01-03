@@ -1,442 +1,151 @@
-/* src/styles.css */
 * {
   box-sizing: border-box;
-}
-
-html,
-body {
-  height: 100%;
 }
 
 body {
   margin: 0;
   background: radial-gradient(circle at top, #0f172a, #020617);
   color: #fff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: system-ui, sans-serif;
   overflow: hidden;
 }
 
-button,
-input {
-  font: inherit;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-/* =====================================================
-   APP LAYOUT
-===================================================== */
 .app {
   height: 100svh;
   max-width: 430px;
-  margin: 0 auto;
+  margin: auto;
   padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow: hidden;
 }
 
-/* Fullscreen */
-:fullscreen .app,
-:-webkit-full-screen .app {
-  max-width: none;
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 16px;
-}
-
-/* =====================================================
-   HEADER
-===================================================== */
 .header {
-  position: relative;
   text-align: center;
-  flex: 0 0 auto;
 }
 
-.header h1 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 900;
-}
-
-/* =====================================================
-   TOP GRID
-===================================================== */
 .top-grid {
-  flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
   height: 200px;
 }
 
-/* =====================================================
-   PANELS
-===================================================== */
 .panel {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
 .panel-title {
-  font-weight: 900;
+  font-weight: 800;
   margin-bottom: 8px;
-  font-size: 14px;
 }
 
 .row {
-  height: 34px;
+  height: 32px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 10px;
-}
-
-.row-text {
-  width: 100%;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
-}
-
-/* =====================================================
-   CARD / DECK
-===================================================== */
-.card-panel {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .card {
-  width: 100%;
-  height: 100%;
-  border-radius: 16px;
+  border-radius: 18px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-weight: 900;
-  user-select: none;
-  text-align: center;
+  align-items: center;
 }
 
 .card.draw {
   background: #9ca3af;
   color: #111;
-  cursor: pointer;
 }
 
 .card.active {
-  background: #fff;
-  color: #000;
-  padding: 12px;
+  background: white;
+  color: black;
 }
 
 .card.disabled {
   opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .card-face {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  text-align: center;
 }
 
 .card-rank {
-  font-size: 46px;
+  font-size: 44px;
   font-weight: 900;
-  line-height: 1;
 }
 
 .card-label {
   font-size: 13px;
   font-weight: 900;
-  letter-spacing: 0.06em;
-  opacity: 0.9;
 }
 
-/* =====================================================
-   WATERFALL BANNER
-===================================================== */
-
-/* Shared */
-.banner {
-  flex: 0 0 auto;
-  width: 100%;
-  border-radius: 14px;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-/* Waterfall (READY + RUNNING visual) */
 .banner.waterfall {
-  background: linear-gradient(
-    90deg,
-    rgba(56, 189, 248, 0.95),
-    rgba(14, 165, 233, 0.95)
-  );
+  background: linear-gradient(90deg, #38bdf8, #0ea5e9);
   color: #06101a;
+  padding: 12px;
+  border-radius: 14px;
 }
 
-/* Start Waterfall button (READY state) */
 .wf-start {
   width: 100%;
-  border: none;
-  border-radius: 12px;
-  padding: 14px 0;
-  font-size: 16px;
-  font-weight: 900;
-  background: rgba(255, 255, 255, 0.9);
-  color: #06101a;
-  cursor: pointer;
-}
-
-.wf-start:active {
-  transform: scale(0.98);
-}
-
-/* Optional RUNNING display (if enabled later) */
-.wf-running {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.wf-count {
-  font-size: 28px;
+  padding: 10px;
   font-weight: 900;
 }
 
-.wf-sub {
-  font-size: 13px;
-  font-weight: 800;
-  opacity: 0.9;
-  text-align: center;
-}
-
-/* =====================================================
-   ACTION BUTTONS (4 IN ONE ROW)
-===================================================== */
-.actions {
-  flex: 0 0 auto;
-  display: grid;
-}
-
-.actions-four {
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
-.btn {
-  border: none;
-  border-radius: 14px;
-  padding: 10px 0;
-  font-size: 18px;
-  font-weight: 900;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn:disabled {
-  opacity: 0.45;
-}
-
-.btn.thumb {
-  background: #facc15;
-  color: #000;
-}
-
-.btn.heaven {
-  background: #3b82f6;
-  color: #fff;
-}
-
-.btn.rulebreak {
-  background: #ef4444;
-  color: #fff;
-}
-
-.btn.question {
-  background: #a855f7;
-  color: #fff;
-}
-
-/* =====================================================
-   STATUS BAR
-===================================================== */
 .status-bar {
-  flex: 0 0 auto;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   padding: 10px;
   border-radius: 14px;
-  font-size: 13px;
   text-align: center;
 }
 
-.status-main {
-  font-weight: 900;
-}
-
-/* =====================================================
-   PLAYERS
-===================================================== */
 .players {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
 .player {
-  position: relative;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   padding: 12px;
+  border: 2px solid transparent;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  border: 2px solid transparent;
-  overflow: hidden;
 }
 
 .player.TURN {
   border-color: #22c55e;
 }
 
-.player.SELECTABLE {
-  cursor: pointer;
-}
-
-.player.DISABLED {
-  opacity: 0.55;
-}
-
-/* Flash (NON-waterfall only) */
 .player.FLASH {
-  border-color: rgba(255, 80, 80, 0.95);
+  border-color: red;
 }
 
-.player.FLASH::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 80, 80, 0.28);
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-/* Video placeholder */
 .video-slot {
-  flex: 1 1 auto;
-  background: #000;
+  flex: 1;
+  background: black;
   border-radius: 12px;
   margin-bottom: 8px;
 }
 
-/* Footer */
 .player-footer {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.player-name {
-  font-size: 18px;
   font-weight: 900;
 }
 
-.player-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.player-beers {
-  font-weight: 900;
-}
-
-/* Badges */
-.badges {
-  display: flex;
-  gap: 6px;
-}
-
-.badge {
-  min-width: 18px;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.badge.b7 {
-  background: #3b82f6;
-  color: #fff;
-}
-
-.badge.bJ {
-  background: #facc15;
-  color: #111;
-}
-
-.badge.bQ {
-  background: #a855f7;
-  color: #fff;
-}
-
-/* =====================================================
-   RULE INPUT
-===================================================== */
 .rule-input {
   display: flex;
   gap: 8px;
-}
-
-.rule-input input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-}
-
-.rule-input button {
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 900;
-}
-
-/* =====================================================
-   FULLSCREEN TUNING
-===================================================== */
-:fullscreen .top-grid {
-  height: 230px;
-}
-
-:fullscreen .player-name {
-  font-size: 20px;
 }
