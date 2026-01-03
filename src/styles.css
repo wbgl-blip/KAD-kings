@@ -23,9 +23,7 @@ input {
   appearance: none;
 }
 
-/* =========================
-   APP LAYOUT (NO SCROLL)
-========================= */
+/* APP LAYOUT (NO SCROLL) */
 .app {
   height: 100svh;
   max-width: 430px;
@@ -37,7 +35,7 @@ input {
   overflow: hidden;
 }
 
-/* Fullscreen: use the whole viewport */
+/* In fullscreen, stop shrinking to 430px and use the whole viewport */
 :fullscreen .app,
 :-webkit-full-screen .app {
   max-width: none;
@@ -47,9 +45,7 @@ input {
   padding: 16px;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 .header {
   position: relative;
   text-align: center;
@@ -78,9 +74,7 @@ input {
   z-index: 50;
 }
 
-/* =========================
-   TOP GRID
-========================= */
+/* TOP GRID */
 .top-grid {
   flex: 0 0 auto;
   display: grid;
@@ -89,14 +83,7 @@ input {
   height: 200px; /* fixed block so players can fill remaining space */
 }
 
-:fullscreen .top-grid,
-:-webkit-full-screen .top-grid {
-  height: 230px;
-}
-
-/* =========================
-   PANELS
-========================= */
+/* Panels */
 .panel {
   background: rgba(255, 255, 255, 0.04);
   border-radius: 18px;
@@ -105,7 +92,6 @@ input {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 0; /* IMPORTANT: prevents grid overflow weirdness */
 }
 
 .panel-title {
@@ -113,11 +99,6 @@ input {
   margin-bottom: 8px;
   opacity: 0.95;
   font-size: 14px;
-}
-
-:fullscreen .panel-title,
-:-webkit-full-screen .panel-title {
-  font-size: 13px;
 }
 
 .row {
@@ -133,11 +114,6 @@ input {
   overflow: hidden;
 }
 
-:fullscreen .row,
-:-webkit-full-screen .row {
-  height: 30px;
-}
-
 .row-text {
   display: block;
   width: 100%;
@@ -148,14 +124,7 @@ input {
   font-size: 12px;
 }
 
-:fullscreen .row-text,
-:-webkit-full-screen .row-text {
-  font-size: 11px;
-}
-
-/* =========================
-   CARD / DECK
-========================= */
+/* CARD / DECK */
 .card-panel {
   justify-content: center;
   align-items: center;
@@ -214,13 +183,53 @@ input {
   font-weight: 800;
 }
 
-/* =========================
-   ACTION BUTTONS
-========================= */
-.actions {
+/* WATERFALL BANNER */
+.waterfall-banner {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.waterfall-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.waterfall-text strong {
+  font-size: 13px;
+}
+
+.waterfall-text span {
+  font-size: 12px;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.waterfall-start {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ACTION BUTTONS (4) */
+.actions-4 {
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
@@ -242,19 +251,22 @@ input {
   color: #000;
 }
 
-.btn.ready {
-  background: #22c55e;
-  color: #000;
-}
-
 .btn.heaven {
   background: #3b82f6;
   color: #fff;
 }
 
-/* =========================
-   STATUS BAR
-========================= */
+.btn.rulebreak {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn.qm {
+  background: #a855f7;
+  color: #fff;
+}
+
+/* STATUS BAR (SMALLER) */
 .status-bar {
   flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.06);
@@ -285,19 +297,7 @@ input {
   font-size: 12px;
 }
 
-.meta-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  font-weight: 900;
-  font-size: 12px;
-}
-
-/* =========================
-   PLAYERS (FILL REMAINING HEIGHT)
-========================= */
+/* PLAYERS (FILL REMAINING HEIGHT) */
 .players {
   flex: 1 1 auto;
   min-height: 0;
@@ -306,13 +306,8 @@ input {
   gap: 10px;
 }
 
-:fullscreen .players,
-:-webkit-full-screen .players {
-  gap: 12px;
-}
-
 .player {
-  position: relative; /* REQUIRED: so FLASH overlay stays inside the tile */
+  position: relative;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   padding: 12px;
@@ -324,26 +319,20 @@ input {
   min-height: 0;
 }
 
-:fullscreen .player,
-:-webkit-full-screen .player {
-  padding: 14px;
-}
-
 .player.TURN {
   border-color: #22c55e;
 }
 
-/* Optional UI states (safe even if not used) */
 .player.SELECTABLE {
-  outline: 2px solid rgba(255, 255, 255, 0.16);
+  outline: 2px solid rgba(255, 255, 255, 0.15);
   outline-offset: -2px;
 }
 
 .player.DISABLED {
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
-/* 2s drink flash — PLAYER TILE ONLY */
+/* 2s drink flash (PLAYER TILE ONLY) */
 .player.FLASH {
   border-color: rgba(255, 80, 80, 0.95);
   box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.35) inset;
@@ -358,20 +347,14 @@ input {
   border-radius: inherit;
 }
 
-/* Video placeholder (prepared for real video later) */
+/* Video placeholder */
 .video-slot {
   flex: 1 1 auto;
   min-height: 0;
   background: #000;
   border-radius: 12px;
   margin-bottom: 8px;
-  pointer-events: none; /* IMPORTANT: does not block taps on the tile */
-}
-
-:fullscreen .video-slot,
-:-webkit-full-screen .video-slot {
-  border-radius: 14px;
-  margin-bottom: 10px;
+  pointer-events: none; /* does not block taps */
 }
 
 .player-footer {
@@ -386,24 +369,12 @@ input {
   font-size: 18px;
 }
 
-:fullscreen .player-name,
-:-webkit-full-screen .player-name {
-  font-size: 20px;
-}
-
 .player-beers {
   opacity: 0.9;
   font-weight: 900;
 }
 
-:fullscreen .player-beers,
-:-webkit-full-screen .player-beers {
-  font-size: 14px;
-}
-
-/* =========================
-   RULE INPUT
-========================= */
+/* RULE INPUT */
 .rule-input {
   flex: 0 0 auto;
   display: flex;
@@ -422,4 +393,51 @@ input {
   border-radius: 10px;
   border: none;
   font-weight: 900;
+}
+
+/* FULLSCREEN / LARGE VIEWPORT TUNING */
+:fullscreen .top-grid,
+:-webkit-full-screen .top-grid {
+  height: 230px;
+}
+
+:fullscreen .row,
+:-webkit-full-screen .row {
+  height: 30px;
+}
+
+:fullscreen .row-text,
+:-webkit-full-screen .row-text {
+  font-size: 11px;
+}
+
+:fullscreen .panel-title,
+:-webkit-full-screen .panel-title {
+  font-size: 13px;
+}
+
+:fullscreen .players,
+:-webkit-full-screen .players {
+  gap: 12px;
+}
+
+:fullscreen .player,
+:-webkit-full-screen .player {
+  padding: 14px;
+}
+
+:fullscreen .video-slot,
+:-webkit-full-screen .video-slot {
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+:fullscreen .player-name,
+:-webkit-full-screen .player-name {
+  font-size: 20px;
+}
+
+:fullscreen .player-beers,
+:-webkit-full-screen .player-beers {
+  font-size: 14px;
 }
