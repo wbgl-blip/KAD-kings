@@ -630,3 +630,46 @@ button {
 :-webkit-full-screen .player-beers {
   font-size: 14px;
 }
+/* =========================
+   DEV DECK
+========================= */
+
+.dev-deck {
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  max-height: 160px;
+  overflow: hidden;
+}
+
+.dev-title {
+  font-size: 12px;
+  font-weight: 900;
+  opacity: 0.8;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.dev-cards {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.dev-card {
+  min-width: 36px;
+  height: 44px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.dev-card.next {
+  outline: 2px solid #22c55e;
+}
