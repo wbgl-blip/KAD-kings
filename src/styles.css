@@ -23,7 +23,9 @@ input {
   appearance: none;
 }
 
-/* APP LAYOUT (NO SCROLL) */
+/* =========================
+   APP LAYOUT (NO SCROLL)
+========================= */
 .app {
   height: 100svh;
   max-width: 430px;
@@ -45,7 +47,9 @@ input {
   padding: 16px;
 }
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
 .header {
   position: relative;
   text-align: center;
@@ -58,7 +62,7 @@ input {
   font-weight: 800;
 }
 
-/* Fullscreen button */
+/* keep it in the top-right even in fullscreen */
 .fullscreen-btn {
   position: fixed;
   right: 12px;
@@ -74,7 +78,9 @@ input {
   z-index: 50;
 }
 
-/* TOP GRID */
+/* =========================
+   TOP GRID
+========================= */
 .top-grid {
   flex: 0 0 auto;
   display: grid;
@@ -88,7 +94,9 @@ input {
   height: 230px;
 }
 
-/* Panels */
+/* =========================
+   PANELS
+========================= */
 .panel {
   background: rgba(255, 255, 255, 0.04);
   border-radius: 18px;
@@ -97,6 +105,7 @@ input {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0; /* IMPORTANT: prevents grid overflow weirdness */
 }
 
 .panel-title {
@@ -144,7 +153,9 @@ input {
   font-size: 11px;
 }
 
-/* CARD / DECK */
+/* =========================
+   CARD / DECK
+========================= */
 .card-panel {
   justify-content: center;
   align-items: center;
@@ -203,7 +214,9 @@ input {
   font-weight: 800;
 }
 
-/* ACTION BUTTONS */
+/* =========================
+   ACTION BUTTONS
+========================= */
 .actions {
   flex: 0 0 auto;
   display: grid;
@@ -239,7 +252,9 @@ input {
   color: #fff;
 }
 
-/* STATUS BAR */
+/* =========================
+   STATUS BAR
+========================= */
 .status-bar {
   flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.06);
@@ -280,7 +295,9 @@ input {
   font-size: 12px;
 }
 
-/* PLAYERS (FILL REMAINING HEIGHT) */
+/* =========================
+   PLAYERS (FILL REMAINING HEIGHT)
+========================= */
 .players {
   flex: 1 1 auto;
   min-height: 0;
@@ -295,7 +312,7 @@ input {
 }
 
 .player {
-  position: relative; /* required for FLASH overlay */
+  position: relative; /* REQUIRED: so FLASH overlay stays inside the tile */
   background: rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   padding: 12px;
@@ -316,11 +333,12 @@ input {
   border-color: #22c55e;
 }
 
-/* Optional UI helpers (not required, but safe) */
+/* Optional UI states (safe even if not used) */
 .player.SELECTABLE {
   outline: 2px solid rgba(255, 255, 255, 0.16);
   outline-offset: -2px;
 }
+
 .player.DISABLED {
   opacity: 0.6;
 }
@@ -340,7 +358,7 @@ input {
   border-radius: inherit;
 }
 
-/* Video placeholder */
+/* Video placeholder (prepared for real video later) */
 .video-slot {
   flex: 1 1 auto;
   min-height: 0;
@@ -383,7 +401,9 @@ input {
   font-size: 14px;
 }
 
-/* RULE INPUT */
+/* =========================
+   RULE INPUT
+========================= */
 .rule-input {
   flex: 0 0 auto;
   display: flex;
